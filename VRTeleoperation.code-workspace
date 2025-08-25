@@ -1,0 +1,941 @@
+{
+	"folders": [
+		{
+			"name": "VRTeleoperation",
+			"path": "."
+		},
+		{
+			"name": "UE5",
+			"path": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+		}
+	],
+	"settings": {
+		"typescript.tsc.autoDetect": "off",
+		"npm.autoDetect": "off",
+		"terminal.integrated.env.linux": {
+			"PATH": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Binaries/ThirdParty/DotNet/8.0.300/linux-x64:${env:PATH}",
+			"DOTNET_ROOT": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Binaries/ThirdParty/DotNet/8.0.300/linux-x64",
+			"DOTNET_HOST_PATH": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Binaries/ThirdParty/DotNet/8.0.300/linux-x64/dotnet",
+			"DOTNET_MULTILEVEL_LOOKUP": "0",
+			"DOTNET_ROLL_FORWARD": "LatestMajor"
+		},
+		"files.associations": {
+			"functional": "cpp",
+			"new": "cpp",
+			"ios": "cpp",
+			"*.inc": "cpp",
+			"array": "cpp",
+			"atomic": "cpp",
+			"cmath": "cpp",
+			"cstdarg": "cpp",
+			"cstddef": "cpp",
+			"cstdint": "cpp",
+			"cstdlib": "cpp",
+			"cstring": "cpp",
+			"exception": "cpp",
+			"algorithm": "cpp",
+			"iterator": "cpp",
+			"memory": "cpp",
+			"tuple": "cpp",
+			"type_traits": "cpp",
+			"utility": "cpp",
+			"initializer_list": "cpp",
+			"limits": "cpp",
+			"cctype": "cpp",
+			"cstdio": "cpp",
+			"cwchar": "cpp",
+			"cwctype": "cpp",
+			"__verbose_abort": "cpp",
+			"compare": "cpp",
+			"stdexcept": "cpp"
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-vscode.cpptools",
+			"ms-dotnettools.csharp"
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "VRTeleoperation Linux Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"Debug",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"Debug",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"VRTeleoperation Linux Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"Debug",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"DebugGame",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"DebugGame",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"VRTeleoperation Linux DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"DebugGame",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"Development",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"Development",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"VRTeleoperation Linux Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"Development",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux Test Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"Test",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux Test Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"Test",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"VRTeleoperation Linux Test Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux Test Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"Test",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux Shipping Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"Shipping",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux Shipping Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"Shipping",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"VRTeleoperation Linux Shipping Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation Linux Shipping Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"Linux",
+					"Shipping",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"Debug",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"Debug",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"VRTeleoperation LinuxArm64 Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"Debug",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"DebugGame",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"DebugGame",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"VRTeleoperation LinuxArm64 DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"DebugGame",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"Development",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"Development",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"VRTeleoperation LinuxArm64 Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"Development",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 Test Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"Test",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 Test Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"Test",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"VRTeleoperation LinuxArm64 Test Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 Test Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"Test",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 Shipping Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"Shipping",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 Shipping Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"Shipping",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"VRTeleoperation LinuxArm64 Shipping Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperation LinuxArm64 Shipping Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperation",
+					"LinuxArm64",
+					"Shipping",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperationEditor Linux Debug Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperationEditor",
+					"Linux",
+					"Debug",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperationEditor Linux Debug Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperationEditor",
+					"Linux",
+					"Debug",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"VRTeleoperationEditor Linux Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperationEditor Linux Debug Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperationEditor",
+					"Linux",
+					"Debug",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperationEditor Linux DebugGame Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperationEditor",
+					"Linux",
+					"DebugGame",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperationEditor Linux DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperationEditor",
+					"Linux",
+					"DebugGame",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"VRTeleoperationEditor Linux DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperationEditor Linux DebugGame Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperationEditor",
+					"Linux",
+					"DebugGame",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperationEditor Linux Development Build",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperationEditor",
+					"Linux",
+					"Development",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperationEditor Linux Development Rebuild",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperationEditor",
+					"Linux",
+					"Development",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"VRTeleoperationEditor Linux Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"label": "VRTeleoperationEditor Linux Development Clean",
+				"group": "build",
+				"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+				"args": [
+					"VRTeleoperationEditor",
+					"Linux",
+					"Development",
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-waitmutex",
+					"-clean"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Launch VRTeleoperation (Debug)",
+				"request": "launch",
+				"program": "/home/robolab/Documents/Unreal Projects/VRTeleoperation/Binaries/Linux/UnrealGame-Linux-Debug",
+				"preLaunchTask": "VRTeleoperation Linux Debug Build",
+				"args": [
+				],
+				"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1",
+				"type": "cppdbg",
+				"visualizerFile": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/VRTeleoperation": "/home/robolab/Documents/Unreal Projects/VRTeleoperation",
+					"/UEVFS/Root": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"name": "Launch VRTeleoperation (DebugGame)",
+				"request": "launch",
+				"program": "/home/robolab/Documents/Unreal Projects/VRTeleoperation/Binaries/Linux/UnrealGame-Linux-DebugGame",
+				"preLaunchTask": "VRTeleoperation Linux DebugGame Build",
+				"args": [
+				],
+				"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1",
+				"type": "cppdbg",
+				"visualizerFile": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/VRTeleoperation": "/home/robolab/Documents/Unreal Projects/VRTeleoperation",
+					"/UEVFS/Root": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"name": "Launch VRTeleoperation (Development)",
+				"request": "launch",
+				"program": "/home/robolab/Documents/Unreal Projects/VRTeleoperation/Binaries/Linux/UnrealGame",
+				"preLaunchTask": "VRTeleoperation Linux Development Build",
+				"args": [
+				],
+				"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1",
+				"type": "cppdbg",
+				"visualizerFile": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/VRTeleoperation": "/home/robolab/Documents/Unreal Projects/VRTeleoperation",
+					"/UEVFS/Root": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"name": "Launch VRTeleoperation (Test)",
+				"request": "launch",
+				"program": "/home/robolab/Documents/Unreal Projects/VRTeleoperation/Binaries/Linux/UnrealGame-Linux-Test",
+				"preLaunchTask": "VRTeleoperation Linux Test Build",
+				"args": [
+				],
+				"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1",
+				"type": "cppdbg",
+				"visualizerFile": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/VRTeleoperation": "/home/robolab/Documents/Unreal Projects/VRTeleoperation",
+					"/UEVFS/Root": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"name": "Launch VRTeleoperation (Shipping)",
+				"request": "launch",
+				"program": "/home/robolab/Documents/Unreal Projects/VRTeleoperation/Binaries/Linux/UnrealGame-Linux-Shipping",
+				"preLaunchTask": "VRTeleoperation Linux Shipping Build",
+				"args": [
+				],
+				"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1",
+				"type": "cppdbg",
+				"visualizerFile": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/VRTeleoperation": "/home/robolab/Documents/Unreal Projects/VRTeleoperation",
+					"/UEVFS/Root": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"name": "Launch VRTeleoperationEditor (Debug)",
+				"request": "launch",
+				"program": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Binaries/Linux/UnrealEditor-Linux-Debug",
+				"preLaunchTask": "VRTeleoperationEditor Linux Debug Build",
+				"args": [
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject"
+				],
+				"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1",
+				"type": "cppdbg",
+				"visualizerFile": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/VRTeleoperation": "/home/robolab/Documents/Unreal Projects/VRTeleoperation",
+					"/UEVFS/Root": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"name": "Launch VRTeleoperationEditor (DebugGame)",
+				"request": "launch",
+				"program": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Binaries/Linux/UnrealEditor-Linux-DebugGame",
+				"preLaunchTask": "VRTeleoperationEditor Linux DebugGame Build",
+				"args": [
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject"
+				],
+				"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1",
+				"type": "cppdbg",
+				"visualizerFile": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/VRTeleoperation": "/home/robolab/Documents/Unreal Projects/VRTeleoperation",
+					"/UEVFS/Root": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"name": "Launch VRTeleoperationEditor (Development)",
+				"request": "launch",
+				"program": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Binaries/Linux/UnrealEditor",
+				"preLaunchTask": "VRTeleoperationEditor Linux Development Build",
+				"args": [
+					"/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject"
+				],
+				"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1",
+				"type": "cppdbg",
+				"visualizerFile": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Extras/VisualStudioDebugging/Unreal.natvis",
+				"showDisplayString": true,
+				"sourceFileMap": {
+					"/UEVFS/VRTeleoperation": "/home/robolab/Documents/Unreal Projects/VRTeleoperation",
+					"/UEVFS/Root": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+				}
+			},
+			{
+				"name": "Generate Project Files",
+				"type": "coreclr",
+				"request": "launch",
+				"preLaunchTask": "UnrealBuildTool Linux Development Build",
+				"program": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Build/BatchFiles/RunUBT.bat",
+				"args": [
+					"-projectfiles",
+					"-vscode",
+					"-project=/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject",
+					"-game",
+					"-engine",
+					"-dotnet"
+				],
+				"env": {
+					"PATH": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Binaries/ThirdParty/DotNet/8.0.300/linux-x64:${env:PATH}",
+					"DOTNET_ROOT": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Binaries/ThirdParty/DotNet/8.0.300/linux-x64",
+					"DOTNET_HOST_PATH": "/home/robolab/software/Linux_Unreal_Engine_5.6.1/Engine/Binaries/ThirdParty/DotNet/8.0.300/linux-x64/dotnet",
+					"DOTNET_MULTILEVEL_LOOKUP": "0",
+					"DOTNET_ROLL_FORWARD": "LatestMajor"
+				},
+				"console": "internalConsole",
+				"internalConsoleOptions": "openOnSessionStart",
+				"stopAtEntry": false,
+				"cwd": "/home/robolab/software/Linux_Unreal_Engine_5.6.1"
+			}
+		]
+	}
+}
