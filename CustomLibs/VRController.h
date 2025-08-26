@@ -78,6 +78,28 @@ struct Pose
     }
 };
 
+struct Controller
+{
+    float trigger;
+    float grab;
+    float x;
+    float y;
+    float thumbstickCapTouch;
+    bool aButton;
+    float aButtonCapTouch;
+    bool bButton;
+    float bButtonCapTouch;
+
+    /**
+     * Obtains a tuple containing all of the struct's data members.
+     * @return The data members in a tuple.
+     */
+    std::tuple<const float&, const float&, const float&, const float&, const float&, const bool&, const float&, const bool&, const float&> ice_tuple() const
+    {
+        return std::tie(trigger, grab, x, y, thumbstickCapTouch, aButton, aButtonCapTouch, bButton, bButtonCapTouch);
+    }
+};
+
 using Ice::operator<;
 using Ice::operator<=;
 using Ice::operator>;
@@ -124,6 +146,11 @@ public:
      */
     static const ::std::string& ice_staticId();
 
+    virtual void sendControllers(Controller left, Controller right, const ::Ice::Current& current) = 0;
+    /// \cond INTERNAL
+    bool _iceD_sendControllers(::IceInternal::Incoming&, const ::Ice::Current&);
+    /// \endcond
+
     virtual void sendPose(Pose head, Pose left, Pose right, const ::Ice::Current& current) = 0;
     /// \cond INTERNAL
     bool _iceD_sendPose(::IceInternal::Incoming&, const ::Ice::Current&);
@@ -142,6 +169,32 @@ namespace RoboCompVRController
 class VRControllerPrx : public virtual ::Ice::Proxy<VRControllerPrx, ::Ice::ObjectPrx>
 {
 public:
+
+    void sendControllers(const Controller& left, const Controller& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    {
+        _makePromiseOutgoing<void>(true, this, &VRControllerPrx::_iceI_sendControllers, left, right, context).get();
+    }
+
+    template<template<typename> class P = ::std::promise>
+    auto sendControllersAsync(const Controller& left, const Controller& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
+        -> decltype(::std::declval<P<void>>().get_future())
+    {
+        return _makePromiseOutgoing<void, P>(false, this, &VRControllerPrx::_iceI_sendControllers, left, right, context);
+    }
+
+    ::std::function<void()>
+    sendControllersAsync(const Controller& left, const Controller& right,
+                         ::std::function<void()> response,
+                         ::std::function<void(::std::exception_ptr)> ex = nullptr,
+                         ::std::function<void(bool)> sent = nullptr,
+                         const ::Ice::Context& context = ::Ice::noExplicitContext)
+    {
+        return _makeLamdaOutgoing<void>(std::move(response), std::move(ex), std::move(sent), this, &RoboCompVRController::VRControllerPrx::_iceI_sendControllers, left, right, context);
+    }
+
+    /// \cond INTERNAL
+    void _iceI_sendControllers(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<void>>&, const Controller&, const Controller&, const ::Ice::Context&);
+    /// \endcond
 
     void sendPose(const Pose& head, const Pose& left, const Pose& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
     {
@@ -208,6 +261,23 @@ struct StreamReader<::RoboCompVRController::Pose, S>
     }
 };
 
+template<>
+struct StreamableTraits<::RoboCompVRController::Controller>
+{
+    static const StreamHelperCategory helper = StreamHelperCategoryStruct;
+    static const int minWireSize = 30;
+    static const bool fixedLength = true;
+};
+
+template<typename S>
+struct StreamReader<::RoboCompVRController::Controller, S>
+{
+    static void read(S* istr, ::RoboCompVRController::Controller& v)
+    {
+        istr->readAll(v.trigger, v.grab, v.x, v.y, v.thumbstickCapTouch, v.aButton, v.aButtonCapTouch, v.bButton, v.bButtonCapTouch);
+    }
+};
+
 }
 /// \endcond
 
@@ -268,10 +338,31 @@ struct Pose
     ::Ice::Float rz;
 };
 
+struct Controller
+{
+    ::Ice::Float trigger;
+    ::Ice::Float grab;
+    ::Ice::Float x;
+    ::Ice::Float y;
+    ::Ice::Float thumbstickCapTouch;
+    bool aButton;
+    ::Ice::Float aButtonCapTouch;
+    bool bButton;
+    ::Ice::Float bButtonCapTouch;
+};
+
 }
 
 namespace RoboCompVRController
 {
+
+/**
+ * Base class for asynchronous callback wrapper classes used for calls to
+ * IceProxy::RoboCompVRController::VRController::begin_sendControllers.
+ * Create a wrapper instance by calling ::RoboCompVRController::newCallback_VRController_sendControllers.
+ */
+class Callback_VRController_sendControllers_Base : public virtual ::IceInternal::CallbackBase { };
+typedef ::IceUtil::Handle< Callback_VRController_sendControllers_Base> Callback_VRController_sendControllersPtr;
 
 /**
  * Base class for asynchronous callback wrapper classes used for calls to
@@ -291,6 +382,44 @@ namespace RoboCompVRController
 
 class VRController : public virtual ::Ice::Proxy<VRController, ::IceProxy::Ice::Object>
 {
+public:
+
+    void sendControllers(const ::RoboCompVRController::Controller& left, const ::RoboCompVRController::Controller& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    {
+        end_sendControllers(_iceI_begin_sendControllers(left, right, context, ::IceInternal::dummyCallback, 0, true));
+    }
+
+    ::Ice::AsyncResultPtr begin_sendControllers(const ::RoboCompVRController::Controller& left, const ::RoboCompVRController::Controller& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    {
+        return _iceI_begin_sendControllers(left, right, context, ::IceInternal::dummyCallback, 0);
+    }
+
+    ::Ice::AsyncResultPtr begin_sendControllers(const ::RoboCompVRController::Controller& left, const ::RoboCompVRController::Controller& right, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    {
+        return _iceI_begin_sendControllers(left, right, ::Ice::noExplicitContext, cb, cookie);
+    }
+
+    ::Ice::AsyncResultPtr begin_sendControllers(const ::RoboCompVRController::Controller& left, const ::RoboCompVRController::Controller& right, const ::Ice::Context& context, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    {
+        return _iceI_begin_sendControllers(left, right, context, cb, cookie);
+    }
+
+    ::Ice::AsyncResultPtr begin_sendControllers(const ::RoboCompVRController::Controller& left, const ::RoboCompVRController::Controller& right, const ::RoboCompVRController::Callback_VRController_sendControllersPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    {
+        return _iceI_begin_sendControllers(left, right, ::Ice::noExplicitContext, cb, cookie);
+    }
+
+    ::Ice::AsyncResultPtr begin_sendControllers(const ::RoboCompVRController::Controller& left, const ::RoboCompVRController::Controller& right, const ::Ice::Context& context, const ::RoboCompVRController::Callback_VRController_sendControllersPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    {
+        return _iceI_begin_sendControllers(left, right, context, cb, cookie);
+    }
+
+    void end_sendControllers(const ::Ice::AsyncResultPtr& result);
+
+private:
+
+    ::Ice::AsyncResultPtr _iceI_begin_sendControllers(const ::RoboCompVRController::Controller&, const ::RoboCompVRController::Controller&, const ::Ice::Context&, const ::IceInternal::CallbackBasePtr&, const ::Ice::LocalObjectPtr& cookie = 0, bool sync = false);
+
 public:
 
     void sendPose(const ::RoboCompVRController::Pose& head, const ::RoboCompVRController::Pose& left, const ::RoboCompVRController::Pose& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
@@ -394,6 +523,11 @@ public:
      */
     static const ::std::string& ice_staticId();
 
+    virtual void sendControllers(const Controller& left, const Controller& right, const ::Ice::Current& current = ::Ice::emptyCurrent) = 0;
+    /// \cond INTERNAL
+    bool _iceD_sendControllers(::IceInternal::Incoming&, const ::Ice::Current&);
+    /// \endcond
+
     virtual void sendPose(const Pose& head, const Pose& left, const Pose& right, const ::Ice::Current& current = ::Ice::emptyCurrent) = 0;
     /// \cond INTERNAL
     bool _iceD_sendPose(::IceInternal::Incoming&, const ::Ice::Current&);
@@ -465,11 +599,209 @@ struct StreamReader< ::RoboCompVRController::Pose, S>
     }
 };
 
+template<>
+struct StreamableTraits< ::RoboCompVRController::Controller>
+{
+    static const StreamHelperCategory helper = StreamHelperCategoryStruct;
+    static const int minWireSize = 30;
+    static const bool fixedLength = true;
+};
+
+template<typename S>
+struct StreamWriter< ::RoboCompVRController::Controller, S>
+{
+    static void write(S* ostr, const ::RoboCompVRController::Controller& v)
+    {
+        ostr->write(v.trigger);
+        ostr->write(v.grab);
+        ostr->write(v.x);
+        ostr->write(v.y);
+        ostr->write(v.thumbstickCapTouch);
+        ostr->write(v.aButton);
+        ostr->write(v.aButtonCapTouch);
+        ostr->write(v.bButton);
+        ostr->write(v.bButtonCapTouch);
+    }
+};
+
+template<typename S>
+struct StreamReader< ::RoboCompVRController::Controller, S>
+{
+    static void read(S* istr, ::RoboCompVRController::Controller& v)
+    {
+        istr->read(v.trigger);
+        istr->read(v.grab);
+        istr->read(v.x);
+        istr->read(v.y);
+        istr->read(v.thumbstickCapTouch);
+        istr->read(v.aButton);
+        istr->read(v.aButtonCapTouch);
+        istr->read(v.bButton);
+        istr->read(v.bButtonCapTouch);
+    }
+};
+
 }
 /// \endcond
 
 namespace RoboCompVRController
 {
+
+/**
+ * Type-safe asynchronous callback wrapper class used for calls to
+ * IceProxy::RoboCompVRController::VRController::begin_sendControllers.
+ * Create a wrapper instance by calling ::RoboCompVRController::newCallback_VRController_sendControllers.
+ */
+template<class T>
+class CallbackNC_VRController_sendControllers : public Callback_VRController_sendControllers_Base, public ::IceInternal::OnewayCallbackNC<T>
+{
+public:
+
+    typedef IceUtil::Handle<T> TPtr;
+
+    typedef void (T::*Exception)(const ::Ice::Exception&);
+    typedef void (T::*Sent)(bool);
+    typedef void (T::*Response)();
+
+    CallbackNC_VRController_sendControllers(const TPtr& obj, Response cb, Exception excb, Sent sentcb)
+        : ::IceInternal::OnewayCallbackNC<T>(obj, cb, excb, sentcb)
+    {
+    }
+};
+
+/**
+ * Creates a callback wrapper instance that delegates to your object.
+ * @param instance The callback object.
+ * @param cb The success method of the callback object.
+ * @param excb The exception method of the callback object.
+ * @param sentcb The sent method of the callback object.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRController::VRController::begin_sendControllers.
+ */
+template<class T> Callback_VRController_sendControllersPtr
+newCallback_VRController_sendControllers(const IceUtil::Handle<T>& instance, void (T::*cb)(), void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
+{
+    return new CallbackNC_VRController_sendControllers<T>(instance, cb, excb, sentcb);
+}
+
+/**
+ * Creates a callback wrapper instance that delegates to your object.
+ * @param instance The callback object.
+ * @param excb The exception method of the callback object.
+ * @param sentcb The sent method of the callback object.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRController::VRController::begin_sendControllers.
+ */
+template<class T> Callback_VRController_sendControllersPtr
+newCallback_VRController_sendControllers(const IceUtil::Handle<T>& instance, void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
+{
+    return new CallbackNC_VRController_sendControllers<T>(instance, 0, excb, sentcb);
+}
+
+/**
+ * Creates a callback wrapper instance that delegates to your object.
+ * @param instance The callback object.
+ * @param cb The success method of the callback object.
+ * @param excb The exception method of the callback object.
+ * @param sentcb The sent method of the callback object.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRController::VRController::begin_sendControllers.
+ */
+template<class T> Callback_VRController_sendControllersPtr
+newCallback_VRController_sendControllers(T* instance, void (T::*cb)(), void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
+{
+    return new CallbackNC_VRController_sendControllers<T>(instance, cb, excb, sentcb);
+}
+
+/**
+ * Creates a callback wrapper instance that delegates to your object.
+ * @param instance The callback object.
+ * @param excb The exception method of the callback object.
+ * @param sentcb The sent method of the callback object.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRController::VRController::begin_sendControllers.
+ */
+template<class T> Callback_VRController_sendControllersPtr
+newCallback_VRController_sendControllers(T* instance, void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
+{
+    return new CallbackNC_VRController_sendControllers<T>(instance, 0, excb, sentcb);
+}
+
+/**
+ * Type-safe asynchronous callback wrapper class with cookie support used for calls to
+ * IceProxy::RoboCompVRController::VRController::begin_sendControllers.
+ * Create a wrapper instance by calling ::RoboCompVRController::newCallback_VRController_sendControllers.
+ */
+template<class T, typename CT>
+class Callback_VRController_sendControllers : public Callback_VRController_sendControllers_Base, public ::IceInternal::OnewayCallback<T, CT>
+{
+public:
+
+    typedef IceUtil::Handle<T> TPtr;
+
+    typedef void (T::*Exception)(const ::Ice::Exception& , const CT&);
+    typedef void (T::*Sent)(bool , const CT&);
+    typedef void (T::*Response)(const CT&);
+
+    Callback_VRController_sendControllers(const TPtr& obj, Response cb, Exception excb, Sent sentcb)
+        : ::IceInternal::OnewayCallback<T, CT>(obj, cb, excb, sentcb)
+    {
+    }
+};
+
+/**
+ * Creates a callback wrapper instance that delegates to your object.
+ * Use this overload when your callback methods receive a cookie value.
+ * @param instance The callback object.
+ * @param cb The success method of the callback object.
+ * @param excb The exception method of the callback object.
+ * @param sentcb The sent method of the callback object.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRController::VRController::begin_sendControllers.
+ */
+template<class T, typename CT> Callback_VRController_sendControllersPtr
+newCallback_VRController_sendControllers(const IceUtil::Handle<T>& instance, void (T::*cb)(const CT&), void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
+{
+    return new Callback_VRController_sendControllers<T, CT>(instance, cb, excb, sentcb);
+}
+
+/**
+ * Creates a callback wrapper instance that delegates to your object.
+ * Use this overload when your callback methods receive a cookie value.
+ * @param instance The callback object.
+ * @param excb The exception method of the callback object.
+ * @param sentcb The sent method of the callback object.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRController::VRController::begin_sendControllers.
+ */
+template<class T, typename CT> Callback_VRController_sendControllersPtr
+newCallback_VRController_sendControllers(const IceUtil::Handle<T>& instance, void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
+{
+    return new Callback_VRController_sendControllers<T, CT>(instance, 0, excb, sentcb);
+}
+
+/**
+ * Creates a callback wrapper instance that delegates to your object.
+ * Use this overload when your callback methods receive a cookie value.
+ * @param instance The callback object.
+ * @param cb The success method of the callback object.
+ * @param excb The exception method of the callback object.
+ * @param sentcb The sent method of the callback object.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRController::VRController::begin_sendControllers.
+ */
+template<class T, typename CT> Callback_VRController_sendControllersPtr
+newCallback_VRController_sendControllers(T* instance, void (T::*cb)(const CT&), void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
+{
+    return new Callback_VRController_sendControllers<T, CT>(instance, cb, excb, sentcb);
+}
+
+/**
+ * Creates a callback wrapper instance that delegates to your object.
+ * Use this overload when your callback methods receive a cookie value.
+ * @param instance The callback object.
+ * @param excb The exception method of the callback object.
+ * @param sentcb The sent method of the callback object.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRController::VRController::begin_sendControllers.
+ */
+template<class T, typename CT> Callback_VRController_sendControllersPtr
+newCallback_VRController_sendControllers(T* instance, void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
+{
+    return new Callback_VRController_sendControllers<T, CT>(instance, 0, excb, sentcb);
+}
 
 /**
  * Type-safe asynchronous callback wrapper class used for calls to

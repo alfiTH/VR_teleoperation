@@ -48,20 +48,10 @@ void publish(const IceStorm::TopicManagerPrxPtr& topicManager,
     pubProxy = Ice::uncheckedCast<PubProxyType>(publisher);
 };
 
-inline RoboCompVRController::Pose toIcePose(const Pose& p)
-{
-    RoboCompVRController::Pose icePose;
-    icePose.x  = p.x;
-    icePose.y  = p.y;
-    icePose.z  = p.z;
-    icePose.rx = p.rx;
-    icePose.ry = p.ry;
-    icePose.rz = p.rz;
-    return icePose;
+inline RoboCompVRController::Pose toIcePose(const RobotMiddleware::Pose& p) { return {p.x, p.y, p.z, p.rx, p.ry, p.rz}; }
+inline RoboCompVRController::Controller toIceController(const RobotMiddleware::Controller& c) { 
+    return {c.trigger, c.grab, c.x, c.y, c.thumbstickCapTouch, c.aButton, c.aButtonCapTouch, c.bButton, c.bButtonCapTouch}; 
 }
-
-
-
 
 struct RobotMiddleware::Impl {
     Ice::CommunicatorHolder communicator;
@@ -127,7 +117,7 @@ bool RobotMiddleware::initIce()
     }
 }
 
-bool RobotMiddleware::sendPose(const Pose& head, const Pose& left, const Pose& right) {
+bool RobotMiddleware::sendPose(const RobotMiddleware::Pose& head, const RobotMiddleware::Pose& left, const RobotMiddleware::Pose& right) {
     try {
         pImpl->vrcontroller_proxy->sendPose(
             toIcePose(head),
@@ -136,7 +126,21 @@ bool RobotMiddleware::sendPose(const Pose& head, const Pose& left, const Pose& r
         );
         return true;
     } catch (const Ice::Exception& ex) {
-        std::cerr << "[RobotMiddleware] Error enviando pose: " << ex << std::endl;
+        std::cerr << "[RobotMiddleware] Error sending pose: " << ex << std::endl;
+        return false;
+    }
+}
+
+
+bool RobotMiddleware::sendControllers(const RobotMiddleware::Controller& left, const RobotMiddleware::Controller& right) {
+    try {
+        pImpl->vrcontroller_proxy->sendControllers(
+            toIceController(left),
+            toIceController(right)
+        );
+        return true;
+    } catch (const Ice::Exception& ex) {
+        std::cerr << "[RobotMiddleware] Error sending controllers: " << ex << std::endl;
         return false;
     }
 }

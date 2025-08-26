@@ -54,10 +54,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs"
+CMAKE_SOURCE_DIR = /home/robolab/Code/VR_teleoperation/CustomLibs
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/build"
+CMAKE_BINARY_DIR = /home/robolab/Code/VR_teleoperation/CustomLibs/build
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -81,14 +81,14 @@ clean: CMakeFiles/Middleware.dir/clean
 CMakeFiles/Middleware.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/build/CMakeFiles" --progress-num=1,2,3 "Built target Middleware"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles --progress-num=1,2,3 "Built target Middleware"
 .PHONY : CMakeFiles/Middleware.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/Middleware.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/build/CMakeFiles" 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/Middleware.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/build/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles 0
 .PHONY : CMakeFiles/Middleware.dir/rule
 
 # Convenience name for target.

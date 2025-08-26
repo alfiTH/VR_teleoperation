@@ -6,6 +6,10 @@
 #include "GameFramework/Pawn.h"
 #include "Camera/CameraComponent.h"
 #include "MotionControllerComponent.h"
+#include "InputAction.h" 
+
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 
 #include "Engine/Engine.h"
 #include "RobotMiddleware.h"
@@ -34,6 +38,13 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void SetupPoseComponent();
+	void GraspLeft(const FInputActionValue& Value);
+	void GraspRight(const FInputActionValue& Value);
+	void TriggerLeft(const FInputActionValue& Value);
+	void TriggerRight(const FInputActionValue& Value);
+	void OnTriggerPressed(const FInputActionValue& Value);
+
     UPROPERTY(VisibleAnywhere)
     UCameraComponent* VRCamera;
 
@@ -43,7 +54,27 @@ public:
     UPROPERTY(VisibleAnywhere)
     UMotionControllerComponent* RightController;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputMappingContext* IMC_Robot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_Hand_Grasp_Left;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_Hand_Grasp_Right;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_Hand_IndexCurl_Left;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_Hand_IndexCurl_Right;
+
+	
+
+
 private:
 	RobotMiddleware middleware;
+	RobotMiddleware::Controller left, right;
+	bool controllerChanged = false;
 
 };

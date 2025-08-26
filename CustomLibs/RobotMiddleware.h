@@ -1,25 +1,46 @@
 #pragma once
 #include <array>
 
-struct Pose
-{
-    float x;
-    float y;
-    float z;
-    float rx;
-    float ry;
-    float rz;
-};
+
 
 class RobotMiddleware {
+
+
 public:
+
+    struct Pose
+    {
+        float x;
+        float y;
+        float z;
+        float rx;
+        float ry;
+        float rz;
+    };
+
+    struct Controller
+    {
+        float trigger;
+        float grab;
+        float x;
+        float y;
+        float thumbstickCapTouch;
+        bool aButton;
+        float aButtonCapTouch;
+        bool bButton;
+        float bButtonCapTouch;
+    };
+
+
+
     RobotMiddleware();
     ~RobotMiddleware();
 
     bool initIce();
 
 
-    bool sendPose(const Pose& head, const Pose& left, const Pose& right);
+    bool sendPose(const RobotMiddleware::Pose& head, const RobotMiddleware::Pose& left, const RobotMiddleware::Pose& right);
+    bool sendControllers(const RobotMiddleware::Controller& left, const RobotMiddleware::Controller& right);
     bool getRobotState(/* ... */);
 private:
     // ICE y detalles internos NO se exponen

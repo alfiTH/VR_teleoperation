@@ -19,8 +19,21 @@ module RoboCompVRController
 		float ry;
 		float rz;
 	};
+	struct Controller
+	{
+		float trigger;
+		float grab;
+		float x;
+		float y;
+		float thumbstickCapTouch;
+		bool aButton;
+		float aButtonCapTouch;
+		bool bButton;
+		float bButtonCapTouch;
+	};
 	interface VRController
 	{
+		void sendControllers (Controller left, Controller right);
 		void sendPose (Pose head, Pose left, Pose right);
 	};
 };

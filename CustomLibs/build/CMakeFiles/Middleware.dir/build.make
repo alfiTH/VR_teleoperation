@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs"
+CMAKE_SOURCE_DIR = /home/robolab/Code/VR_teleoperation/CustomLibs
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/build"
+CMAKE_BINARY_DIR = /home/robolab/Code/VR_teleoperation/CustomLibs/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/Middleware.dir/depend.make
@@ -70,32 +70,32 @@ include CMakeFiles/Middleware.dir/progress.make
 include CMakeFiles/Middleware.dir/flags.make
 
 CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o: CMakeFiles/Middleware.dir/flags.make
-CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o: /home/robolab/Documents/Unreal\ Projects/VRTeleoperation/CustomLibs/RobotMiddleware.cpp
+CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o: /home/robolab/Code/VR_teleoperation/CustomLibs/RobotMiddleware.cpp
 CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o: CMakeFiles/Middleware.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o -MF CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o.d -o CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o -c "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/RobotMiddleware.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o -MF CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o.d -o CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o -c /home/robolab/Code/VR_teleoperation/CustomLibs/RobotMiddleware.cpp
 
 CMakeFiles/Middleware.dir/RobotMiddleware.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Middleware.dir/RobotMiddleware.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/RobotMiddleware.cpp" > CMakeFiles/Middleware.dir/RobotMiddleware.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robolab/Code/VR_teleoperation/CustomLibs/RobotMiddleware.cpp > CMakeFiles/Middleware.dir/RobotMiddleware.cpp.i
 
 CMakeFiles/Middleware.dir/RobotMiddleware.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Middleware.dir/RobotMiddleware.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/RobotMiddleware.cpp" -o CMakeFiles/Middleware.dir/RobotMiddleware.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robolab/Code/VR_teleoperation/CustomLibs/RobotMiddleware.cpp -o CMakeFiles/Middleware.dir/RobotMiddleware.cpp.s
 
 CMakeFiles/Middleware.dir/VRController.cpp.o: CMakeFiles/Middleware.dir/flags.make
-CMakeFiles/Middleware.dir/VRController.cpp.o: /home/robolab/Documents/Unreal\ Projects/VRTeleoperation/CustomLibs/VRController.cpp
+CMakeFiles/Middleware.dir/VRController.cpp.o: /home/robolab/Code/VR_teleoperation/CustomLibs/VRController.cpp
 CMakeFiles/Middleware.dir/VRController.cpp.o: CMakeFiles/Middleware.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Middleware.dir/VRController.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Middleware.dir/VRController.cpp.o -MF CMakeFiles/Middleware.dir/VRController.cpp.o.d -o CMakeFiles/Middleware.dir/VRController.cpp.o -c "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/VRController.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Middleware.dir/VRController.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Middleware.dir/VRController.cpp.o -MF CMakeFiles/Middleware.dir/VRController.cpp.o.d -o CMakeFiles/Middleware.dir/VRController.cpp.o -c /home/robolab/Code/VR_teleoperation/CustomLibs/VRController.cpp
 
 CMakeFiles/Middleware.dir/VRController.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Middleware.dir/VRController.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/VRController.cpp" > CMakeFiles/Middleware.dir/VRController.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robolab/Code/VR_teleoperation/CustomLibs/VRController.cpp > CMakeFiles/Middleware.dir/VRController.cpp.i
 
 CMakeFiles/Middleware.dir/VRController.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Middleware.dir/VRController.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/VRController.cpp" -o CMakeFiles/Middleware.dir/VRController.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robolab/Code/VR_teleoperation/CustomLibs/VRController.cpp -o CMakeFiles/Middleware.dir/VRController.cpp.s
 
 # Object files for target Middleware
 Middleware_OBJECTS = \
@@ -113,7 +113,7 @@ libRobotMiddleware.so: /usr/lib/x86_64-linux-gnu/libIceStorm++11.so
 libRobotMiddleware.so: /usr/lib/x86_64-linux-gnu/libIce++11.so
 libRobotMiddleware.so: /usr/lib/x86_64-linux-gnu/libIceStorm++11.so
 libRobotMiddleware.so: CMakeFiles/Middleware.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX shared library libRobotMiddleware.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX shared library libRobotMiddleware.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Middleware.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -125,6 +125,6 @@ CMakeFiles/Middleware.dir/clean:
 .PHONY : CMakeFiles/Middleware.dir/clean
 
 CMakeFiles/Middleware.dir/depend:
-	cd "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/build" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs" "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs" "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/build" "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/build" "/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/build/CMakeFiles/Middleware.dir/DependInfo.cmake" "--color=$(COLOR)"
+	cd /home/robolab/Code/VR_teleoperation/CustomLibs/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/robolab/Code/VR_teleoperation/CustomLibs /home/robolab/Code/VR_teleoperation/CustomLibs /home/robolab/Code/VR_teleoperation/CustomLibs/build /home/robolab/Code/VR_teleoperation/CustomLibs/build /home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles/Middleware.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/Middleware.dir/depend
 

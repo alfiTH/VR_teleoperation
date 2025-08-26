@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = -DICE_CPP11_MAPPING -DMiddleware_EXPORTS
 
-CXX_INCLUDES = -I"/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs/include" -I"/home/robolab/Documents/Unreal Projects/VRTeleoperation/CustomLibs"
+CXX_INCLUDES = -I/home/robolab/Code/VR_teleoperation/CustomLibs/include -I/home/robolab/Code/VR_teleoperation/CustomLibs
 
 CXX_FLAGS = -std=gnu++17 -fPIC -fmax-errors=1 -fno-char8_t -O3
 

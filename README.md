@@ -60,4 +60,8 @@ cd ..
 ln -s $(pwd)/CustomLibs/build/libRobotMiddleware.so  Binaries/Linux/libRobotMiddleware.so
 ```
 
- 
+ ### Notes
+ The game start is definnerd in blueprint/VRGameMode
+ The input Map in Inputs/IMC_Robot
+ The inputs is de Action inpunts in Inputs, only it define the type of data
+ To be easier, the Robot(Pawn) is wappered in RobotBP to use Inputs

@@ -50,39 +50,39 @@ DebugSet: RequiredTools UnrealFrontend-Linux-Debug VRTeleoperationEditor-Linux-D
 
 
 VRTeleoperation-Android-DebugGame:
-	 $(BUILD) VRTeleoperation Android DebugGame  -Project="/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject" $(ARGS)
+	 $(BUILD) VRTeleoperation Android DebugGame  -Project="/home/robolab/Code/VR_teleoperation/VRTeleoperation.uproject" $(ARGS)
 
 VRTeleoperation-Android-Development:
-	 $(BUILD) VRTeleoperation Android Development  -Project="/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject" $(ARGS)
+	 $(BUILD) VRTeleoperation Android Development  -Project="/home/robolab/Code/VR_teleoperation/VRTeleoperation.uproject" $(ARGS)
 
 VRTeleoperation-Android-Shipping:
-	 $(BUILD) VRTeleoperation Android Shipping  -Project="/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject" $(ARGS)
+	 $(BUILD) VRTeleoperation Android Shipping  -Project="/home/robolab/Code/VR_teleoperation/VRTeleoperation.uproject" $(ARGS)
 
 VRTeleoperation-Linux-DebugGame:
-	 $(BUILD) VRTeleoperation Linux DebugGame  -Project="/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject" $(ARGS)
+	 $(BUILD) VRTeleoperation Linux DebugGame  -Project="/home/robolab/Code/VR_teleoperation/VRTeleoperation.uproject" $(ARGS)
 
 VRTeleoperation-Linux-Development:
-	 $(BUILD) VRTeleoperation Linux Development  -Project="/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject" $(ARGS)
+	 $(BUILD) VRTeleoperation Linux Development  -Project="/home/robolab/Code/VR_teleoperation/VRTeleoperation.uproject" $(ARGS)
 
 VRTeleoperation-Linux-Shipping:
-	 $(BUILD) VRTeleoperation Linux Shipping  -Project="/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject" $(ARGS)
+	 $(BUILD) VRTeleoperation Linux Shipping  -Project="/home/robolab/Code/VR_teleoperation/VRTeleoperation.uproject" $(ARGS)
 
 VRTeleoperation-LinuxArm64-DebugGame:
-	 $(BUILD) VRTeleoperation LinuxArm64 DebugGame  -Project="/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject" $(ARGS)
+	 $(BUILD) VRTeleoperation LinuxArm64 DebugGame  -Project="/home/robolab/Code/VR_teleoperation/VRTeleoperation.uproject" $(ARGS)
 
 VRTeleoperation-LinuxArm64-Development:
-	 $(BUILD) VRTeleoperation LinuxArm64 Development  -Project="/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject" $(ARGS)
+	 $(BUILD) VRTeleoperation LinuxArm64 Development  -Project="/home/robolab/Code/VR_teleoperation/VRTeleoperation.uproject" $(ARGS)
 
 VRTeleoperation-LinuxArm64-Shipping:
-	 $(BUILD) VRTeleoperation LinuxArm64 Shipping  -Project="/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject" $(ARGS)
+	 $(BUILD) VRTeleoperation LinuxArm64 Shipping  -Project="/home/robolab/Code/VR_teleoperation/VRTeleoperation.uproject" $(ARGS)
 
 VRTeleoperation: VRTeleoperation-Linux-Development
 
 VRTeleoperationEditor-Linux-DebugGame:
-	 $(BUILD) VRTeleoperationEditor Linux DebugGame  -Project="/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject" $(ARGS)
+	 $(BUILD) VRTeleoperationEditor Linux DebugGame  -Project="/home/robolab/Code/VR_teleoperation/VRTeleoperation.uproject" $(ARGS)
 
 VRTeleoperationEditor-Linux-Development:
-	 $(BUILD) VRTeleoperationEditor Linux Development  -Project="/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject" $(ARGS)
+	 $(BUILD) VRTeleoperationEditor Linux Development  -Project="/home/robolab/Code/VR_teleoperation/VRTeleoperation.uproject" $(ARGS)
 
 VRTeleoperationEditor: VRTeleoperationEditor-Linux-Development
 
@@ -138,6 +138,6 @@ UnrealGame-LinuxArm64-Shipping:
 UnrealGame: UnrealGame-Linux-Development
 
 configure:
-	$(BUILD) -ProjectFiles -Project="/home/robolab/Documents/Unreal Projects/VRTeleoperation/VRTeleoperation.uproject" -Game 
+	$(BUILD) -ProjectFiles -Project="/home/robolab/Code/VR_teleoperation/VRTeleoperation.uproject" -Game 
 
 .PHONY: $(TARGETS)

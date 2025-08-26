@@ -58,8 +58,10 @@ const ::std::string iceC_RoboCompVRController_VRController_ops[] =
     "ice_ids",
     "ice_isA",
     "ice_ping",
+    "sendControllers",
     "sendPose"
 };
+const ::std::string iceC_RoboCompVRController_VRController_sendControllers_name = "sendControllers";
 const ::std::string iceC_RoboCompVRController_VRController_sendPose_name = "sendPose";
 
 }
@@ -91,6 +93,22 @@ RoboCompVRController::VRController::ice_staticId()
 
 /// \cond INTERNAL
 bool
+RoboCompVRController::VRController::_iceD_sendControllers(::IceInternal::Incoming& inS, const ::Ice::Current& current)
+{
+    _iceCheckMode(::Ice::OperationMode::Normal, current.mode);
+    auto istr = inS.startReadParams();
+    Controller iceP_left;
+    Controller iceP_right;
+    istr->readAll(iceP_left, iceP_right);
+    inS.endReadParams();
+    this->sendControllers(::std::move(iceP_left), ::std::move(iceP_right), current);
+    inS.writeEmptyParams();
+    return true;
+}
+/// \endcond
+
+/// \cond INTERNAL
+bool
 RoboCompVRController::VRController::_iceD_sendPose(::IceInternal::Incoming& inS, const ::Ice::Current& current)
 {
     _iceCheckMode(::Ice::OperationMode::Normal, current.mode);
@@ -110,7 +128,7 @@ RoboCompVRController::VRController::_iceD_sendPose(::IceInternal::Incoming& inS,
 bool
 RoboCompVRController::VRController::_iceDispatch(::IceInternal::Incoming& in, const ::Ice::Current& current)
 {
-    ::std::pair<const ::std::string*, const ::std::string*> r = ::std::equal_range(iceC_RoboCompVRController_VRController_ops, iceC_RoboCompVRController_VRController_ops + 5, current.operation);
+    ::std::pair<const ::std::string*, const ::std::string*> r = ::std::equal_range(iceC_RoboCompVRController_VRController_ops, iceC_RoboCompVRController_VRController_ops + 6, current.operation);
     if(r.first == r.second)
     {
         throw ::Ice::OperationNotExistException(__FILE__, __LINE__, current.id, current.facet, current.operation);
@@ -136,6 +154,10 @@ RoboCompVRController::VRController::_iceDispatch(::IceInternal::Incoming& in, co
         }
         case 4:
         {
+            return _iceD_sendControllers(in, current);
+        }
+        case 5:
+        {
             return _iceD_sendPose(in, current);
         }
         default:
@@ -144,6 +166,19 @@ RoboCompVRController::VRController::_iceDispatch(::IceInternal::Incoming& in, co
             throw ::Ice::OperationNotExistException(__FILE__, __LINE__, current.id, current.facet, current.operation);
         }
     }
+}
+/// \endcond
+
+/// \cond INTERNAL
+void
+RoboCompVRController::VRControllerPrx::_iceI_sendControllers(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<void>>& outAsync, const Controller& iceP_left, const Controller& iceP_right, const ::Ice::Context& context)
+{
+    outAsync->invoke(iceC_RoboCompVRController_VRController_sendControllers_name, ::Ice::OperationMode::Normal, ::Ice::FormatType::DefaultFormat, context,
+        [&](::Ice::OutputStream* ostr)
+        {
+            ostr->writeAll(iceP_left, iceP_right);
+        },
+        nullptr);
 }
 /// \endcond
 
@@ -183,6 +218,8 @@ namespace Ice
 namespace
 {
 
+const ::std::string iceC_RoboCompVRController_VRController_sendControllers_name = "sendControllers";
+
 const ::std::string iceC_RoboCompVRController_VRController_sendPose_name = "sendPose";
 
 }
@@ -206,6 +243,32 @@ void
     }
 }
 /// \endcond
+
+::Ice::AsyncResultPtr
+IceProxy::RoboCompVRController::VRController::_iceI_begin_sendControllers(const ::RoboCompVRController::Controller& iceP_left, const ::RoboCompVRController::Controller& iceP_right, const ::Ice::Context& context, const ::IceInternal::CallbackBasePtr& del, const ::Ice::LocalObjectPtr& cookie, bool sync)
+{
+    ::IceInternal::OutgoingAsyncPtr result = new ::IceInternal::CallbackOutgoing(this, iceC_RoboCompVRController_VRController_sendControllers_name, del, cookie, sync);
+    try
+    {
+        result->prepare(iceC_RoboCompVRController_VRController_sendControllers_name, ::Ice::Normal, context);
+        ::Ice::OutputStream* ostr = result->startWriteParams(::Ice::DefaultFormat);
+        ostr->write(iceP_left);
+        ostr->write(iceP_right);
+        result->endWriteParams();
+        result->invoke(iceC_RoboCompVRController_VRController_sendControllers_name);
+    }
+    catch(const ::Ice::Exception& ex)
+    {
+        result->abort(ex);
+    }
+    return result;
+}
+
+void
+IceProxy::RoboCompVRController::VRController::end_sendControllers(const ::Ice::AsyncResultPtr& result)
+{
+    _end(result, iceC_RoboCompVRController_VRController_sendControllers_name);
+}
 
 ::Ice::AsyncResultPtr
 IceProxy::RoboCompVRController::VRController::_iceI_begin_sendPose(const ::RoboCompVRController::Pose& iceP_head, const ::RoboCompVRController::Pose& iceP_left, const ::RoboCompVRController::Pose& iceP_right, const ::Ice::Context& context, const ::IceInternal::CallbackBasePtr& del, const ::Ice::LocalObjectPtr& cookie, bool sync)
@@ -298,6 +361,23 @@ RoboCompVRController::VRController::ice_staticId()
 
 /// \cond INTERNAL
 bool
+RoboCompVRController::VRController::_iceD_sendControllers(::IceInternal::Incoming& inS, const ::Ice::Current& current)
+{
+    _iceCheckMode(::Ice::Normal, current.mode);
+    ::Ice::InputStream* istr = inS.startReadParams();
+    Controller iceP_left;
+    Controller iceP_right;
+    istr->read(iceP_left);
+    istr->read(iceP_right);
+    inS.endReadParams();
+    this->sendControllers(iceP_left, iceP_right, current);
+    inS.writeEmptyParams();
+    return true;
+}
+/// \endcond
+
+/// \cond INTERNAL
+bool
 RoboCompVRController::VRController::_iceD_sendPose(::IceInternal::Incoming& inS, const ::Ice::Current& current)
 {
     _iceCheckMode(::Ice::Normal, current.mode);
@@ -323,6 +403,7 @@ const ::std::string iceC_RoboCompVRController_VRController_all[] =
     "ice_ids",
     "ice_isA",
     "ice_ping",
+    "sendControllers",
     "sendPose"
 };
 
@@ -332,7 +413,7 @@ const ::std::string iceC_RoboCompVRController_VRController_all[] =
 bool
 RoboCompVRController::VRController::_iceDispatch(::IceInternal::Incoming& in, const ::Ice::Current& current)
 {
-    ::std::pair<const ::std::string*, const ::std::string*> r = ::std::equal_range(iceC_RoboCompVRController_VRController_all, iceC_RoboCompVRController_VRController_all + 5, current.operation);
+    ::std::pair<const ::std::string*, const ::std::string*> r = ::std::equal_range(iceC_RoboCompVRController_VRController_all, iceC_RoboCompVRController_VRController_all + 6, current.operation);
     if(r.first == r.second)
     {
         throw ::Ice::OperationNotExistException(__FILE__, __LINE__, current.id, current.facet, current.operation);
@@ -357,6 +438,10 @@ RoboCompVRController::VRController::_iceDispatch(::IceInternal::Incoming& in, co
             return _iceD_ice_ping(in, current);
         }
         case 4:
+        {
+            return _iceD_sendControllers(in, current);
+        }
+        case 5:
         {
             return _iceD_sendPose(in, current);
         }
