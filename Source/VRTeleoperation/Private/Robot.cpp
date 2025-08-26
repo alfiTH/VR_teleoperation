@@ -48,8 +48,20 @@ void ARobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		Input->BindAction(IA_Hand_Grasp_Right, ETriggerEvent::Triggered, this, &ARobot::GraspRight);
 		Input->BindAction(IA_Hand_IndexCurl_Left, ETriggerEvent::Triggered, this, &ARobot::TriggerLeft);
 		Input->BindAction(IA_Hand_IndexCurl_Right, ETriggerEvent::Triggered, this, &ARobot::TriggerRight);
+		Input->BindAction(IA_Hand_A, ETriggerEvent::Started, this, &ARobot::PushA);
+		Input->BindAction(IA_Hand_A, ETriggerEvent::Completed, this, &ARobot::ReleaseA);
+		Input->BindAction(IA_Hand_B, ETriggerEvent::Started, this, &ARobot::PushB);
+		Input->BindAction(IA_Hand_B, ETriggerEvent::Completed, this, &ARobot::ReleaseB);
+		Input->BindAction(IA_Hand_X, ETriggerEvent::Started, this, &ARobot::PushX);
+		Input->BindAction(IA_Hand_X, ETriggerEvent::Completed, this, &ARobot::ReleaseX);
+		Input->BindAction(IA_Hand_Y, ETriggerEvent::Started, this, &ARobot::PushY);
+		Input->BindAction(IA_Hand_Y, ETriggerEvent::Completed, this, &ARobot::ReleaseY);
+		Input->BindAction(IA_Hand_Thumbstick_Left, ETriggerEvent::Triggered, this, &ARobot::ThumbStickLeft);
+		Input->BindAction(IA_Hand_Thumbstick_Right, ETriggerEvent::Triggered, this, &ARobot::ThumbStickRight);
+
 }
 
+#pragma region Inputs
 void ARobot::GraspLeft(const FInputActionValue& Value){
 	float GraspValue = Value.Get<float>();
 	if (GraspValue > 0.1f)
@@ -84,20 +96,63 @@ void ARobot::TriggerRight(const FInputActionValue& Value){
 		controllerChanged = true;
 	}
 };
-
-
-
-void ARobot::OnTriggerPressed(const FInputActionValue& Value)
+#pragma region Button
+void ARobot::PushA(const FInputActionValue& Value){
+	right.aButton= true;
+	controllerChanged = true;
+};
+void ARobot::ReleaseA(const FInputActionValue& Value){
+	right.aButton= false;
+	controllerChanged = true;
+};
+void ARobot::PushB(const FInputActionValue& Value){
+	right.bButton= true;
+	controllerChanged = true;
+};
+void ARobot::ReleaseB(const FInputActionValue& Value){
+	right.bButton= false;
+	controllerChanged = true;
+};
+void ARobot::PushX(const FInputActionValue& Value){
+	left.aButton= true;
+	controllerChanged = true;
+};
+void ARobot::ReleaseX(const FInputActionValue& Value){
+	left.aButton= false;
+	controllerChanged = true;
+};
+void ARobot::PushY(const FInputActionValue& Value){
+	left.bButton= true;
+	controllerChanged = true;
+};
+void ARobot::ReleaseY(const FInputActionValue& Value){
+	left.bButton= false;
+	controllerChanged = true;
+};
+#pragma endregion
+void ARobot::ThumbStickLeft(const FInputActionValue& Value)
 {
-    // Value devuelve un float entre 0 y 1 según la presión del gatillo
-    float TriggerValue = Value.Get<float>();
-    UE_LOG(LogTemp, Log, TEXT("Trigger Pressed: %f"), TriggerValue);
-
-    if (TriggerValue > 0.1f)
+    FVector2D StickValue = Value.Get<FVector2D>();
+    if (!StickValue.IsNearlyZero(0.1f))
     {
-        // Hacer algo, por ejemplo disparar
+        left.x = StickValue.X;
+        left.y = StickValue.Y;
+        controllerChanged = true;
     }
 }
+void ARobot::ThumbStickRight(const FInputActionValue& Value)
+{
+    FVector2D StickValue = Value.Get<FVector2D>();
+    if (!StickValue.IsNearlyZero(0.1f))
+    {
+        right.x = StickValue.X;
+        right.y = StickValue.Y;
+        controllerChanged = true;
+    }
+}
+
+#pragma endregion
+
 
 // Called every frame
 void ARobot::Tick(float DeltaTime)

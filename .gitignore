@@ -43,8 +43,8 @@
 #################################
 # Unreal Engine Generated Files #
 #################################
-/[Bb]uild
-/[Bb]uilds
+[Bb]uild
+[Bb]uilds
 /Binaries
 /DerivedDataCache
 /Intermediate
@@ -70,9 +70,12 @@
 *.sln
 # VSCode Cache Directory
 .vscode
+.idea
 # VSCode History Files
 **/.history
 
 #################################
 # Miscellaneous Generated Files #
 #########################
+
+VRTeleoperation.code-workspace

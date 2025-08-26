@@ -43,7 +43,16 @@ public:
 	void GraspRight(const FInputActionValue& Value);
 	void TriggerLeft(const FInputActionValue& Value);
 	void TriggerRight(const FInputActionValue& Value);
-	void OnTriggerPressed(const FInputActionValue& Value);
+	void PushA(const FInputActionValue& Value);
+	void ReleaseA(const FInputActionValue& Value);
+	void PushB(const FInputActionValue& Value);
+	void ReleaseB(const FInputActionValue& Value);
+	void PushX(const FInputActionValue& Value);
+	void ReleaseX(const FInputActionValue& Value);
+	void PushY(const FInputActionValue& Value);
+	void ReleaseY(const FInputActionValue& Value);
+	void ThumbStickLeft(const FInputActionValue& Value);
+	void ThumbStickRight(const FInputActionValue& Value);
 
     UPROPERTY(VisibleAnywhere)
     UCameraComponent* VRCamera;
@@ -69,7 +78,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	UInputAction* IA_Hand_IndexCurl_Right;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_Hand_A;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_Hand_B;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_Hand_X;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_Hand_Y;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_Hand_Thumbstick_Left;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_Hand_Thumbstick_Right;
 
 
 private:
