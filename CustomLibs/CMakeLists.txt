@@ -14,6 +14,7 @@ FIND_PACKAGE( Ice REQUIRED COMPONENTS Ice IceStorm OPTIONAL_COMPONENTS IceUtil )
 add_library(Middleware SHARED
     RobotMiddleware.cpp
     VRController.cpp
+    Lidar3D.cpp
 )
 
 # Incluir directorios
