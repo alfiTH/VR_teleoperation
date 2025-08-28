@@ -39,10 +39,15 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void SetupPoseComponent();
+	
 	void GraspLeft(const FInputActionValue& Value);
+	void GraspReleaseLeft(const FInputActionValue& Value);
 	void GraspRight(const FInputActionValue& Value);
+	void GraspReleaseRight(const FInputActionValue& Value);
 	void TriggerLeft(const FInputActionValue& Value);
+	void TriggerReleaseLeft(const FInputActionValue& Value);
 	void TriggerRight(const FInputActionValue& Value);
+	void TriggerReleaseRight(const FInputActionValue& Value);
 	void PushA(const FInputActionValue& Value);
 	void ReleaseA(const FInputActionValue& Value);
 	void PushB(const FInputActionValue& Value);
@@ -52,7 +57,10 @@ public:
 	void PushY(const FInputActionValue& Value);
 	void ReleaseY(const FInputActionValue& Value);
 	void ThumbStickLeft(const FInputActionValue& Value);
+	void ThumbStickReleaseLeft(const FInputActionValue& Value);
 	void ThumbStickRight(const FInputActionValue& Value);
+	void ThumbStickReleaseRight(const FInputActionValue& Value);
+
 
     UPROPERTY(VisibleAnywhere)
     UCameraComponent* VRCamera;
