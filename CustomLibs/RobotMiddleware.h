@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <vector>
 
 
 
@@ -42,6 +43,8 @@ public:
     bool sendPose(const RobotMiddleware::Pose& head, const RobotMiddleware::Pose& left, const RobotMiddleware::Pose& right);
     bool sendControllers(const RobotMiddleware::Controller& left, const RobotMiddleware::Controller& right);
     bool getRobotState(/* ... */);
+
+    std::vector<std::array<float, 3>> getLidarData();
 private:
     // ICE y detalles internos NO se exponen
     struct Impl;

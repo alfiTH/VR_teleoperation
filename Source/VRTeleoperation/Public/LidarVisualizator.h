@@ -1,0 +1,39 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Components/ActorComponent.h"
+#include "LidarVisualizator.generated.h"
+
+
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class VRTELEOPERATION_API ULidarVisualizator : public UActorComponent
+{
+	GENERATED_BODY()
+
+public:	
+	// Sets default values for this component's properties
+	ULidarVisualizator();
+
+protected:
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
+	TArray<FVector> PointCloud = {
+		FVector(0, 0, 0),
+		FVector(100, 100, 100),
+		FVector(-50, 50, 0),
+		FVector(200, -200, 0)
+	};
+
+	void DrawPointCloud();
+	void GenerateWall();
+
+public:	
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	
+		
+};

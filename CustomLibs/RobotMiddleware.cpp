@@ -3,6 +3,7 @@
 #include <IceStorm/IceStorm.h>
 #include <memory>
 #include <VRController.h>
+#include <Lidar3D.h>
 
 
 template <typename PubProxyType, typename PubProxyPointer>
@@ -48,15 +49,51 @@ void publish(const IceStorm::TopicManagerPrxPtr& topicManager,
     pubProxy = Ice::uncheckedCast<PubProxyType>(publisher);
 };
 
+template <typename ProxyType, typename ProxyPointer>
+void require(const Ice::CommunicatorPtr& communicator,
+             const std::string& proxyConfig, 
+             const std::string& proxyName,
+             ProxyPointer& proxy)
+{
+    try
+    {
+        proxy = Ice::uncheckedCast<ProxyType>(communicator->stringToProxy(proxyConfig));
+        std::cout << proxyName << " initialized Ok!\n";
+    }
+    catch(const Ice::Exception& ex)
+    {
+        std::cout << "[" << PROGRAM_NAME << "]: Exception creating proxy " << proxyName << ": " << ex;
+        throw;
+    }
+}
+
 inline RoboCompVRController::Pose toIcePose(const RobotMiddleware::Pose& p) { return {p.x, p.y, p.z, p.rx, p.ry, p.rz}; }
 inline RoboCompVRController::Controller toIceController(const RobotMiddleware::Controller& c) { 
     return {c.trigger, c.grab, c.x, c.y, c.thumbstickCapTouch, c.aButton, c.aButtonCapTouch, c.bButton, c.bButtonCapTouch}; 
+}
+//inline std::vector<std::array<float, 3>> iceToCloudPoints(const RoboCompLidar3D::TData &lidar){
+//    std::vector<std::array<float, 3>> pointCloud;
+//    pointCloud.reserve(lidar.points.size());
+//    std::transform(lidar.points.begin(), lidar.points.end(), std::back_inserter(pointCloud),
+//                   [](const auto &point) -> std::array<float, 3> {
+//                       return {point.x, point.y, point.z};
+//                   });
+//    return pointCloud;
+//}
+
+inline std::vector<std::array<float, 3>> iceToCloudPoints(const RoboCompLidar3D::TData &lidar) {
+    std::vector<std::array<float, 3>> pointCloud;
+    pointCloud.reserve(lidar.points.size());
+    for (const auto &point : lidar.points)
+        pointCloud.emplace_back(std::array<float, 3>{point.x,point.y, point.z});
+    return pointCloud;
 }
 
 struct RobotMiddleware::Impl {
     Ice::CommunicatorHolder communicator;
     IceStorm::TopicManagerPrxPtr topicManager;
     RoboCompVRController::VRControllerPrxPtr vrcontroller_proxy;
+    RoboCompLidar3D::Lidar3DPrxPtr lidar3d_proxy;
 
 
     Impl() 
@@ -78,6 +115,10 @@ struct RobotMiddleware::Impl {
             std::cout << "Exception: 'rcnode' not running: " << ex << std::endl;
             throw std::runtime_error("TopicManager.Proxy not defined");
         }
+
+        //Require code
+        require<RoboCompLidar3D::Lidar3DPrx, RoboCompLidar3D::Lidar3DPrxPtr>(ic,
+                            "lidar3d:tcp -h localhost -p 11988", "Lidar3DProxy", lidar3d_proxy);
 
         //Publish code
         publish<RoboCompVRController::VRControllerPrx, RoboCompVRController::VRControllerPrxPtr>(topicManager,
@@ -142,5 +183,15 @@ bool RobotMiddleware::sendControllers(const RobotMiddleware::Controller& left, c
     } catch (const Ice::Exception& ex) {
         std::cerr << "[RobotMiddleware] Error sending controllers: " << ex << std::endl;
         return false;
+    }
+}
+
+std::vector<std::array<float, 3>> RobotMiddleware::getLidarData() {
+    try {
+        std::vector<std::array<float, 3>> cloudPoints = iceToCloudPoints(pImpl->lidar3d_proxy->getLidarData("", 0.0f, 180.0f, 1));
+        return cloudPoints;
+    }catch (const Ice::Exception& ex){
+        std::cerr << "[RobotMiddleware] Error getting lidar data: " << ex << std::endl;
+        return {};
     }
 }
