@@ -13,6 +13,8 @@
 
 #include "Engine/Engine.h"
 #include "RobotMiddleware.h"
+#include <atomic>
+#include <iostream>
 
 #include "DrawDebugHelpers.h"
 #include "Robot.generated.h"
@@ -108,6 +110,6 @@ public:
 private:
 	RobotMiddleware middleware;
 	RobotMiddleware::Controller left, right;
-	bool controllerChanged = false;
+	std::atomic<bool> controllerChanged = false;
 
 };
