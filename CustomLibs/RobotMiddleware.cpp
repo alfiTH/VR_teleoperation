@@ -2,8 +2,9 @@
 #include <Ice/Ice.h>  // solo aquí dentro
 #include <IceStorm/IceStorm.h>
 #include <memory>
-#include <VRController.h>
+#include <VRControllerPub.h>
 #include <Lidar3D.h>
+#include <cmath>
 
 
 template <typename PubProxyType, typename PubProxyPointer>
@@ -62,13 +63,24 @@ void require(const Ice::CommunicatorPtr& communicator,
     }
     catch(const Ice::Exception& ex)
     {
-        std::cout << "[" << PROGRAM_NAME << "]: Exception creating proxy " << proxyName << ": " << ex;
+        std::cout << "Exception creating proxy " << proxyName << ": " << ex;
         throw;
     }
 }
 
-inline RoboCompVRController::Pose toIcePose(const RobotMiddleware::Pose& p) { return {p.x, p.y, p.z, p.rx, p.ry, p.rz}; }
-inline RoboCompVRController::Controller toIceController(const RobotMiddleware::Controller& c) { 
+constexpr double DEG2RAD = M_PI / 180.0;
+
+inline RoboCompVRControllerPub::Pose toIcePose(const RobotMiddleware::Pose& p) {     
+    return {
+        -p.y*10,
+        p.x*10,
+        p.z*10,
+        p.rx * DEG2RAD,
+        p.rz * DEG2RAD,
+        -p.ry * DEG2RAD
+    };
+}
+inline RoboCompVRControllerPub::Controller toIceController(const RobotMiddleware::Controller& c) { 
     return {c.trigger, c.grab, c.x, c.y, c.thumbstickCapTouch, c.aButton, c.aButtonCapTouch, c.bButton, c.bButtonCapTouch}; 
 }
 //inline std::vector<std::array<float, 3>> iceToCloudPoints(const RoboCompLidar3D::TData &lidar){
@@ -92,16 +104,17 @@ inline std::vector<std::array<float, 3>> iceToCloudPoints(const RoboCompLidar3D:
 struct RobotMiddleware::Impl {
     Ice::CommunicatorHolder communicator;
     IceStorm::TopicManagerPrxPtr topicManager;
-    RoboCompVRController::VRControllerPrxPtr vrcontroller_proxy;
+    RoboCompVRControllerPub::VRControllerPubPrxPtr vrcontroller_proxy;
     RoboCompLidar3D::Lidar3DPrxPtr lidar3d_proxy;
 
 
     Impl() 
         : communicator(makeInitData())
     {
+        auto ic = communicator.communicator();
         try
         {
-            auto ic = communicator.communicator();
+           
             topicManager = Ice::checkedCast<IceStorm::TopicManagerPrx>(ic->stringToProxy("IceStorm/TopicManager:default -p 9999"));
             if (!topicManager)
             {
@@ -121,9 +134,9 @@ struct RobotMiddleware::Impl {
                             "lidar3d:tcp -h localhost -p 11988", "Lidar3DProxy", lidar3d_proxy);
 
         //Publish code
-        publish<RoboCompVRController::VRControllerPrx, RoboCompVRController::VRControllerPrxPtr>(topicManager,
+        publish<RoboCompVRControllerPub::VRControllerPubPrx, RoboCompVRControllerPub::VRControllerPubPrxPtr>(topicManager,
                             "",
-                            "VRController", vrcontroller_proxy);
+                            "VRControllerPub", vrcontroller_proxy);
 
 
 

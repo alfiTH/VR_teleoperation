@@ -129,6 +129,30 @@ Middleware/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/build
 .PHONY : Middleware/fast
 
+Lidar3D.o: Lidar3D.cpp.o
+.PHONY : Lidar3D.o
+
+# target to build an object file
+Lidar3D.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/Lidar3D.cpp.o
+.PHONY : Lidar3D.cpp.o
+
+Lidar3D.i: Lidar3D.cpp.i
+.PHONY : Lidar3D.i
+
+# target to preprocess a source file
+Lidar3D.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/Lidar3D.cpp.i
+.PHONY : Lidar3D.cpp.i
+
+Lidar3D.s: Lidar3D.cpp.s
+.PHONY : Lidar3D.s
+
+# target to generate assembly for a file
+Lidar3D.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/Lidar3D.cpp.s
+.PHONY : Lidar3D.cpp.s
+
 RobotMiddleware.o: RobotMiddleware.cpp.o
 .PHONY : RobotMiddleware.o
 
@@ -153,29 +177,29 @@ RobotMiddleware.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/RobotMiddleware.cpp.s
 .PHONY : RobotMiddleware.cpp.s
 
-VRController.o: VRController.cpp.o
-.PHONY : VRController.o
+VRControllerPub.o: VRControllerPub.cpp.o
+.PHONY : VRControllerPub.o
 
 # target to build an object file
-VRController.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/VRController.cpp.o
-.PHONY : VRController.cpp.o
+VRControllerPub.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/VRControllerPub.cpp.o
+.PHONY : VRControllerPub.cpp.o
 
-VRController.i: VRController.cpp.i
-.PHONY : VRController.i
+VRControllerPub.i: VRControllerPub.cpp.i
+.PHONY : VRControllerPub.i
 
 # target to preprocess a source file
-VRController.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/VRController.cpp.i
-.PHONY : VRController.cpp.i
+VRControllerPub.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/VRControllerPub.cpp.i
+.PHONY : VRControllerPub.cpp.i
 
-VRController.s: VRController.cpp.s
-.PHONY : VRController.s
+VRControllerPub.s: VRControllerPub.cpp.s
+.PHONY : VRControllerPub.s
 
 # target to generate assembly for a file
-VRController.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/VRController.cpp.s
-.PHONY : VRController.cpp.s
+VRControllerPub.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/VRControllerPub.cpp.s
+.PHONY : VRControllerPub.cpp.s
 
 # Help Target
 help:
@@ -186,12 +210,15 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... Middleware"
+	@echo "... Lidar3D.o"
+	@echo "... Lidar3D.i"
+	@echo "... Lidar3D.s"
 	@echo "... RobotMiddleware.o"
 	@echo "... RobotMiddleware.i"
 	@echo "... RobotMiddleware.s"
-	@echo "... VRController.o"
-	@echo "... VRController.i"
-	@echo "... VRController.s"
+	@echo "... VRControllerPub.o"
+	@echo "... VRControllerPub.i"
+	@echo "... VRControllerPub.s"
 .PHONY : help
 
 

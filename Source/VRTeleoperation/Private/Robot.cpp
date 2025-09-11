@@ -11,9 +11,6 @@ ARobot::ARobot()
 
 	middleware.initIce();
 	SetupPoseComponent();
-
-
-
 }
 
 // Called when the game starts or when spawned
@@ -21,8 +18,6 @@ void ARobot::BeginPlay()
 {
 	Super::BeginPlay();
 }
-
-
 
 void ARobot::SetupPoseComponent()
 {
@@ -39,7 +34,7 @@ void ARobot::SetupPoseComponent()
     RightController->SetupAttachment(RootComponent);
     RightController->SetTrackingSource(EControllerHand::Right);
 }
-
+#pragma region Inputs
 void ARobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -68,8 +63,7 @@ void ARobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		Input->BindAction(IA_Hand_Thumbstick_Right, ETriggerEvent::Completed, this, &ARobot::ThumbStickReleaseRight);
 
 }
-
-#pragma region Inputs
+#pragma region Triggers
 void ARobot::GraspLeft(const FInputActionValue& Value){
 	left.grab = Value.Get<float>();
 	controllerChanged = true;
@@ -109,6 +103,7 @@ void ARobot::TriggerReleaseRight(const FInputActionValue& Value){
 	controllerChanged = true;
 
 };
+#pragma endregion
 #pragma region Button
 void ARobot::PushA(const FInputActionValue& Value){
 	right.aButton= true;
@@ -143,6 +138,7 @@ void ARobot::ReleaseY(const FInputActionValue& Value){
 	controllerChanged = true;
 };
 #pragma endregion
+#pragma region ThumbStick
 void ARobot::ThumbStickLeft(const FInputActionValue& Value)
 {
     FVector2D StickValue = Value.Get<FVector2D>();
@@ -172,6 +168,7 @@ void ARobot::ThumbStickReleaseRight(const FInputActionValue& Value)
 	controllerChanged = true;
 }
 #pragma endregion
+#pragma endregion
 
 
 // Called every frame
@@ -180,8 +177,6 @@ void ARobot::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
     if (!GEngine)
 		return ;
-	
-
 
 	FVector HMDPos = VRCamera->GetComponentLocation();
 	FRotator HMDRot = VRCamera->GetComponentRotation();
@@ -204,7 +199,7 @@ void ARobot::Tick(float DeltaTime)
 		middleware.sendControllers(left, right);
 	}
 
-
+	#pragma region Debug
 	auto VecToStr2 = [](const FVector& V) {
 		return FString::Printf(TEXT("X=%.2f, Y=%.2f, Z=%.2f"), V.X, V.Y, V.Z);
 	};
@@ -253,5 +248,7 @@ void ARobot::Tick(float DeltaTime)
 		0,
 		1.f
 	);
+#pragma endregion
+
 }
 

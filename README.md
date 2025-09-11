@@ -50,7 +50,7 @@ Inside the CustomLibs folder, there is an ICE communication interface for RoboCo
 To build it:
 ```bash
 cd CustomLibs
-slice2cpp VRController.ice
+slice2cpp VRControllerPub.ice
 cmake -B build && make  -C build -j12
 
 ```
