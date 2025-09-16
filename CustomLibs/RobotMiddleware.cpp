@@ -72,12 +72,16 @@ constexpr double DEG2RAD = M_PI / 180.0;
 
 inline RoboCompVRControllerPub::Pose toIcePose(const RobotMiddleware::Pose& p) {     
     return {
-        -p.y*10,
         p.x*10,
+        p.y*10,
         p.z*10,
         p.rx * DEG2RAD,
+        p.ry * DEG2RAD,
         p.rz * DEG2RAD,
-        -p.ry * DEG2RAD
+        p.qrx,
+        p.qry,
+        p.qrz,
+        p.qrw
     };
 }
 inline RoboCompVRControllerPub::Controller toIceController(const RobotMiddleware::Controller& c) { 
@@ -171,9 +175,9 @@ bool RobotMiddleware::initIce()
     }
 }
 
-bool RobotMiddleware::sendPose(const RobotMiddleware::Pose& head, const RobotMiddleware::Pose& left, const RobotMiddleware::Pose& right) {
+bool RobotMiddleware::sendPoses(const RobotMiddleware::Pose& head, const RobotMiddleware::Pose& left, const RobotMiddleware::Pose& right) {
     try {
-        pImpl->vrcontroller_proxy->sendPose(
+        pImpl->vrcontroller_proxy->sendPoses(
             toIcePose(head),
             toIcePose(left),
             toIcePose(right)

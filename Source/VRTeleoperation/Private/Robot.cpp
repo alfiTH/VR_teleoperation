@@ -180,17 +180,21 @@ void ARobot::Tick(float DeltaTime)
 
 	FVector HMDPos = VRCamera->GetComponentLocation();
 	FRotator HMDRot = VRCamera->GetComponentRotation();
+	FQuat HMDQuat = VRCamera->GetComponentQuat();
+
 
 	FVector LeftPos = LeftController->GetComponentLocation();
 	FRotator LeftRot = LeftController->GetComponentRotation();
+	FQuat LeftQuat = LeftController->GetComponentQuat();
 
 	FVector RightPos = RightController->GetComponentLocation();
 	FRotator RightRot = RightController->GetComponentRotation();
+	FQuat RightQuat = RightController->GetComponentQuat();
 
 
-	middleware.sendPose(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDRot.Pitch, HMDRot.Yaw, HMDRot.Roll},
-		RobotMiddleware::Pose{LeftPos.X, LeftPos.Y, LeftPos.Z, LeftRot.Pitch, LeftRot.Yaw, LeftRot.Roll},
-		RobotMiddleware::Pose{RightPos.X, RightPos.Y, RightPos.Z, RightRot.Pitch, RightRot.Yaw, RightRot.Roll}
+	middleware.sendPoses(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDRot.Pitch, HMDRot.Yaw, HMDRot.Roll, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W},
+		RobotMiddleware::Pose{LeftPos.X, LeftPos.Y, LeftPos.Z, LeftRot.Pitch, LeftRot.Yaw, LeftRot.Roll, LeftQuat.X, LeftQuat.Y, LeftQuat.Z, LeftQuat.W},
+		RobotMiddleware::Pose{RightPos.X, RightPos.Y, RightPos.Z, RightRot.Pitch, RightRot.Yaw, RightRot.Roll, RightQuat.X, RightQuat.Y, RightQuat.Z, RightQuat.W}
 	);
 
 	if (controllerChanged)
@@ -203,24 +207,21 @@ void ARobot::Tick(float DeltaTime)
 	auto VecToStr2 = [](const FVector& V) {
 		return FString::Printf(TEXT("X=%.2f, Y=%.2f, Z=%.2f"), V.X, V.Y, V.Z);
 	};
-
 	auto RotToStr2 = [](const FRotator& V) {
 		return FString::Printf(TEXT("X=%.2f, Y=%.2f, Z=%.2f"), V.Pitch, V.Yaw, V.Roll);
 	};
-
-
 	auto QuatToStr2 = [](const FQuat& Q) {
 		return FString::Printf(TEXT("X=%.5f, Y=%.5f, Z=%.5f, W=%.5f"), Q.X, Q.Y, Q.Z, Q.W);
 	};
 
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black,
-		FString::Printf(TEXT("HMD: %s\n%s"), *VecToStr2(HMDPos), *RotToStr2(HMDRot)), true, FVector2D(2.5, 2.5));
+		FString::Printf(TEXT("HMD: %s\n%s\n%s"), *VecToStr2(HMDPos), *RotToStr2(HMDRot), *QuatToStr2(HMDQuat)), true, FVector2D(2.5, 2.5));
 
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red,
-		FString::Printf(TEXT("Left: %s\n%s"), *VecToStr2(LeftPos), *RotToStr2(LeftRot)), true, FVector2D(2.5, 2.5));
+		FString::Printf(TEXT("Left: %s\n%s\n%s"), *VecToStr2(LeftPos), *RotToStr2(LeftRot), *QuatToStr2(LeftQuat)), true, FVector2D(2.5, 2.5));
 
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue,
-		FString::Printf(TEXT("Right: %s\n%s"), *VecToStr2(RightPos), *RotToStr2(RightRot)), true, FVector2D(2.5, 2.5));
+		FString::Printf(TEXT("Right: %s\n%s\n%s"), *VecToStr2(RightPos), *RotToStr2(RightRot), *QuatToStr2(RightQuat)), true, FVector2D(2.5, 2.5));
 
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Orange,
 		FString::Printf(TEXT("Period: %.3f"), DeltaTime), true, FVector2D(2.5, 2.5));

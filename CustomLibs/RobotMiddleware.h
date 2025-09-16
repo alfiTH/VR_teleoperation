@@ -17,6 +17,11 @@ public:
         float rx;
         float ry;
         float rz;
+        float qrx;
+        float qry;
+        float qrz;
+        float qrw;
+
     };
 
     struct Controller
@@ -40,7 +45,7 @@ public:
     bool initIce();
 
 
-    bool sendPose(const RobotMiddleware::Pose& head, const RobotMiddleware::Pose& left, const RobotMiddleware::Pose& right);
+    bool sendPoses(const RobotMiddleware::Pose& head, const RobotMiddleware::Pose& left, const RobotMiddleware::Pose& right);
     bool sendControllers(const RobotMiddleware::Controller& left, const RobotMiddleware::Controller& right);
     bool getRobotState(/* ... */);
 

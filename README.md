@@ -65,3 +65,5 @@ ln -s $(pwd)/CustomLibs/build/libRobotMiddleware.so  Binaries/Linux/libRobotMidd
  The input Map in Inputs/IMC_Robot
  The inputs is de Action inpunts in Inputs, only it define the type of data
  To be easier, the Robot(Pawn) is wappered in RobotBP to use Inputs
+ URFD to FBX with blender 3.1.2 [urdf_importer](https://github.com/HoangGiang93/urdf_importer), you need copy the libs urdf_parser_py and yamlpy to python blender enviroment
+ To import fbx in unreal, right click in contrent drawlwer-->import to current folder-->select in types FBX skeletal meshes(*.fbx)-->open-->Select Skeletal Mesh-->Import All

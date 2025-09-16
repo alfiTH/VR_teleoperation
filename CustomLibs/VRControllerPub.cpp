@@ -59,10 +59,10 @@ const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_ops[] =
     "ice_isA",
     "ice_ping",
     "sendControllers",
-    "sendPose"
+    "sendPoses"
 };
 const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_sendControllers_name = "sendControllers";
-const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_sendPose_name = "sendPose";
+const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_sendPoses_name = "sendPoses";
 
 }
 
@@ -109,7 +109,7 @@ RoboCompVRControllerPub::VRControllerPub::_iceD_sendControllers(::IceInternal::I
 
 /// \cond INTERNAL
 bool
-RoboCompVRControllerPub::VRControllerPub::_iceD_sendPose(::IceInternal::Incoming& inS, const ::Ice::Current& current)
+RoboCompVRControllerPub::VRControllerPub::_iceD_sendPoses(::IceInternal::Incoming& inS, const ::Ice::Current& current)
 {
     _iceCheckMode(::Ice::OperationMode::Normal, current.mode);
     auto istr = inS.startReadParams();
@@ -118,7 +118,7 @@ RoboCompVRControllerPub::VRControllerPub::_iceD_sendPose(::IceInternal::Incoming
     Pose iceP_right;
     istr->readAll(iceP_head, iceP_left, iceP_right);
     inS.endReadParams();
-    this->sendPose(::std::move(iceP_head), ::std::move(iceP_left), ::std::move(iceP_right), current);
+    this->sendPoses(::std::move(iceP_head), ::std::move(iceP_left), ::std::move(iceP_right), current);
     inS.writeEmptyParams();
     return true;
 }
@@ -158,7 +158,7 @@ RoboCompVRControllerPub::VRControllerPub::_iceDispatch(::IceInternal::Incoming& 
         }
         case 5:
         {
-            return _iceD_sendPose(in, current);
+            return _iceD_sendPoses(in, current);
         }
         default:
         {
@@ -184,9 +184,9 @@ RoboCompVRControllerPub::VRControllerPubPrx::_iceI_sendControllers(const ::std::
 
 /// \cond INTERNAL
 void
-RoboCompVRControllerPub::VRControllerPubPrx::_iceI_sendPose(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<void>>& outAsync, const Pose& iceP_head, const Pose& iceP_left, const Pose& iceP_right, const ::Ice::Context& context)
+RoboCompVRControllerPub::VRControllerPubPrx::_iceI_sendPoses(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<void>>& outAsync, const Pose& iceP_head, const Pose& iceP_left, const Pose& iceP_right, const ::Ice::Context& context)
 {
-    outAsync->invoke(iceC_RoboCompVRControllerPub_VRControllerPub_sendPose_name, ::Ice::OperationMode::Normal, ::Ice::FormatType::DefaultFormat, context,
+    outAsync->invoke(iceC_RoboCompVRControllerPub_VRControllerPub_sendPoses_name, ::Ice::OperationMode::Normal, ::Ice::FormatType::DefaultFormat, context,
         [&](::Ice::OutputStream* ostr)
         {
             ostr->writeAll(iceP_head, iceP_left, iceP_right);
@@ -220,7 +220,7 @@ namespace
 
 const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_sendControllers_name = "sendControllers";
 
-const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_sendPose_name = "sendPose";
+const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_sendPoses_name = "sendPoses";
 
 }
 
@@ -271,18 +271,18 @@ IceProxy::RoboCompVRControllerPub::VRControllerPub::end_sendControllers(const ::
 }
 
 ::Ice::AsyncResultPtr
-IceProxy::RoboCompVRControllerPub::VRControllerPub::_iceI_begin_sendPose(const ::RoboCompVRControllerPub::Pose& iceP_head, const ::RoboCompVRControllerPub::Pose& iceP_left, const ::RoboCompVRControllerPub::Pose& iceP_right, const ::Ice::Context& context, const ::IceInternal::CallbackBasePtr& del, const ::Ice::LocalObjectPtr& cookie, bool sync)
+IceProxy::RoboCompVRControllerPub::VRControllerPub::_iceI_begin_sendPoses(const ::RoboCompVRControllerPub::Pose& iceP_head, const ::RoboCompVRControllerPub::Pose& iceP_left, const ::RoboCompVRControllerPub::Pose& iceP_right, const ::Ice::Context& context, const ::IceInternal::CallbackBasePtr& del, const ::Ice::LocalObjectPtr& cookie, bool sync)
 {
-    ::IceInternal::OutgoingAsyncPtr result = new ::IceInternal::CallbackOutgoing(this, iceC_RoboCompVRControllerPub_VRControllerPub_sendPose_name, del, cookie, sync);
+    ::IceInternal::OutgoingAsyncPtr result = new ::IceInternal::CallbackOutgoing(this, iceC_RoboCompVRControllerPub_VRControllerPub_sendPoses_name, del, cookie, sync);
     try
     {
-        result->prepare(iceC_RoboCompVRControllerPub_VRControllerPub_sendPose_name, ::Ice::Normal, context);
+        result->prepare(iceC_RoboCompVRControllerPub_VRControllerPub_sendPoses_name, ::Ice::Normal, context);
         ::Ice::OutputStream* ostr = result->startWriteParams(::Ice::DefaultFormat);
         ostr->write(iceP_head);
         ostr->write(iceP_left);
         ostr->write(iceP_right);
         result->endWriteParams();
-        result->invoke(iceC_RoboCompVRControllerPub_VRControllerPub_sendPose_name);
+        result->invoke(iceC_RoboCompVRControllerPub_VRControllerPub_sendPoses_name);
     }
     catch(const ::Ice::Exception& ex)
     {
@@ -292,9 +292,9 @@ IceProxy::RoboCompVRControllerPub::VRControllerPub::_iceI_begin_sendPose(const :
 }
 
 void
-IceProxy::RoboCompVRControllerPub::VRControllerPub::end_sendPose(const ::Ice::AsyncResultPtr& result)
+IceProxy::RoboCompVRControllerPub::VRControllerPub::end_sendPoses(const ::Ice::AsyncResultPtr& result)
 {
-    _end(result, iceC_RoboCompVRControllerPub_VRControllerPub_sendPose_name);
+    _end(result, iceC_RoboCompVRControllerPub_VRControllerPub_sendPoses_name);
 }
 
 /// \cond INTERNAL
@@ -378,7 +378,7 @@ RoboCompVRControllerPub::VRControllerPub::_iceD_sendControllers(::IceInternal::I
 
 /// \cond INTERNAL
 bool
-RoboCompVRControllerPub::VRControllerPub::_iceD_sendPose(::IceInternal::Incoming& inS, const ::Ice::Current& current)
+RoboCompVRControllerPub::VRControllerPub::_iceD_sendPoses(::IceInternal::Incoming& inS, const ::Ice::Current& current)
 {
     _iceCheckMode(::Ice::Normal, current.mode);
     ::Ice::InputStream* istr = inS.startReadParams();
@@ -389,7 +389,7 @@ RoboCompVRControllerPub::VRControllerPub::_iceD_sendPose(::IceInternal::Incoming
     istr->read(iceP_left);
     istr->read(iceP_right);
     inS.endReadParams();
-    this->sendPose(iceP_head, iceP_left, iceP_right, current);
+    this->sendPoses(iceP_head, iceP_left, iceP_right, current);
     inS.writeEmptyParams();
     return true;
 }
@@ -404,7 +404,7 @@ const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_all[] =
     "ice_isA",
     "ice_ping",
     "sendControllers",
-    "sendPose"
+    "sendPoses"
 };
 
 }
@@ -443,7 +443,7 @@ RoboCompVRControllerPub::VRControllerPub::_iceDispatch(::IceInternal::Incoming& 
         }
         case 5:
         {
-            return _iceD_sendPose(in, current);
+            return _iceD_sendPoses(in, current);
         }
         default:
         {

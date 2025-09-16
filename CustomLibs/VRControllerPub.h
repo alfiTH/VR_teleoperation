@@ -67,14 +67,18 @@ struct Pose
     float rx;
     float ry;
     float rz;
+    float qrx;
+    float qry;
+    float qrz;
+    float qrw;
 
     /**
      * Obtains a tuple containing all of the struct's data members.
      * @return The data members in a tuple.
      */
-    std::tuple<const float&, const float&, const float&, const float&, const float&, const float&> ice_tuple() const
+    std::tuple<const float&, const float&, const float&, const float&, const float&, const float&, const float&, const float&, const float&, const float&> ice_tuple() const
     {
-        return std::tie(x, y, z, rx, ry, rz);
+        return std::tie(x, y, z, rx, ry, rz, qrx, qry, qrz, qrw);
     }
 };
 
@@ -151,9 +155,9 @@ public:
     bool _iceD_sendControllers(::IceInternal::Incoming&, const ::Ice::Current&);
     /// \endcond
 
-    virtual void sendPose(Pose head, Pose left, Pose right, const ::Ice::Current& current) = 0;
+    virtual void sendPoses(Pose head, Pose left, Pose right, const ::Ice::Current& current) = 0;
     /// \cond INTERNAL
-    bool _iceD_sendPose(::IceInternal::Incoming&, const ::Ice::Current&);
+    bool _iceD_sendPoses(::IceInternal::Incoming&, const ::Ice::Current&);
     /// \endcond
 
     /// \cond INTERNAL
@@ -196,30 +200,30 @@ public:
     void _iceI_sendControllers(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<void>>&, const Controller&, const Controller&, const ::Ice::Context&);
     /// \endcond
 
-    void sendPose(const Pose& head, const Pose& left, const Pose& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    void sendPoses(const Pose& head, const Pose& left, const Pose& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
     {
-        _makePromiseOutgoing<void>(true, this, &VRControllerPubPrx::_iceI_sendPose, head, left, right, context).get();
+        _makePromiseOutgoing<void>(true, this, &VRControllerPubPrx::_iceI_sendPoses, head, left, right, context).get();
     }
 
     template<template<typename> class P = ::std::promise>
-    auto sendPoseAsync(const Pose& head, const Pose& left, const Pose& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    auto sendPosesAsync(const Pose& head, const Pose& left, const Pose& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
         -> decltype(::std::declval<P<void>>().get_future())
     {
-        return _makePromiseOutgoing<void, P>(false, this, &VRControllerPubPrx::_iceI_sendPose, head, left, right, context);
+        return _makePromiseOutgoing<void, P>(false, this, &VRControllerPubPrx::_iceI_sendPoses, head, left, right, context);
     }
 
     ::std::function<void()>
-    sendPoseAsync(const Pose& head, const Pose& left, const Pose& right,
-                  ::std::function<void()> response,
-                  ::std::function<void(::std::exception_ptr)> ex = nullptr,
-                  ::std::function<void(bool)> sent = nullptr,
-                  const ::Ice::Context& context = ::Ice::noExplicitContext)
+    sendPosesAsync(const Pose& head, const Pose& left, const Pose& right,
+                   ::std::function<void()> response,
+                   ::std::function<void(::std::exception_ptr)> ex = nullptr,
+                   ::std::function<void(bool)> sent = nullptr,
+                   const ::Ice::Context& context = ::Ice::noExplicitContext)
     {
-        return _makeLamdaOutgoing<void>(std::move(response), std::move(ex), std::move(sent), this, &RoboCompVRControllerPub::VRControllerPubPrx::_iceI_sendPose, head, left, right, context);
+        return _makeLamdaOutgoing<void>(std::move(response), std::move(ex), std::move(sent), this, &RoboCompVRControllerPub::VRControllerPubPrx::_iceI_sendPoses, head, left, right, context);
     }
 
     /// \cond INTERNAL
-    void _iceI_sendPose(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<void>>&, const Pose&, const Pose&, const Pose&, const ::Ice::Context&);
+    void _iceI_sendPoses(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<void>>&, const Pose&, const Pose&, const Pose&, const ::Ice::Context&);
     /// \endcond
 
     /**
@@ -248,7 +252,7 @@ template<>
 struct StreamableTraits<::RoboCompVRControllerPub::Pose>
 {
     static const StreamHelperCategory helper = StreamHelperCategoryStruct;
-    static const int minWireSize = 24;
+    static const int minWireSize = 40;
     static const bool fixedLength = true;
 };
 
@@ -257,7 +261,7 @@ struct StreamReader<::RoboCompVRControllerPub::Pose, S>
 {
     static void read(S* istr, ::RoboCompVRControllerPub::Pose& v)
     {
-        istr->readAll(v.x, v.y, v.z, v.rx, v.ry, v.rz);
+        istr->readAll(v.x, v.y, v.z, v.rx, v.ry, v.rz, v.qrx, v.qry, v.qrz, v.qrw);
     }
 };
 
@@ -336,6 +340,10 @@ struct Pose
     ::Ice::Float rx;
     ::Ice::Float ry;
     ::Ice::Float rz;
+    ::Ice::Float qrx;
+    ::Ice::Float qry;
+    ::Ice::Float qrz;
+    ::Ice::Float qrw;
 };
 
 struct Controller
@@ -366,11 +374,11 @@ typedef ::IceUtil::Handle< Callback_VRControllerPub_sendControllers_Base> Callba
 
 /**
  * Base class for asynchronous callback wrapper classes used for calls to
- * IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPose.
- * Create a wrapper instance by calling ::RoboCompVRControllerPub::newCallback_VRControllerPub_sendPose.
+ * IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPoses.
+ * Create a wrapper instance by calling ::RoboCompVRControllerPub::newCallback_VRControllerPub_sendPoses.
  */
-class Callback_VRControllerPub_sendPose_Base : public virtual ::IceInternal::CallbackBase { };
-typedef ::IceUtil::Handle< Callback_VRControllerPub_sendPose_Base> Callback_VRControllerPub_sendPosePtr;
+class Callback_VRControllerPub_sendPoses_Base : public virtual ::IceInternal::CallbackBase { };
+typedef ::IceUtil::Handle< Callback_VRControllerPub_sendPoses_Base> Callback_VRControllerPub_sendPosesPtr;
 
 }
 
@@ -422,41 +430,41 @@ private:
 
 public:
 
-    void sendPose(const ::RoboCompVRControllerPub::Pose& head, const ::RoboCompVRControllerPub::Pose& left, const ::RoboCompVRControllerPub::Pose& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    void sendPoses(const ::RoboCompVRControllerPub::Pose& head, const ::RoboCompVRControllerPub::Pose& left, const ::RoboCompVRControllerPub::Pose& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
     {
-        end_sendPose(_iceI_begin_sendPose(head, left, right, context, ::IceInternal::dummyCallback, 0, true));
+        end_sendPoses(_iceI_begin_sendPoses(head, left, right, context, ::IceInternal::dummyCallback, 0, true));
     }
 
-    ::Ice::AsyncResultPtr begin_sendPose(const ::RoboCompVRControllerPub::Pose& head, const ::RoboCompVRControllerPub::Pose& left, const ::RoboCompVRControllerPub::Pose& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    ::Ice::AsyncResultPtr begin_sendPoses(const ::RoboCompVRControllerPub::Pose& head, const ::RoboCompVRControllerPub::Pose& left, const ::RoboCompVRControllerPub::Pose& right, const ::Ice::Context& context = ::Ice::noExplicitContext)
     {
-        return _iceI_begin_sendPose(head, left, right, context, ::IceInternal::dummyCallback, 0);
+        return _iceI_begin_sendPoses(head, left, right, context, ::IceInternal::dummyCallback, 0);
     }
 
-    ::Ice::AsyncResultPtr begin_sendPose(const ::RoboCompVRControllerPub::Pose& head, const ::RoboCompVRControllerPub::Pose& left, const ::RoboCompVRControllerPub::Pose& right, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    ::Ice::AsyncResultPtr begin_sendPoses(const ::RoboCompVRControllerPub::Pose& head, const ::RoboCompVRControllerPub::Pose& left, const ::RoboCompVRControllerPub::Pose& right, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
     {
-        return _iceI_begin_sendPose(head, left, right, ::Ice::noExplicitContext, cb, cookie);
+        return _iceI_begin_sendPoses(head, left, right, ::Ice::noExplicitContext, cb, cookie);
     }
 
-    ::Ice::AsyncResultPtr begin_sendPose(const ::RoboCompVRControllerPub::Pose& head, const ::RoboCompVRControllerPub::Pose& left, const ::RoboCompVRControllerPub::Pose& right, const ::Ice::Context& context, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    ::Ice::AsyncResultPtr begin_sendPoses(const ::RoboCompVRControllerPub::Pose& head, const ::RoboCompVRControllerPub::Pose& left, const ::RoboCompVRControllerPub::Pose& right, const ::Ice::Context& context, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
     {
-        return _iceI_begin_sendPose(head, left, right, context, cb, cookie);
+        return _iceI_begin_sendPoses(head, left, right, context, cb, cookie);
     }
 
-    ::Ice::AsyncResultPtr begin_sendPose(const ::RoboCompVRControllerPub::Pose& head, const ::RoboCompVRControllerPub::Pose& left, const ::RoboCompVRControllerPub::Pose& right, const ::RoboCompVRControllerPub::Callback_VRControllerPub_sendPosePtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    ::Ice::AsyncResultPtr begin_sendPoses(const ::RoboCompVRControllerPub::Pose& head, const ::RoboCompVRControllerPub::Pose& left, const ::RoboCompVRControllerPub::Pose& right, const ::RoboCompVRControllerPub::Callback_VRControllerPub_sendPosesPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
     {
-        return _iceI_begin_sendPose(head, left, right, ::Ice::noExplicitContext, cb, cookie);
+        return _iceI_begin_sendPoses(head, left, right, ::Ice::noExplicitContext, cb, cookie);
     }
 
-    ::Ice::AsyncResultPtr begin_sendPose(const ::RoboCompVRControllerPub::Pose& head, const ::RoboCompVRControllerPub::Pose& left, const ::RoboCompVRControllerPub::Pose& right, const ::Ice::Context& context, const ::RoboCompVRControllerPub::Callback_VRControllerPub_sendPosePtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    ::Ice::AsyncResultPtr begin_sendPoses(const ::RoboCompVRControllerPub::Pose& head, const ::RoboCompVRControllerPub::Pose& left, const ::RoboCompVRControllerPub::Pose& right, const ::Ice::Context& context, const ::RoboCompVRControllerPub::Callback_VRControllerPub_sendPosesPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
     {
-        return _iceI_begin_sendPose(head, left, right, context, cb, cookie);
+        return _iceI_begin_sendPoses(head, left, right, context, cb, cookie);
     }
 
-    void end_sendPose(const ::Ice::AsyncResultPtr& result);
+    void end_sendPoses(const ::Ice::AsyncResultPtr& result);
 
 private:
 
-    ::Ice::AsyncResultPtr _iceI_begin_sendPose(const ::RoboCompVRControllerPub::Pose&, const ::RoboCompVRControllerPub::Pose&, const ::RoboCompVRControllerPub::Pose&, const ::Ice::Context&, const ::IceInternal::CallbackBasePtr&, const ::Ice::LocalObjectPtr& cookie = 0, bool sync = false);
+    ::Ice::AsyncResultPtr _iceI_begin_sendPoses(const ::RoboCompVRControllerPub::Pose&, const ::RoboCompVRControllerPub::Pose&, const ::RoboCompVRControllerPub::Pose&, const ::Ice::Context&, const ::IceInternal::CallbackBasePtr&, const ::Ice::LocalObjectPtr& cookie = 0, bool sync = false);
 
 public:
 
@@ -528,9 +536,9 @@ public:
     bool _iceD_sendControllers(::IceInternal::Incoming&, const ::Ice::Current&);
     /// \endcond
 
-    virtual void sendPose(const Pose& head, const Pose& left, const Pose& right, const ::Ice::Current& current = ::Ice::emptyCurrent) = 0;
+    virtual void sendPoses(const Pose& head, const Pose& left, const Pose& right, const ::Ice::Current& current = ::Ice::emptyCurrent) = 0;
     /// \cond INTERNAL
-    bool _iceD_sendPose(::IceInternal::Incoming&, const ::Ice::Current&);
+    bool _iceD_sendPoses(::IceInternal::Incoming&, const ::Ice::Current&);
     /// \endcond
 
     /// \cond INTERNAL
@@ -567,7 +575,7 @@ template<>
 struct StreamableTraits< ::RoboCompVRControllerPub::Pose>
 {
     static const StreamHelperCategory helper = StreamHelperCategoryStruct;
-    static const int minWireSize = 24;
+    static const int minWireSize = 40;
     static const bool fixedLength = true;
 };
 
@@ -582,6 +590,10 @@ struct StreamWriter< ::RoboCompVRControllerPub::Pose, S>
         ostr->write(v.rx);
         ostr->write(v.ry);
         ostr->write(v.rz);
+        ostr->write(v.qrx);
+        ostr->write(v.qry);
+        ostr->write(v.qrz);
+        ostr->write(v.qrw);
     }
 };
 
@@ -596,6 +608,10 @@ struct StreamReader< ::RoboCompVRControllerPub::Pose, S>
         istr->read(v.rx);
         istr->read(v.ry);
         istr->read(v.rz);
+        istr->read(v.qrx);
+        istr->read(v.qry);
+        istr->read(v.qrz);
+        istr->read(v.qrw);
     }
 };
 
@@ -805,11 +821,11 @@ newCallback_VRControllerPub_sendControllers(T* instance, void (T::*excb)(const :
 
 /**
  * Type-safe asynchronous callback wrapper class used for calls to
- * IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPose.
- * Create a wrapper instance by calling ::RoboCompVRControllerPub::newCallback_VRControllerPub_sendPose.
+ * IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPoses.
+ * Create a wrapper instance by calling ::RoboCompVRControllerPub::newCallback_VRControllerPub_sendPoses.
  */
 template<class T>
-class CallbackNC_VRControllerPub_sendPose : public Callback_VRControllerPub_sendPose_Base, public ::IceInternal::OnewayCallbackNC<T>
+class CallbackNC_VRControllerPub_sendPoses : public Callback_VRControllerPub_sendPoses_Base, public ::IceInternal::OnewayCallbackNC<T>
 {
 public:
 
@@ -819,7 +835,7 @@ public:
     typedef void (T::*Sent)(bool);
     typedef void (T::*Response)();
 
-    CallbackNC_VRControllerPub_sendPose(const TPtr& obj, Response cb, Exception excb, Sent sentcb)
+    CallbackNC_VRControllerPub_sendPoses(const TPtr& obj, Response cb, Exception excb, Sent sentcb)
         : ::IceInternal::OnewayCallbackNC<T>(obj, cb, excb, sentcb)
     {
     }
@@ -831,12 +847,12 @@ public:
  * @param cb The success method of the callback object.
  * @param excb The exception method of the callback object.
  * @param sentcb The sent method of the callback object.
- * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPose.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPoses.
  */
-template<class T> Callback_VRControllerPub_sendPosePtr
-newCallback_VRControllerPub_sendPose(const IceUtil::Handle<T>& instance, void (T::*cb)(), void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
+template<class T> Callback_VRControllerPub_sendPosesPtr
+newCallback_VRControllerPub_sendPoses(const IceUtil::Handle<T>& instance, void (T::*cb)(), void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
 {
-    return new CallbackNC_VRControllerPub_sendPose<T>(instance, cb, excb, sentcb);
+    return new CallbackNC_VRControllerPub_sendPoses<T>(instance, cb, excb, sentcb);
 }
 
 /**
@@ -844,12 +860,12 @@ newCallback_VRControllerPub_sendPose(const IceUtil::Handle<T>& instance, void (T
  * @param instance The callback object.
  * @param excb The exception method of the callback object.
  * @param sentcb The sent method of the callback object.
- * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPose.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPoses.
  */
-template<class T> Callback_VRControllerPub_sendPosePtr
-newCallback_VRControllerPub_sendPose(const IceUtil::Handle<T>& instance, void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
+template<class T> Callback_VRControllerPub_sendPosesPtr
+newCallback_VRControllerPub_sendPoses(const IceUtil::Handle<T>& instance, void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
 {
-    return new CallbackNC_VRControllerPub_sendPose<T>(instance, 0, excb, sentcb);
+    return new CallbackNC_VRControllerPub_sendPoses<T>(instance, 0, excb, sentcb);
 }
 
 /**
@@ -858,12 +874,12 @@ newCallback_VRControllerPub_sendPose(const IceUtil::Handle<T>& instance, void (T
  * @param cb The success method of the callback object.
  * @param excb The exception method of the callback object.
  * @param sentcb The sent method of the callback object.
- * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPose.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPoses.
  */
-template<class T> Callback_VRControllerPub_sendPosePtr
-newCallback_VRControllerPub_sendPose(T* instance, void (T::*cb)(), void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
+template<class T> Callback_VRControllerPub_sendPosesPtr
+newCallback_VRControllerPub_sendPoses(T* instance, void (T::*cb)(), void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
 {
-    return new CallbackNC_VRControllerPub_sendPose<T>(instance, cb, excb, sentcb);
+    return new CallbackNC_VRControllerPub_sendPoses<T>(instance, cb, excb, sentcb);
 }
 
 /**
@@ -871,21 +887,21 @@ newCallback_VRControllerPub_sendPose(T* instance, void (T::*cb)(), void (T::*exc
  * @param instance The callback object.
  * @param excb The exception method of the callback object.
  * @param sentcb The sent method of the callback object.
- * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPose.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPoses.
  */
-template<class T> Callback_VRControllerPub_sendPosePtr
-newCallback_VRControllerPub_sendPose(T* instance, void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
+template<class T> Callback_VRControllerPub_sendPosesPtr
+newCallback_VRControllerPub_sendPoses(T* instance, void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
 {
-    return new CallbackNC_VRControllerPub_sendPose<T>(instance, 0, excb, sentcb);
+    return new CallbackNC_VRControllerPub_sendPoses<T>(instance, 0, excb, sentcb);
 }
 
 /**
  * Type-safe asynchronous callback wrapper class with cookie support used for calls to
- * IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPose.
- * Create a wrapper instance by calling ::RoboCompVRControllerPub::newCallback_VRControllerPub_sendPose.
+ * IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPoses.
+ * Create a wrapper instance by calling ::RoboCompVRControllerPub::newCallback_VRControllerPub_sendPoses.
  */
 template<class T, typename CT>
-class Callback_VRControllerPub_sendPose : public Callback_VRControllerPub_sendPose_Base, public ::IceInternal::OnewayCallback<T, CT>
+class Callback_VRControllerPub_sendPoses : public Callback_VRControllerPub_sendPoses_Base, public ::IceInternal::OnewayCallback<T, CT>
 {
 public:
 
@@ -895,7 +911,7 @@ public:
     typedef void (T::*Sent)(bool , const CT&);
     typedef void (T::*Response)(const CT&);
 
-    Callback_VRControllerPub_sendPose(const TPtr& obj, Response cb, Exception excb, Sent sentcb)
+    Callback_VRControllerPub_sendPoses(const TPtr& obj, Response cb, Exception excb, Sent sentcb)
         : ::IceInternal::OnewayCallback<T, CT>(obj, cb, excb, sentcb)
     {
     }
@@ -908,12 +924,12 @@ public:
  * @param cb The success method of the callback object.
  * @param excb The exception method of the callback object.
  * @param sentcb The sent method of the callback object.
- * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPose.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPoses.
  */
-template<class T, typename CT> Callback_VRControllerPub_sendPosePtr
-newCallback_VRControllerPub_sendPose(const IceUtil::Handle<T>& instance, void (T::*cb)(const CT&), void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
+template<class T, typename CT> Callback_VRControllerPub_sendPosesPtr
+newCallback_VRControllerPub_sendPoses(const IceUtil::Handle<T>& instance, void (T::*cb)(const CT&), void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
 {
-    return new Callback_VRControllerPub_sendPose<T, CT>(instance, cb, excb, sentcb);
+    return new Callback_VRControllerPub_sendPoses<T, CT>(instance, cb, excb, sentcb);
 }
 
 /**
@@ -922,12 +938,12 @@ newCallback_VRControllerPub_sendPose(const IceUtil::Handle<T>& instance, void (T
  * @param instance The callback object.
  * @param excb The exception method of the callback object.
  * @param sentcb The sent method of the callback object.
- * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPose.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPoses.
  */
-template<class T, typename CT> Callback_VRControllerPub_sendPosePtr
-newCallback_VRControllerPub_sendPose(const IceUtil::Handle<T>& instance, void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
+template<class T, typename CT> Callback_VRControllerPub_sendPosesPtr
+newCallback_VRControllerPub_sendPoses(const IceUtil::Handle<T>& instance, void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
 {
-    return new Callback_VRControllerPub_sendPose<T, CT>(instance, 0, excb, sentcb);
+    return new Callback_VRControllerPub_sendPoses<T, CT>(instance, 0, excb, sentcb);
 }
 
 /**
@@ -937,12 +953,12 @@ newCallback_VRControllerPub_sendPose(const IceUtil::Handle<T>& instance, void (T
  * @param cb The success method of the callback object.
  * @param excb The exception method of the callback object.
  * @param sentcb The sent method of the callback object.
- * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPose.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPoses.
  */
-template<class T, typename CT> Callback_VRControllerPub_sendPosePtr
-newCallback_VRControllerPub_sendPose(T* instance, void (T::*cb)(const CT&), void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
+template<class T, typename CT> Callback_VRControllerPub_sendPosesPtr
+newCallback_VRControllerPub_sendPoses(T* instance, void (T::*cb)(const CT&), void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
 {
-    return new Callback_VRControllerPub_sendPose<T, CT>(instance, cb, excb, sentcb);
+    return new Callback_VRControllerPub_sendPoses<T, CT>(instance, cb, excb, sentcb);
 }
 
 /**
@@ -951,12 +967,12 @@ newCallback_VRControllerPub_sendPose(T* instance, void (T::*cb)(const CT&), void
  * @param instance The callback object.
  * @param excb The exception method of the callback object.
  * @param sentcb The sent method of the callback object.
- * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPose.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompVRControllerPub::VRControllerPub::begin_sendPoses.
  */
-template<class T, typename CT> Callback_VRControllerPub_sendPosePtr
-newCallback_VRControllerPub_sendPose(T* instance, void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
+template<class T, typename CT> Callback_VRControllerPub_sendPosesPtr
+newCallback_VRControllerPub_sendPoses(T* instance, void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
 {
-    return new Callback_VRControllerPub_sendPose<T, CT>(instance, 0, excb, sentcb);
+    return new Callback_VRControllerPub_sendPoses<T, CT>(instance, 0, excb, sentcb);
 }
 
 }

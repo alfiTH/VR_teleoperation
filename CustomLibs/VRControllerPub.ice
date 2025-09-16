@@ -18,6 +18,10 @@ module RoboCompVRControllerPub
 		float rx;
 		float ry;
 		float rz;
+		float qrx;
+		float qry;
+		float qrz;
+		float qrw;
 	};
 	struct Controller
 	{
@@ -34,7 +38,7 @@ module RoboCompVRControllerPub
 	interface VRControllerPub
 	{
 		void sendControllers (Controller left, Controller right);
-		void sendPose (Pose head, Pose left, Pose right);
+		void sendPoses (Pose head, Pose left, Pose right);
 	};
 };
 
