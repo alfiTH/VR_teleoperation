@@ -18,7 +18,7 @@ ULidarVisualizator::ULidarVisualizator()
 void ULidarVisualizator::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	GenerateWall();
 }
 
