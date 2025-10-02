@@ -59,9 +59,11 @@ const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_ops[] =
     "ice_isA",
     "ice_ping",
     "sendControllers",
+    "sendHaptics",
     "sendPoses"
 };
 const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_sendControllers_name = "sendControllers";
+const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_sendHaptics_name = "sendHaptics";
 const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_sendPoses_name = "sendPoses";
 
 }
@@ -109,6 +111,22 @@ RoboCompVRControllerPub::VRControllerPub::_iceD_sendControllers(::IceInternal::I
 
 /// \cond INTERNAL
 bool
+RoboCompVRControllerPub::VRControllerPub::_iceD_sendHaptics(::IceInternal::Incoming& inS, const ::Ice::Current& current)
+{
+    _iceCheckMode(::Ice::OperationMode::Normal, current.mode);
+    auto istr = inS.startReadParams();
+    Haptic iceP_left;
+    Haptic iceP_right;
+    istr->readAll(iceP_left, iceP_right);
+    inS.endReadParams();
+    this->sendHaptics(::std::move(iceP_left), ::std::move(iceP_right), current);
+    inS.writeEmptyParams();
+    return true;
+}
+/// \endcond
+
+/// \cond INTERNAL
+bool
 RoboCompVRControllerPub::VRControllerPub::_iceD_sendPoses(::IceInternal::Incoming& inS, const ::Ice::Current& current)
 {
     _iceCheckMode(::Ice::OperationMode::Normal, current.mode);
@@ -128,7 +146,7 @@ RoboCompVRControllerPub::VRControllerPub::_iceD_sendPoses(::IceInternal::Incomin
 bool
 RoboCompVRControllerPub::VRControllerPub::_iceDispatch(::IceInternal::Incoming& in, const ::Ice::Current& current)
 {
-    ::std::pair<const ::std::string*, const ::std::string*> r = ::std::equal_range(iceC_RoboCompVRControllerPub_VRControllerPub_ops, iceC_RoboCompVRControllerPub_VRControllerPub_ops + 6, current.operation);
+    ::std::pair<const ::std::string*, const ::std::string*> r = ::std::equal_range(iceC_RoboCompVRControllerPub_VRControllerPub_ops, iceC_RoboCompVRControllerPub_VRControllerPub_ops + 7, current.operation);
     if(r.first == r.second)
     {
         throw ::Ice::OperationNotExistException(__FILE__, __LINE__, current.id, current.facet, current.operation);
@@ -158,6 +176,10 @@ RoboCompVRControllerPub::VRControllerPub::_iceDispatch(::IceInternal::Incoming& 
         }
         case 5:
         {
+            return _iceD_sendHaptics(in, current);
+        }
+        case 6:
+        {
             return _iceD_sendPoses(in, current);
         }
         default:
@@ -174,6 +196,19 @@ void
 RoboCompVRControllerPub::VRControllerPubPrx::_iceI_sendControllers(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<void>>& outAsync, const Controller& iceP_left, const Controller& iceP_right, const ::Ice::Context& context)
 {
     outAsync->invoke(iceC_RoboCompVRControllerPub_VRControllerPub_sendControllers_name, ::Ice::OperationMode::Normal, ::Ice::FormatType::DefaultFormat, context,
+        [&](::Ice::OutputStream* ostr)
+        {
+            ostr->writeAll(iceP_left, iceP_right);
+        },
+        nullptr);
+}
+/// \endcond
+
+/// \cond INTERNAL
+void
+RoboCompVRControllerPub::VRControllerPubPrx::_iceI_sendHaptics(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<void>>& outAsync, const Haptic& iceP_left, const Haptic& iceP_right, const ::Ice::Context& context)
+{
+    outAsync->invoke(iceC_RoboCompVRControllerPub_VRControllerPub_sendHaptics_name, ::Ice::OperationMode::Normal, ::Ice::FormatType::DefaultFormat, context,
         [&](::Ice::OutputStream* ostr)
         {
             ostr->writeAll(iceP_left, iceP_right);
@@ -219,6 +254,8 @@ namespace
 {
 
 const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_sendControllers_name = "sendControllers";
+
+const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_sendHaptics_name = "sendHaptics";
 
 const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_sendPoses_name = "sendPoses";
 
@@ -268,6 +305,32 @@ void
 IceProxy::RoboCompVRControllerPub::VRControllerPub::end_sendControllers(const ::Ice::AsyncResultPtr& result)
 {
     _end(result, iceC_RoboCompVRControllerPub_VRControllerPub_sendControllers_name);
+}
+
+::Ice::AsyncResultPtr
+IceProxy::RoboCompVRControllerPub::VRControllerPub::_iceI_begin_sendHaptics(const ::RoboCompVRControllerPub::Haptic& iceP_left, const ::RoboCompVRControllerPub::Haptic& iceP_right, const ::Ice::Context& context, const ::IceInternal::CallbackBasePtr& del, const ::Ice::LocalObjectPtr& cookie, bool sync)
+{
+    ::IceInternal::OutgoingAsyncPtr result = new ::IceInternal::CallbackOutgoing(this, iceC_RoboCompVRControllerPub_VRControllerPub_sendHaptics_name, del, cookie, sync);
+    try
+    {
+        result->prepare(iceC_RoboCompVRControllerPub_VRControllerPub_sendHaptics_name, ::Ice::Normal, context);
+        ::Ice::OutputStream* ostr = result->startWriteParams(::Ice::DefaultFormat);
+        ostr->write(iceP_left);
+        ostr->write(iceP_right);
+        result->endWriteParams();
+        result->invoke(iceC_RoboCompVRControllerPub_VRControllerPub_sendHaptics_name);
+    }
+    catch(const ::Ice::Exception& ex)
+    {
+        result->abort(ex);
+    }
+    return result;
+}
+
+void
+IceProxy::RoboCompVRControllerPub::VRControllerPub::end_sendHaptics(const ::Ice::AsyncResultPtr& result)
+{
+    _end(result, iceC_RoboCompVRControllerPub_VRControllerPub_sendHaptics_name);
 }
 
 ::Ice::AsyncResultPtr
@@ -378,6 +441,23 @@ RoboCompVRControllerPub::VRControllerPub::_iceD_sendControllers(::IceInternal::I
 
 /// \cond INTERNAL
 bool
+RoboCompVRControllerPub::VRControllerPub::_iceD_sendHaptics(::IceInternal::Incoming& inS, const ::Ice::Current& current)
+{
+    _iceCheckMode(::Ice::Normal, current.mode);
+    ::Ice::InputStream* istr = inS.startReadParams();
+    Haptic iceP_left;
+    Haptic iceP_right;
+    istr->read(iceP_left);
+    istr->read(iceP_right);
+    inS.endReadParams();
+    this->sendHaptics(iceP_left, iceP_right, current);
+    inS.writeEmptyParams();
+    return true;
+}
+/// \endcond
+
+/// \cond INTERNAL
+bool
 RoboCompVRControllerPub::VRControllerPub::_iceD_sendPoses(::IceInternal::Incoming& inS, const ::Ice::Current& current)
 {
     _iceCheckMode(::Ice::Normal, current.mode);
@@ -404,6 +484,7 @@ const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_all[] =
     "ice_isA",
     "ice_ping",
     "sendControllers",
+    "sendHaptics",
     "sendPoses"
 };
 
@@ -413,7 +494,7 @@ const ::std::string iceC_RoboCompVRControllerPub_VRControllerPub_all[] =
 bool
 RoboCompVRControllerPub::VRControllerPub::_iceDispatch(::IceInternal::Incoming& in, const ::Ice::Current& current)
 {
-    ::std::pair<const ::std::string*, const ::std::string*> r = ::std::equal_range(iceC_RoboCompVRControllerPub_VRControllerPub_all, iceC_RoboCompVRControllerPub_VRControllerPub_all + 6, current.operation);
+    ::std::pair<const ::std::string*, const ::std::string*> r = ::std::equal_range(iceC_RoboCompVRControllerPub_VRControllerPub_all, iceC_RoboCompVRControllerPub_VRControllerPub_all + 7, current.operation);
     if(r.first == r.second)
     {
         throw ::Ice::OperationNotExistException(__FILE__, __LINE__, current.id, current.facet, current.operation);
@@ -442,6 +523,10 @@ RoboCompVRControllerPub::VRControllerPub::_iceDispatch(::IceInternal::Incoming& 
             return _iceD_sendControllers(in, current);
         }
         case 5:
+        {
+            return _iceD_sendHaptics(in, current);
+        }
+        case 6:
         {
             return _iceD_sendPoses(in, current);
         }

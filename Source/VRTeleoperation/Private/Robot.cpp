@@ -8,15 +8,30 @@ ARobot::ARobot()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	middleware.initIce();
-	SetupPoseComponent();
+    SetupPoseComponent();
 }
 
 // Called when the game starts or when spawned
 void ARobot::BeginPlay()
 {
 	Super::BeginPlay();
+	if (!middleware.initIce())
+	{
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			UKismetSystemLibrary::QuitGame(
+				GetWorld(),
+				PlayerController,
+				EQuitPreference::Quit,
+				true // true cierra sin mostrar mensaje de confirmación
+			);
+		}
+	}
+}
+void ARobot::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
 }
 
 void ARobot::SetupPoseComponent()
@@ -202,6 +217,10 @@ void ARobot::Tick(float DeltaTime)
 		controllerChanged = false;
 		middleware.sendControllers(left, right);
 	}
+
+	RobotMiddleware::Haptic leftHaptic, rightHaptic;
+	
+	middleware.getHaptics(leftHaptic, rightHaptic);
 
 	#pragma region Debug
 	auto VecToStr2 = [](const FVector& V) {

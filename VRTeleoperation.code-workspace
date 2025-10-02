@@ -889,8 +889,6 @@
 				"args": [
 					"-projectfiles",
 					"-vscode",
-					"-project=/home/robolab/Code/VR_teleoperation/VRTeleoperation.uproject",
-					"-game",
 					"-engine",
 					"-dotnet"
 				],

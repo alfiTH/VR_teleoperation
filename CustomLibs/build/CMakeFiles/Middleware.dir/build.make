@@ -83,53 +83,85 @@ CMakeFiles/Middleware.dir/RobotMiddleware.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Middleware.dir/RobotMiddleware.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robolab/Code/VR_teleoperation/CustomLibs/RobotMiddleware.cpp -o CMakeFiles/Middleware.dir/RobotMiddleware.cpp.s
 
-CMakeFiles/Middleware.dir/VRControllerPub.cpp.o: CMakeFiles/Middleware.dir/flags.make
-CMakeFiles/Middleware.dir/VRControllerPub.cpp.o: /home/robolab/Code/VR_teleoperation/CustomLibs/VRControllerPub.cpp
-CMakeFiles/Middleware.dir/VRControllerPub.cpp.o: CMakeFiles/Middleware.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Middleware.dir/VRControllerPub.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Middleware.dir/VRControllerPub.cpp.o -MF CMakeFiles/Middleware.dir/VRControllerPub.cpp.o.d -o CMakeFiles/Middleware.dir/VRControllerPub.cpp.o -c /home/robolab/Code/VR_teleoperation/CustomLibs/VRControllerPub.cpp
+CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.o: CMakeFiles/Middleware.dir/flags.make
+CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.o: /home/robolab/Code/VR_teleoperation/CustomLibs/include/VRControllerPub.cpp
+CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.o: CMakeFiles/Middleware.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.o -MF CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.o.d -o CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.o -c /home/robolab/Code/VR_teleoperation/CustomLibs/include/VRControllerPub.cpp
 
-CMakeFiles/Middleware.dir/VRControllerPub.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Middleware.dir/VRControllerPub.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robolab/Code/VR_teleoperation/CustomLibs/VRControllerPub.cpp > CMakeFiles/Middleware.dir/VRControllerPub.cpp.i
+CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robolab/Code/VR_teleoperation/CustomLibs/include/VRControllerPub.cpp > CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.i
 
-CMakeFiles/Middleware.dir/VRControllerPub.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Middleware.dir/VRControllerPub.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robolab/Code/VR_teleoperation/CustomLibs/VRControllerPub.cpp -o CMakeFiles/Middleware.dir/VRControllerPub.cpp.s
+CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robolab/Code/VR_teleoperation/CustomLibs/include/VRControllerPub.cpp -o CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.s
 
-CMakeFiles/Middleware.dir/Lidar3D.cpp.o: CMakeFiles/Middleware.dir/flags.make
-CMakeFiles/Middleware.dir/Lidar3D.cpp.o: /home/robolab/Code/VR_teleoperation/CustomLibs/Lidar3D.cpp
-CMakeFiles/Middleware.dir/Lidar3D.cpp.o: CMakeFiles/Middleware.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Middleware.dir/Lidar3D.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Middleware.dir/Lidar3D.cpp.o -MF CMakeFiles/Middleware.dir/Lidar3D.cpp.o.d -o CMakeFiles/Middleware.dir/Lidar3D.cpp.o -c /home/robolab/Code/VR_teleoperation/CustomLibs/Lidar3D.cpp
+CMakeFiles/Middleware.dir/include/Lidar3D.cpp.o: CMakeFiles/Middleware.dir/flags.make
+CMakeFiles/Middleware.dir/include/Lidar3D.cpp.o: /home/robolab/Code/VR_teleoperation/CustomLibs/include/Lidar3D.cpp
+CMakeFiles/Middleware.dir/include/Lidar3D.cpp.o: CMakeFiles/Middleware.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Middleware.dir/include/Lidar3D.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Middleware.dir/include/Lidar3D.cpp.o -MF CMakeFiles/Middleware.dir/include/Lidar3D.cpp.o.d -o CMakeFiles/Middleware.dir/include/Lidar3D.cpp.o -c /home/robolab/Code/VR_teleoperation/CustomLibs/include/Lidar3D.cpp
 
-CMakeFiles/Middleware.dir/Lidar3D.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Middleware.dir/Lidar3D.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robolab/Code/VR_teleoperation/CustomLibs/Lidar3D.cpp > CMakeFiles/Middleware.dir/Lidar3D.cpp.i
+CMakeFiles/Middleware.dir/include/Lidar3D.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Middleware.dir/include/Lidar3D.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robolab/Code/VR_teleoperation/CustomLibs/include/Lidar3D.cpp > CMakeFiles/Middleware.dir/include/Lidar3D.cpp.i
 
-CMakeFiles/Middleware.dir/Lidar3D.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Middleware.dir/Lidar3D.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robolab/Code/VR_teleoperation/CustomLibs/Lidar3D.cpp -o CMakeFiles/Middleware.dir/Lidar3D.cpp.s
+CMakeFiles/Middleware.dir/include/Lidar3D.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Middleware.dir/include/Lidar3D.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robolab/Code/VR_teleoperation/CustomLibs/include/Lidar3D.cpp -o CMakeFiles/Middleware.dir/include/Lidar3D.cpp.s
+
+CMakeFiles/Middleware.dir/include/KinovaArm.cpp.o: CMakeFiles/Middleware.dir/flags.make
+CMakeFiles/Middleware.dir/include/KinovaArm.cpp.o: /home/robolab/Code/VR_teleoperation/CustomLibs/include/KinovaArm.cpp
+CMakeFiles/Middleware.dir/include/KinovaArm.cpp.o: CMakeFiles/Middleware.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Middleware.dir/include/KinovaArm.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Middleware.dir/include/KinovaArm.cpp.o -MF CMakeFiles/Middleware.dir/include/KinovaArm.cpp.o.d -o CMakeFiles/Middleware.dir/include/KinovaArm.cpp.o -c /home/robolab/Code/VR_teleoperation/CustomLibs/include/KinovaArm.cpp
+
+CMakeFiles/Middleware.dir/include/KinovaArm.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Middleware.dir/include/KinovaArm.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robolab/Code/VR_teleoperation/CustomLibs/include/KinovaArm.cpp > CMakeFiles/Middleware.dir/include/KinovaArm.cpp.i
+
+CMakeFiles/Middleware.dir/include/KinovaArm.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Middleware.dir/include/KinovaArm.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robolab/Code/VR_teleoperation/CustomLibs/include/KinovaArm.cpp -o CMakeFiles/Middleware.dir/include/KinovaArm.cpp.s
+
+CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.o: CMakeFiles/Middleware.dir/flags.make
+CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.o: /home/robolab/Code/VR_teleoperation/CustomLibs/include/vrcontrollerpubI.cpp
+CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.o: CMakeFiles/Middleware.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.o -MF CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.o.d -o CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.o -c /home/robolab/Code/VR_teleoperation/CustomLibs/include/vrcontrollerpubI.cpp
+
+CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/robolab/Code/VR_teleoperation/CustomLibs/include/vrcontrollerpubI.cpp > CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.i
+
+CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/robolab/Code/VR_teleoperation/CustomLibs/include/vrcontrollerpubI.cpp -o CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.s
 
 # Object files for target Middleware
 Middleware_OBJECTS = \
 "CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o" \
-"CMakeFiles/Middleware.dir/VRControllerPub.cpp.o" \
-"CMakeFiles/Middleware.dir/Lidar3D.cpp.o"
+"CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.o" \
+"CMakeFiles/Middleware.dir/include/Lidar3D.cpp.o" \
+"CMakeFiles/Middleware.dir/include/KinovaArm.cpp.o" \
+"CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.o"
 
 # External object files for target Middleware
 Middleware_EXTERNAL_OBJECTS =
 
 libRobotMiddleware.so: CMakeFiles/Middleware.dir/RobotMiddleware.cpp.o
-libRobotMiddleware.so: CMakeFiles/Middleware.dir/VRControllerPub.cpp.o
-libRobotMiddleware.so: CMakeFiles/Middleware.dir/Lidar3D.cpp.o
+libRobotMiddleware.so: CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.o
+libRobotMiddleware.so: CMakeFiles/Middleware.dir/include/Lidar3D.cpp.o
+libRobotMiddleware.so: CMakeFiles/Middleware.dir/include/KinovaArm.cpp.o
+libRobotMiddleware.so: CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.o
 libRobotMiddleware.so: CMakeFiles/Middleware.dir/build.make
 libRobotMiddleware.so: /usr/lib/x86_64-linux-gnu/libIce++11.so
 libRobotMiddleware.so: /usr/lib/x86_64-linux-gnu/libIceStorm++11.so
 libRobotMiddleware.so: /usr/lib/x86_64-linux-gnu/libIce++11.so
 libRobotMiddleware.so: /usr/lib/x86_64-linux-gnu/libIceStorm++11.so
 libRobotMiddleware.so: CMakeFiles/Middleware.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX shared library libRobotMiddleware.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/robolab/Code/VR_teleoperation/CustomLibs/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX shared library libRobotMiddleware.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Middleware.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

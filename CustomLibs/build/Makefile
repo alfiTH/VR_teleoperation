@@ -129,30 +129,6 @@ Middleware/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/build
 .PHONY : Middleware/fast
 
-Lidar3D.o: Lidar3D.cpp.o
-.PHONY : Lidar3D.o
-
-# target to build an object file
-Lidar3D.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/Lidar3D.cpp.o
-.PHONY : Lidar3D.cpp.o
-
-Lidar3D.i: Lidar3D.cpp.i
-.PHONY : Lidar3D.i
-
-# target to preprocess a source file
-Lidar3D.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/Lidar3D.cpp.i
-.PHONY : Lidar3D.cpp.i
-
-Lidar3D.s: Lidar3D.cpp.s
-.PHONY : Lidar3D.s
-
-# target to generate assembly for a file
-Lidar3D.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/Lidar3D.cpp.s
-.PHONY : Lidar3D.cpp.s
-
 RobotMiddleware.o: RobotMiddleware.cpp.o
 .PHONY : RobotMiddleware.o
 
@@ -177,29 +153,101 @@ RobotMiddleware.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/RobotMiddleware.cpp.s
 .PHONY : RobotMiddleware.cpp.s
 
-VRControllerPub.o: VRControllerPub.cpp.o
-.PHONY : VRControllerPub.o
+include/KinovaArm.o: include/KinovaArm.cpp.o
+.PHONY : include/KinovaArm.o
 
 # target to build an object file
-VRControllerPub.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/VRControllerPub.cpp.o
-.PHONY : VRControllerPub.cpp.o
+include/KinovaArm.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/include/KinovaArm.cpp.o
+.PHONY : include/KinovaArm.cpp.o
 
-VRControllerPub.i: VRControllerPub.cpp.i
-.PHONY : VRControllerPub.i
+include/KinovaArm.i: include/KinovaArm.cpp.i
+.PHONY : include/KinovaArm.i
 
 # target to preprocess a source file
-VRControllerPub.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/VRControllerPub.cpp.i
-.PHONY : VRControllerPub.cpp.i
+include/KinovaArm.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/include/KinovaArm.cpp.i
+.PHONY : include/KinovaArm.cpp.i
 
-VRControllerPub.s: VRControllerPub.cpp.s
-.PHONY : VRControllerPub.s
+include/KinovaArm.s: include/KinovaArm.cpp.s
+.PHONY : include/KinovaArm.s
 
 # target to generate assembly for a file
-VRControllerPub.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/VRControllerPub.cpp.s
-.PHONY : VRControllerPub.cpp.s
+include/KinovaArm.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/include/KinovaArm.cpp.s
+.PHONY : include/KinovaArm.cpp.s
+
+include/Lidar3D.o: include/Lidar3D.cpp.o
+.PHONY : include/Lidar3D.o
+
+# target to build an object file
+include/Lidar3D.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/include/Lidar3D.cpp.o
+.PHONY : include/Lidar3D.cpp.o
+
+include/Lidar3D.i: include/Lidar3D.cpp.i
+.PHONY : include/Lidar3D.i
+
+# target to preprocess a source file
+include/Lidar3D.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/include/Lidar3D.cpp.i
+.PHONY : include/Lidar3D.cpp.i
+
+include/Lidar3D.s: include/Lidar3D.cpp.s
+.PHONY : include/Lidar3D.s
+
+# target to generate assembly for a file
+include/Lidar3D.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/include/Lidar3D.cpp.s
+.PHONY : include/Lidar3D.cpp.s
+
+include/VRControllerPub.o: include/VRControllerPub.cpp.o
+.PHONY : include/VRControllerPub.o
+
+# target to build an object file
+include/VRControllerPub.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.o
+.PHONY : include/VRControllerPub.cpp.o
+
+include/VRControllerPub.i: include/VRControllerPub.cpp.i
+.PHONY : include/VRControllerPub.i
+
+# target to preprocess a source file
+include/VRControllerPub.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.i
+.PHONY : include/VRControllerPub.cpp.i
+
+include/VRControllerPub.s: include/VRControllerPub.cpp.s
+.PHONY : include/VRControllerPub.s
+
+# target to generate assembly for a file
+include/VRControllerPub.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/include/VRControllerPub.cpp.s
+.PHONY : include/VRControllerPub.cpp.s
+
+include/vrcontrollerpubI.o: include/vrcontrollerpubI.cpp.o
+.PHONY : include/vrcontrollerpubI.o
+
+# target to build an object file
+include/vrcontrollerpubI.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.o
+.PHONY : include/vrcontrollerpubI.cpp.o
+
+include/vrcontrollerpubI.i: include/vrcontrollerpubI.cpp.i
+.PHONY : include/vrcontrollerpubI.i
+
+# target to preprocess a source file
+include/vrcontrollerpubI.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.i
+.PHONY : include/vrcontrollerpubI.cpp.i
+
+include/vrcontrollerpubI.s: include/vrcontrollerpubI.cpp.s
+.PHONY : include/vrcontrollerpubI.s
+
+# target to generate assembly for a file
+include/vrcontrollerpubI.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Middleware.dir/build.make CMakeFiles/Middleware.dir/include/vrcontrollerpubI.cpp.s
+.PHONY : include/vrcontrollerpubI.cpp.s
 
 # Help Target
 help:
@@ -210,15 +258,21 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... Middleware"
-	@echo "... Lidar3D.o"
-	@echo "... Lidar3D.i"
-	@echo "... Lidar3D.s"
 	@echo "... RobotMiddleware.o"
 	@echo "... RobotMiddleware.i"
 	@echo "... RobotMiddleware.s"
-	@echo "... VRControllerPub.o"
-	@echo "... VRControllerPub.i"
-	@echo "... VRControllerPub.s"
+	@echo "... include/KinovaArm.o"
+	@echo "... include/KinovaArm.i"
+	@echo "... include/KinovaArm.s"
+	@echo "... include/Lidar3D.o"
+	@echo "... include/Lidar3D.i"
+	@echo "... include/Lidar3D.s"
+	@echo "... include/VRControllerPub.o"
+	@echo "... include/VRControllerPub.i"
+	@echo "... include/VRControllerPub.s"
+	@echo "... include/vrcontrollerpubI.o"
+	@echo "... include/vrcontrollerpubI.i"
+	@echo "... include/vrcontrollerpubI.s"
 .PHONY : help
 
 
