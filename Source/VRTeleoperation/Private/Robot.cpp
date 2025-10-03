@@ -15,7 +15,8 @@ ARobot::ARobot()
 void ARobot::BeginPlay()
 {
 	Super::BeginPlay();
-	if (!middleware.initIce())
+	middleware = &RobotMiddlewareSingleton::Get();
+	if (!middleware->running)
 	{
 		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 		if (PlayerController)
@@ -207,7 +208,7 @@ void ARobot::Tick(float DeltaTime)
 	FQuat RightQuat = RightController->GetComponentQuat();
 
 
-	middleware.sendPoses(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDRot.Pitch, HMDRot.Yaw, HMDRot.Roll, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W},
+	middleware->sendPoses(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDRot.Pitch, HMDRot.Yaw, HMDRot.Roll, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W},
 		RobotMiddleware::Pose{LeftPos.X, LeftPos.Y, LeftPos.Z, LeftRot.Pitch, LeftRot.Yaw, LeftRot.Roll, LeftQuat.X, LeftQuat.Y, LeftQuat.Z, LeftQuat.W},
 		RobotMiddleware::Pose{RightPos.X, RightPos.Y, RightPos.Z, RightRot.Pitch, RightRot.Yaw, RightRot.Roll, RightQuat.X, RightQuat.Y, RightQuat.Z, RightQuat.W}
 	);
@@ -215,12 +216,12 @@ void ARobot::Tick(float DeltaTime)
 	if (controllerChanged)
 	{	
 		controllerChanged = false;
-		middleware.sendControllers(left, right);
+		middleware->sendControllers(left, right);
 	}
 
 	RobotMiddleware::Haptic leftHaptic, rightHaptic;
 	
-	middleware.getHaptics(leftHaptic, rightHaptic);
+	middleware->getHaptics(leftHaptic, rightHaptic);
 
 	#pragma region Debug
 	auto VecToStr2 = [](const FVector& V) {

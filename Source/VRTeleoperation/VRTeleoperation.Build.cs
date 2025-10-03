@@ -9,9 +9,20 @@ public class VRTeleoperation : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore",  "EnhancedInput", "HeadMountedDisplay"});
+		PublicDependencyModuleNames.AddRange(new string[] {
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"InputCore", 
+			"EnhancedInput",
+			"HeadMountedDisplay"
+		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		PrivateDependencyModuleNames.AddRange(new string[] {
+			"RHI",
+			"RenderCore",
+			"Renderer" // <- a veces necesario si usas el render graph
+		});
 
 		//ICE libs
 		// PublicSystemIncludePaths.Add("/usr/include");

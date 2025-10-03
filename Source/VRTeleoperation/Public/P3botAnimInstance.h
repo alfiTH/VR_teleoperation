@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "RobotMiddleware.h"
+#include "RobotMiddlewareSingleton.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -41,6 +41,6 @@ public:
 	float LeftQ6;
 	
 
-	RobotMiddleware middleware;
+	RobotMiddleware* middleware;
 	
 };

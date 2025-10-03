@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <vector>
+#include <memory>
 
 class RobotMiddleware {
 public:
@@ -44,7 +45,8 @@ public:
     RobotMiddleware();
     ~RobotMiddleware();
 
-    bool initIce();
+    bool running = false;
+
     bool sendPoses(const RobotMiddleware::Pose& head, const RobotMiddleware::Pose& left, const RobotMiddleware::Pose& right);
     bool sendControllers(const RobotMiddleware::Controller& left, const RobotMiddleware::Controller& right);
     bool getHaptics(RobotMiddleware::Haptic& left, RobotMiddleware::Haptic& right);
@@ -52,7 +54,10 @@ public:
     bool getRobotState(float (&left)[8], float (&right)[8]);
 
 private:
+    bool initIce();
+
     // ICE y detalles internos NO se exponen
     struct Impl;
-    Impl* pImpl = nullptr;  // Puntero al "pImpl"
+
+    std::unique_ptr<Impl> pImpl;  // Puntero al "pImpl"
 };

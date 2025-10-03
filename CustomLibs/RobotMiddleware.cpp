@@ -305,12 +305,14 @@ struct RobotMiddleware::Impl {
 
 };
 
-RobotMiddleware::RobotMiddleware() {}
-RobotMiddleware::~RobotMiddleware() { delete pImpl; }
-
+RobotMiddleware::RobotMiddleware() {
+    running = initIce();
+}
+RobotMiddleware::~RobotMiddleware() { 
+}
 bool RobotMiddleware::initIce()
 {
-        this->pImpl = new Impl();
+    	this->pImpl = std::make_unique<Impl>();
         return this->pImpl->isOk;
 }
 

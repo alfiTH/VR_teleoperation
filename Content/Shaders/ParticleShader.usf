@@ -1,0 +1,32 @@
+#include "/Engine/Public/Platform.ush"
+
+struct Particle
+{
+    float3 Position;
+    float4 Color;
+};
+
+StructuredBuffer<Particle> ParticleBuffer;
+
+struct VS_OUTPUT
+{
+    float4 Position : SV_POSITION;
+    float4 Color : COLOR0;
+};
+
+VS_OUTPUT MainVS(uint VertexID : SV_VertexID)
+{
+    VS_OUTPUT Output;
+    Particle P = ParticleBuffer[VertexID];
+
+    // Proyectar a clip space (demo: escala a espacio pequeño)
+    Output.Position = float4(P.Position * 0.001f, 1.0f);
+    Output.Color = P.Color;
+
+    return Output;
+}
+
+float4 MainPS(VS_OUTPUT Input) : SV_Target
+{
+    return Input.Color;
+}

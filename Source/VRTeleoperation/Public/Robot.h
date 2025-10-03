@@ -15,7 +15,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 
 #include "Engine/Engine.h"
-#include "RobotMiddleware.h"
+#include "RobotMiddlewareSingleton.h"
 #include <atomic>
 #include <iostream>
 
@@ -112,7 +112,7 @@ public:
 
 
 private:
-	RobotMiddleware middleware;
+	RobotMiddleware* middleware;
 	RobotMiddleware::Controller left, right;
 	std::atomic<bool> controllerChanged = false;
 
