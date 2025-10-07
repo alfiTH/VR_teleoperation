@@ -44,8 +44,7 @@ public:
 
     RobotMiddleware();
     ~RobotMiddleware();
-
-    bool running = false;
+    bool isRunning();
 
     bool sendPoses(const RobotMiddleware::Pose& head, const RobotMiddleware::Pose& left, const RobotMiddleware::Pose& right);
     bool sendControllers(const RobotMiddleware::Controller& left, const RobotMiddleware::Controller& right);

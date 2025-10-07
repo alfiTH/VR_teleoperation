@@ -184,27 +184,39 @@ inline RobotMiddleware::Haptic iceToHaptic(const RoboCompVRControllerPub::Haptic
 # pragma endregion Parsers
 
 struct RobotMiddleware::Impl {
-    bool isOk = true;
+    std::atomic<bool> running{true};
     Ice::CommunicatorHolder communicator;
     IceStorm::TopicManagerPrxPtr topicManager;
     RoboCompVRControllerPub::VRControllerPubPrxPtr vrcontroller_proxy;
+
+    // Lidar
     RoboCompLidar3D::Lidar3DPrxPtr lidar3d_proxy;
+    std::mutex lidar_mutex;
+    std::thread lidar_worker;
+    std::vector<std::array<float, 3>> cloudPoints;
+
+    // Arm
+    std::thread arm_worker;
     RoboCompKinovaArm::KinovaArmPrxPtr arm_left_proxy, arm_right_proxy;
+    std::mutex arm_mutex;
+    float left_arm[8]{};
+    float right_arm[8]{};
+
+
 
     //Haptic
     std::shared_ptr<IceStorm::TopicPrx> vrcontrollerpub_topic;
 	Ice::ObjectPrxPtr vrcontrollerpub;
-    Haptic left, right;
-    std::mutex mtx;
+    Haptic left_haptic, right_haptic;
+    std::mutex haptic_mutex;
     std::shared_ptr<VRControllerPubI> servant = std::make_shared<VRControllerPubI>(
         nullptr, 
         [this](const RoboCompVRControllerPub::Haptic& l, const RoboCompVRControllerPub::Haptic& r) {
-            std::lock_guard<std::mutex> lock(mtx);
-            this->left  = iceToHaptic(l);
-            this->right = iceToHaptic(r);
+            std::scoped_lock<std::mutex> lock(haptic_mutex);
+            this->left_haptic  = iceToHaptic(l);
+            this->right_haptic = iceToHaptic(r);
         },
         nullptr);
-
 
     Impl() 
         : communicator(makeInitData())
@@ -216,7 +228,7 @@ struct RobotMiddleware::Impl {
             if (!topicManager)
             {
                 std::cout << "\033[31mERROR\033[0m TopicManager.Proxy not defined in config file."<<std::endl;
-                isOk = false;
+                running = false;
             }
             std::cout << "\033[32mINFO\033[0m topicManager ptr: " << topicManager.get() << "\n";
             
@@ -224,23 +236,23 @@ struct RobotMiddleware::Impl {
                                 "lidar3d:tcp -h localhost -p 11988", "Lidar3DProxy"))
                 lidar3d_proxy = *lidar3d_opt;
             else{
-                isOk = false;
+                running = false;
                 return;
             }
 
             if (auto arm_left_opt = require<RoboCompKinovaArm::KinovaArmPrx, RoboCompKinovaArm::KinovaArmPrxPtr>(ic,
-                                "kinovaarm:tcp -h localhost -p 10006", "KinovaArmProxy"))
+                                "kinovaarm1:tcp -h localhost -p 10006", "KinovaArmProxy"))
                 arm_left_proxy = *arm_left_opt;
             else{
-                isOk = false;
+                running = false;
                 return;
             }
             
             if (auto arm_right_opt = require<RoboCompKinovaArm::KinovaArmPrx, RoboCompKinovaArm::KinovaArmPrxPtr>(ic,
-                                "kinovaarm:tcp -h localhost -p 10007", "KinovaArmProxy"))
+                                "kinovaarm:tcp -h localhost -p 10005", "KinovaArmProxy"))
                 arm_right_proxy = *arm_right_opt;
             else{
-                isOk = false;
+                running = false;
                 return;
             }
 
@@ -248,35 +260,43 @@ struct RobotMiddleware::Impl {
                             "", "VRControllerPub"))
                 vrcontroller_proxy = *vrcontroller_opt;
             else{
-                isOk = false;
+                running = false;
                 return;
             }
 
             if (not subscribe<VRControllerPubI>(ic, topicManager, "tcp -p 0", "haptic", "VRControllerPub", servant,
-                            vrcontrollerpub_topic, vrcontrollerpub))
-                isOk = false;
+                            vrcontrollerpub_topic, vrcontrollerpub)){
+                running = false;
                 return;
-  
+            }
         }
         catch (const Ice::Exception& ex) {
              std::cout << "\033[31mERROR\033[0m Exception: 'rcnode' not running: " << ex << std::endl;
             std::cerr << "Ice exception: " << ex.what() << "\n";
-            isOk = false;
+            running = false;
         }
         catch (const std::exception& ex)
         {
             std::cout << "\033[31mERROR\033[0m Impl failed: " << ex.what() << std::endl;
-            isOk = false;
+            running = false;
         }
         catch (...)
         {
             std::cout << "\033[31mERROR\033[0m Exception: 'rcnode' not running: " << std::endl;
             std::cout << "\033[31mERROR\033[0m Impl failed: unknown non-std::exception"<< std::endl;
-            isOk = false;
+            running = false;
         }
+
+        // lidar_worker = std::thread(&RobotMiddleware::Impl::updateLidarData, this);
+        arm_worker = std::thread(&RobotMiddleware::Impl::updateRobotState, this);
     }
     ~Impl(){
-		vrcontrollerpub_topic->unsubscribe(vrcontrollerpub);
+        running = false;
+
+        if (vrcontrollerpub_topic){
+		    vrcontrollerpub_topic->unsubscribe(vrcontrollerpub);
+            vrcontrollerpub_topic = nullptr;
+        }
 
         vrcontroller_proxy = nullptr;
         lidar3d_proxy = nullptr;
@@ -290,6 +310,11 @@ struct RobotMiddleware::Impl {
             ic->waitForShutdown();
         }
 
+        if (lidar_worker.joinable())
+            lidar_worker.join();
+         if (arm_worker.joinable())
+            arm_worker.join();
+
     }
 
     static Ice::InitializationData makeInitData() {
@@ -301,19 +326,83 @@ struct RobotMiddleware::Impl {
         initData.properties->setProperty("Ice.MessageSizeMax", "20004800");
         return initData;
     }
+    void updateLidarData(){
+         using namespace std::chrono;
+        const auto period = 20ms;
+
+        while (running)
+        {
+            auto start = steady_clock::now();
+            try {
+                auto ret = lidar3d_proxy->getLidarData("", 0.0f, 3.1416, 1);
+                {
+                    std::scoped_lock lock(lidar_mutex);
+                    cloudPoints = iceToCloudPoints(ret);
+                }
+            }catch (...){
+                std::cout <<  "\033[1;33mWARNING\033[0m Failed getting lidar data\n";
+            }
+             // Period
+            auto elapsed = steady_clock::now() - start;
+            if (elapsed < period)
+                std::this_thread::sleep_for(period - elapsed);
+        }
+    }
+
+    void updateRobotState(){
+        using namespace std::chrono;
+        const auto period = 20ms;
+        const double rad_to_deg = 180.0 / M_PI;
+
+        while (running)
+        {
+            auto start = steady_clock::now();
+            try
+            {
+                // Llamadas asíncronas no bloqueantes
+                auto left_future  = arm_left_proxy->getJointsStateAsync();
+                auto right_future = arm_right_proxy->getJointsStateAsync();
+
+                RoboCompKinovaArm::TJoints left_joints  = left_future.get();
+                RoboCompKinovaArm::TJoints right_joints = right_future.get();
+
+                {
+                    std::scoped_lock lock(arm_mutex);
+                    for (int i = 0; i < 8; ++i)
+                    {
+                        left_arm[i]  = left_joints.joints[i].angle * rad_to_deg;
+                        right_arm[i] = right_joints.joints[i].angle * rad_to_deg;
+                    }
+                }
+            }
+            catch (...)
+            {
+                std::cout << "\033[1;33mWARNING\033[0m Failed to update robot state\n";
+            }
+
+            // Period
+            auto elapsed = steady_clock::now() - start;
+            if (elapsed < period)
+                std::this_thread::sleep_for(period - elapsed);
+        }
+    }
 
 
 };
 
 RobotMiddleware::RobotMiddleware() {
-    running = initIce();
+    initIce();
 }
 RobotMiddleware::~RobotMiddleware() { 
 }
 bool RobotMiddleware::initIce()
 {
     	this->pImpl = std::make_unique<Impl>();
-        return this->pImpl->isOk;
+        return isRunning();
+}
+
+bool RobotMiddleware::isRunning(){
+    return this->pImpl->running;
 }
 
 bool RobotMiddleware::sendPoses(const RobotMiddleware::Pose& head, const RobotMiddleware::Pose& left, const RobotMiddleware::Pose& right) {
@@ -346,35 +435,32 @@ bool RobotMiddleware::sendControllers(const RobotMiddleware::Controller& left, c
 
 bool RobotMiddleware::getHaptics(RobotMiddleware::Haptic& left, RobotMiddleware::Haptic& right){
     if (!pImpl) return false;
-    std::lock_guard<std::mutex> lock(pImpl->mtx);
-    left  = pImpl->left;
-    right = pImpl->right;
+    std::scoped_lock<std::mutex> lock(pImpl->haptic_mutex);
+    left  = pImpl->left_haptic;
+    right = pImpl->right_haptic;
     return true;
 }
 
 std::vector<std::array<float, 3>> RobotMiddleware::getLidarData() {
+    if (!pImpl) return {};
     try {
-        std::vector<std::array<float, 3>> cloudPoints = iceToCloudPoints(pImpl->lidar3d_proxy->getLidarData("", 0.0f, 180.0f, 1));
-        return cloudPoints;
-    }catch (...){
-        std::cout <<  "\033[1;33mWARNING\033[0m Failed getting lidar data\n";
+        std::scoped_lock lock(pImpl->lidar_mutex);
+        return pImpl->cloudPoints;
+    } catch (...) {
+        std::cout <<  "\033[1;33mWARNING\033[0m Failed to get robot state\n";
         return {};
     }
 }
 
 bool RobotMiddleware::getRobotState(float (&left)[8], float (&right)[8]) {
+    if (!pImpl) return false;
     try {
-        // llamar a getJointsStateAsync, devuelve std::future<TJoints>
-        std::future<RoboCompKinovaArm::TJoints> left_future  = pImpl->arm_left_proxy->getJointsStateAsync();
-        std::future<RoboCompKinovaArm::TJoints> right_future = pImpl->arm_right_proxy->getJointsStateAsync();
-
-        // opcional: bloquear hasta que estén listos
-        RoboCompKinovaArm::TJoints left_joints  = left_future.get();
-        RoboCompKinovaArm::TJoints right_joints = right_future.get();
-
-        for (int i = 0; i < 8; ++i) {
-            left[i]  = left_joints.joints[i].angle;
-            right[i] = right_joints.joints[i].angle;
+        {
+            std::scoped_lock lock(pImpl->arm_mutex);
+            for (int i = 0; i < 8; ++i) {
+                left[i]  = pImpl->left_arm[i];
+                right[i] = pImpl->right_arm[i];
+            }
         }
         return true;
     } catch (...) {
@@ -382,4 +468,3 @@ bool RobotMiddleware::getRobotState(float (&left)[8], float (&right)[8]) {
         return false;
     }
 }
-

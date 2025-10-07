@@ -16,7 +16,7 @@ void ARobot::BeginPlay()
 {
 	Super::BeginPlay();
 	middleware = &RobotMiddlewareSingleton::Get();
-	if (!middleware->running)
+	if (!middleware->isRunning())
 	{
 		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 		if (PlayerController)
