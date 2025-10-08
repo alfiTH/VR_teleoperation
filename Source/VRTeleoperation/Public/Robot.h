@@ -6,7 +6,10 @@
 #include "GameFramework/Pawn.h"
 #include "Camera/CameraComponent.h"
 #include "MotionControllerComponent.h"
-#include "InputAction.h" 
+#include "InputAction.h"
+
+#include "GameFramework/PlayerController.h"
+#include "Haptics/HapticFeedbackEffect_Base.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -44,7 +47,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void TriggerHapticFeedback(EControllerHand Hand, float Intensity, float Frequency);
 	void SetupPoseComponent();
+
 	
 	void GraspLeft(const FInputActionValue& Value);
 	void GraspReleaseLeft(const FInputActionValue& Value);
@@ -113,6 +118,7 @@ public:
 
 private:
 	RobotMiddleware* middleware;
+	TWeakObjectPtr<APlayerController> CachedPC;
 	RobotMiddleware::Controller left, right;
 	std::atomic<bool> controllerChanged = false;
 

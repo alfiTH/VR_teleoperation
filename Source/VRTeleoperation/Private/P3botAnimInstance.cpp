@@ -36,16 +36,6 @@ void UP3botAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	// Leer el estado del robot desde la memoria (no bloqueante)
 	if (middleware->getRobotState(left, right))
 	{
-		// TArray<FString> leftStr;
-		//
-		// for (float f : left)
-		// {
-		// 	leftStr.Add(FString::SanitizeFloat(f));
-		// }
-		//
-		// UE_LOG(LogTemp, Warning, TEXT("poses: %s"), *FString::Join(leftStr, TEXT(", ")));
-		
-		// Ejemplo: actualizar las variables del anim blueprint
 		LeftQ0 = -left[0];
 		LeftQ1 = -left[1];
 		LeftQ2 = -left[2];

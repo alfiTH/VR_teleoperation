@@ -29,6 +29,12 @@ void ARobot::BeginPlay()
 			);
 		}
 	}
+	CachedPC = Cast<APlayerController>(GetController());
+
+	if (!CachedPC.IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ARobot::BeginPlay -> Pawn dont has PlayerController"));
+	}
 }
 void ARobot::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
@@ -50,6 +56,48 @@ void ARobot::SetupPoseComponent()
     RightController->SetupAttachment(RootComponent);
     RightController->SetTrackingSource(EControllerHand::Right);
 }
+
+
+void ARobot::TriggerHapticFeedback(
+	EControllerHand Hand,
+	float Intensity /* = 1.0f */,
+	float Frequency /* = 0.5f */)
+{
+
+	// Obtener PlayerController
+	if (!CachedPC.IsValid())
+	{
+		CachedPC = Cast<APlayerController>(GetController());
+		if (!CachedPC.IsValid())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("TriggerHapticFeedback: PlayerController no encontrado"));
+			return;
+		}
+	}
+
+	APlayerController* PC = CachedPC.Get();
+	if (!PC)
+		return;
+
+
+	// Validar parámetros
+	Intensity = FMath::Clamp(Intensity, 0.0f, 1.0f);
+	Frequency = FMath::Clamp(Frequency, 0.0f, 1.0f);
+
+
+	// Aplicar vibración
+	if (Intensity > TOLERANCE_FLOAT)
+	{
+		PC->SetHapticsByValue(Intensity, Frequency, Hand);
+	}
+	else
+	{
+		CachedPC->StopHapticEffect(Hand);
+	}
+
+	
+}
+
 #pragma region Inputs
 void ARobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -220,8 +268,10 @@ void ARobot::Tick(float DeltaTime)
 	}
 
 	RobotMiddleware::Haptic leftHaptic, rightHaptic;
-	
 	middleware->getHaptics(leftHaptic, rightHaptic);
+	TriggerHapticFeedback(EControllerHand::Left, leftHaptic.intensity, leftHaptic.frequency);
+	TriggerHapticFeedback(EControllerHand::Right, rightHaptic.intensity, rightHaptic.frequency);
+	
 
 	#pragma region Debug
 	auto VecToStr2 = [](const FVector& V) {

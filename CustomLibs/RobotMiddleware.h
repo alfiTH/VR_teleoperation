@@ -38,7 +38,12 @@ public:
     {
         float intensity;
         float frequency;
-        float duration;
+    };
+
+    struct Point 
+    {
+    float Position[3];
+    int8_t Color[3];     
     };
     
 

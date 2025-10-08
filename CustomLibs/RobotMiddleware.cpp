@@ -20,7 +20,7 @@ bool subscribe( const Ice::CommunicatorPtr& communicator,
                 std::string name_topic,
                 const std::string& topicBaseName,
                 std::shared_ptr<SubInterfaceType> servant,
-                std::shared_ptr<IceStorm::TopicPrx> topic,
+                std::shared_ptr<IceStorm::TopicPrx> &topic,
                 Ice::ObjectPrxPtr& proxy)
 {
     try   
@@ -29,7 +29,7 @@ bool subscribe( const Ice::CommunicatorPtr& communicator,
         name_topic += topicBaseName;
 
         Ice::ObjectAdapterPtr adapter = communicator->createObjectAdapterWithEndpoints(name_topic, endpointConfig);
-        auto proxy = adapter->addWithUUID(servant)->ice_oneway();
+        proxy = adapter->addWithUUID(servant)->ice_oneway();
 
         std::shared_ptr<IceStorm::TopicPrx> topic;
         try {
@@ -47,9 +47,10 @@ bool subscribe( const Ice::CommunicatorPtr& communicator,
                 std::cout << "\033[31mERROR\033[0m subscribing the " 
                         << name_topic << "unknown non-std::exception"<< std::endl;
                 return false; 
-                IceStorm::QoS qos;
-                topic->subscribeAndGetPublisher(qos, proxy);
+                
             }
+            IceStorm::QoS qos;
+            topic->subscribeAndGetPublisher(qos, proxy);
         }
         adapter->activate();
     }
@@ -176,8 +177,7 @@ inline std::vector<std::array<float, 3>> iceToCloudPoints(const RoboCompLidar3D:
 inline RobotMiddleware::Haptic iceToHaptic(const RoboCompVRControllerPub::Haptic &haptic){
     return {
         haptic.intensity,
-        haptic.frequency,
-        0
+        haptic.frequency
     };
 }
 
@@ -208,6 +208,8 @@ struct RobotMiddleware::Impl {
     std::shared_ptr<IceStorm::TopicPrx> vrcontrollerpub_topic;
 	Ice::ObjectPrxPtr vrcontrollerpub;
     Haptic left_haptic, right_haptic;
+    std::atomic<bool> hapticChanged{false};
+
     std::mutex haptic_mutex;
     std::shared_ptr<VRControllerPubI> servant = std::make_shared<VRControllerPubI>(
         nullptr, 
@@ -215,6 +217,7 @@ struct RobotMiddleware::Impl {
             std::scoped_lock<std::mutex> lock(haptic_mutex);
             this->left_haptic  = iceToHaptic(l);
             this->right_haptic = iceToHaptic(r);
+            hapticChanged = true;
         },
         nullptr);
 
@@ -436,9 +439,10 @@ bool RobotMiddleware::sendControllers(const RobotMiddleware::Controller& left, c
 bool RobotMiddleware::getHaptics(RobotMiddleware::Haptic& left, RobotMiddleware::Haptic& right){
     if (!pImpl) return false;
     std::scoped_lock<std::mutex> lock(pImpl->haptic_mutex);
+    pImpl->hapticChanged = false;
     left  = pImpl->left_haptic;
     right = pImpl->right_haptic;
-    return true;
+    return pImpl->hapticChanged;
 }
 
 std::vector<std::array<float, 3>> RobotMiddleware::getLidarData() {
