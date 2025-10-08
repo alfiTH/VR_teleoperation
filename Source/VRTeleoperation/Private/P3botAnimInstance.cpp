@@ -3,27 +3,36 @@
 void UP3botAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
-	middleware = &RobotMiddlewareSingleton::Get();
-
-	if (!middleware->isRunning())
+	if (GetWorld() && GetWorld()->IsGameWorld())
 	{
-		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-		if (PlayerController)
+		middleware = &RobotMiddlewareSingleton::Get();
+
+		if (!middleware->isRunning())
 		{
-			UKismetSystemLibrary::QuitGame(
-				GetWorld(),
-				PlayerController,
-				EQuitPreference::Quit,
-				true // true cierra sin mostrar mensaje de confirmación
-			);
+			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+			if (PlayerController)
+			{
+				UKismetSystemLibrary::QuitGame(
+					GetWorld(),
+					PlayerController,
+					EQuitPreference::Quit,
+					true // true cierra sin mostrar mensaje de confirmación
+				);
+			}
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT("Editor mode"));
 	}
 }
 
 void UP3botAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-
+	if (!GEngine or !GetWorld() or !GetWorld()->IsGameWorld())
+		return ;
+	
 	if (!middleware) 
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Middleware not initialized in UP3botAnimInstance"));

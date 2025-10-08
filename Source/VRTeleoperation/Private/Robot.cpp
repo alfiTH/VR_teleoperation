@@ -15,25 +15,32 @@ ARobot::ARobot()
 void ARobot::BeginPlay()
 {
 	Super::BeginPlay();
-	middleware = &RobotMiddlewareSingleton::Get();
-	if (!middleware->isRunning())
+	if (GetWorld() && GetWorld()->IsGameWorld())
 	{
-		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-		if (PlayerController)
+		middleware = &RobotMiddlewareSingleton::Get();
+		if (!middleware->isRunning())
 		{
-			UKismetSystemLibrary::QuitGame(
-				GetWorld(),
-				PlayerController,
-				EQuitPreference::Quit,
-				true // true cierra sin mostrar mensaje de confirmación
-			);
+			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+			if (PlayerController)
+			{
+				UKismetSystemLibrary::QuitGame(
+					GetWorld(),
+					PlayerController,
+					EQuitPreference::Quit,
+					true // true cierra sin mostrar mensaje de confirmación
+				);
+			}
+		}
+		CachedPC = Cast<APlayerController>(GetController());
+
+		if (!CachedPC.IsValid())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ARobot::BeginPlay -> Pawn dont has PlayerController"));
 		}
 	}
-	CachedPC = Cast<APlayerController>(GetController());
-
-	if (!CachedPC.IsValid())
+	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ARobot::BeginPlay -> Pawn dont has PlayerController"));
+		UE_LOG(LogTemp, Display, TEXT("Editor mode"));
 	}
 }
 void ARobot::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -239,7 +246,7 @@ void ARobot::ThumbStickReleaseRight(const FInputActionValue& Value)
 void ARobot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-    if (!GEngine)
+    if (!GEngine or !GetWorld() or !GetWorld()->IsGameWorld())
 		return ;
 
 	FVector HMDPos = VRCamera->GetComponentLocation();
