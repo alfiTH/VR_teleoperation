@@ -15,13 +15,16 @@ public class VRTeleoperation : ModuleRules
 			"Engine",
 			"InputCore", 
 			"EnhancedInput",
-			"HeadMountedDisplay"
+			"HeadMountedDisplay",
+			"RenderCore",
+			"RHI",
+			"Niagara"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
-			"RHI",
-			"RenderCore",
-			"Renderer" // <- a veces necesario si usas el render graph
+			
+			
+			// "Renderer" // <- a veces necesario si usas el render graph
 		});
 
 		//ICE libs

@@ -22,6 +22,8 @@
 #include <atomic>
 #include <iostream>
 
+#include "PointCloudComponent.h"
+
 #include "DrawDebugHelpers.h"
 #include "Robot.generated.h"
 
@@ -121,5 +123,8 @@ private:
 	TWeakObjectPtr<APlayerController> CachedPC;
 	RobotMiddleware::Controller left, right;
 	std::atomic<bool> controllerChanged = false;
+public:
+	UPROPERTY(VisibleAnywhere)
+	UPointCloudComponent* PointCloudComponent;
 
 };
