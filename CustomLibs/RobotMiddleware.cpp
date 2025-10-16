@@ -158,21 +158,18 @@ inline RoboCompVRControllerPub::Pose toIcePose(const RobotMiddleware::Pose& p) {
 inline RoboCompVRControllerPub::Controller toIceController(const RobotMiddleware::Controller& c) { 
     return {c.trigger, c.grab, c.x, c.y, c.thumbstickCapTouch, c.aButton, c.aButtonCapTouch, c.bButton, c.bButtonCapTouch}; 
 }
-//inline std::vector<std::array<float, 3>> iceToCloudPoints(const RoboCompLidar3D::TData &lidar){
-//    std::vector<std::array<float, 3>> pointCloud;
-//    pointCloud.reserve(lidar.points.size());
-//    std::transform(lidar.points.begin(), lidar.points.end(), std::back_inserter(pointCloud),
-//                   [](const auto &point) -> std::array<float, 3> {
-//                       return {point.x, point.y, point.z};
-//                   });
-//    return pointCloud;
-//}
-inline std::vector<std::array<float, 3>> iceToCloudPoints(const RoboCompLidar3D::TData &lidar) {
-    std::vector<std::array<float, 3>> pointCloud;
-    pointCloud.reserve(lidar.points.size());
-    for (const auto &point : lidar.points)
-        pointCloud.emplace_back(std::array<float, 3>{point.x,point.y, point.z});
-    return pointCloud;
+
+inline RobotMiddleware::ColorCloudData iceToCloudPoints(const RoboCompLidar3D::TColorCloudData &cloudIn) {
+    RobotMiddleware::ColorCloudData cloudOut;
+
+    cloudOut.X = std::move(cloudIn.X);
+    cloudOut.Y = std::move(cloudIn.Y);
+    cloudOut.Z = std::move(cloudIn.Z);
+    cloudOut.R = std::move(cloudIn.R);
+    cloudOut.G = std::move(cloudIn.G);
+    cloudOut.B = std::move(cloudIn.B);
+
+    return cloudOut;
 }
 inline RobotMiddleware::Haptic iceToHaptic(const RoboCompVRControllerPub::Haptic &haptic){
     return {
@@ -193,7 +190,7 @@ struct RobotMiddleware::Impl {
     RoboCompLidar3D::Lidar3DPrxPtr lidar3d_proxy;
     std::mutex lidar_mutex;
     std::thread lidar_worker;
-    std::vector<std::array<float, 3>> cloudPoints;
+    RobotMiddleware::ColorCloudData cloudPoints;
 
     // Arm
     std::thread arm_worker;
@@ -236,7 +233,7 @@ struct RobotMiddleware::Impl {
             std::cout << "\033[32mINFO\033[0m topicManager ptr: " << topicManager.get() << "\n";
             
             if (auto lidar3d_opt = require<RoboCompLidar3D::Lidar3DPrx, RoboCompLidar3D::Lidar3DPrxPtr>(ic,
-                                "lidar3d:tcp -h localhost -p 11988", "Lidar3DProxy"))
+                                "lidar3d:tcp -h localhost -p 11990", "Lidar3DProxy"))
                 lidar3d_proxy = *lidar3d_opt;
             else{
                 running = false;
@@ -290,7 +287,7 @@ struct RobotMiddleware::Impl {
             running = false;
         }
 
-        // lidar_worker = std::thread(&RobotMiddleware::Impl::updateLidarData, this);
+        lidar_worker = std::thread(&RobotMiddleware::Impl::updateLidarData, this);
         arm_worker = std::thread(&RobotMiddleware::Impl::updateRobotState, this);
     }
     ~Impl(){
@@ -337,7 +334,7 @@ struct RobotMiddleware::Impl {
         {
             auto start = steady_clock::now();
             try {
-                auto ret = lidar3d_proxy->getLidarData("", 0.0f, 3.1416, 1);
+                auto ret = lidar3d_proxy->getColorCloudData();
                 {
                     std::scoped_lock lock(lidar_mutex);
                     cloudPoints = iceToCloudPoints(ret);
@@ -445,7 +442,7 @@ bool RobotMiddleware::getHaptics(RobotMiddleware::Haptic& left, RobotMiddleware:
     return pImpl->hapticChanged;
 }
 
-std::vector<std::array<float, 3>> RobotMiddleware::getLidarData() {
+const RobotMiddleware::ColorCloudData& RobotMiddleware::getColorCloudData() {
     if (!pImpl) return {};
     try {
         std::scoped_lock lock(pImpl->lidar_mutex);
