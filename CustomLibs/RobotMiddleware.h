@@ -40,10 +40,14 @@ public:
         float frequency;
     };
 
-    struct Point 
+    struct ColorCloudData 
     {
-    float Position[3];
-    int8_t Color[3];     
+    std::vector<short> X;
+    std::vector<short> Y;
+    std::vector<short> Z;
+    std::vector<unsigned char> R;
+    std::vector<unsigned char> G;
+    std::vector<unsigned char> B;   
     };
     
 
@@ -54,7 +58,7 @@ public:
     bool sendPoses(const RobotMiddleware::Pose& head, const RobotMiddleware::Pose& left, const RobotMiddleware::Pose& right);
     bool sendControllers(const RobotMiddleware::Controller& left, const RobotMiddleware::Controller& right);
     bool getHaptics(RobotMiddleware::Haptic& left, RobotMiddleware::Haptic& right);
-    std::vector<std::array<float, 3>> getLidarData();
+    const ColorCloudData& getColorCloudData();
     bool getRobotState(float (&left)[8], float (&right)[8]);
 
 private:

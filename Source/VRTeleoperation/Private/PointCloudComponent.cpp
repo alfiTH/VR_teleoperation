@@ -21,19 +21,31 @@ void UPointCloudComponent::BeginPlay()
 	Super::BeginPlay();
 	if (GetWorld() && GetWorld()->IsGameWorld())
 	{
-		ParticlePositions.SetNumUninitialized(NumPoints);
-		ParticleColors.SetNumUninitialized(NumPoints);
 		if (!NiagaraComp)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("⚠️ Niagara Component not assigned in %s"), *GetOwner()->GetName());
+		}
+		middleware = &RobotMiddlewareSingleton::Get();
+		if (!middleware->isRunning() or !NiagaraComp)
+		{
+			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+			if (PlayerController)
+			{
+				UKismetSystemLibrary::QuitGame(
+					GetWorld(),
+					PlayerController,
+					EQuitPreference::Quit,
+					true // true cierra sin mostrar mensaje de confirmación
+				);
+			}
 		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Display, TEXT("Editor mode"));
 	}
-	// ...
-	
+	ParticlePositions.SetNumUninitialized(MAX_POINT_CLOUD);
+	ParticleColors.SetNumUninitialized(MAX_POINT_CLOUD);	
 }
 
 
@@ -44,32 +56,43 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (!GEngine or !GetWorld() or !GetWorld()->IsGameWorld())
 		return ;
+		
+	if (!middleware) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Middleware not initialized in UP3botAnimInstance"));
+		return;
+	}
 
 	if (!NiagaraComp or !NiagaraComp->IsActive())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("⚠️ Niagara Component does not activate"));
 		return ;
 	}
-	
 	double StartTime = FPlatformTime::Seconds();  
-	ParallelFor( NumPoints, [&](int32 i)
-	{
-		ParticlePositions[i][0] = 200;
-		ParticlePositions[i][1] = 0;
-		ParticlePositions[i][2] =  100;
-		// ParticlePositions[i][1] = FMath::FRandRange(-200.0, 200.0);
-		// ParticlePositions[i][2] =  FMath::FRandRange(10.0, 200.0);
-		ParticleColors[i].R = 0.5; // entre 0.0 y 1.0
-		ParticleColors[i].G = 0.5;
-		ParticleColors[i].B = 0.5;
-		ParticleColors[i].A = 1.0f;
-	},EParallelForFlags::BackgroundPriority);
-	
+
+	RobotMiddleware::ColorCloudData cloud  = middleware->getColorCloudData();
+
 	double EndTime = FPlatformTime::Seconds(); 
 	double DurationMs = (EndTime - StartTime) * 1000.0;
+	
+	UE_LOG(LogTemp, Display, TEXT("get cloud took %.3f ms for %d points"), DurationMs, cloud.X.size());
+	
+	StartTime = FPlatformTime::Seconds();  
+	ParallelFor( NumPoints, [&](int32 i)
+	{
+		ParticlePositions[i][0] = cloud.Y[i]/10.0;
+		ParticlePositions[i][1] = cloud.X[i]/10.0;
+		ParticlePositions[i][2] =  cloud.Z[i]/10.0;
+		ParticleColors[i].R = cloud.R[i]/255.0; // entre 0.0 y 1.0
+		ParticleColors[i].G = cloud.G[i]/255.0;
+		ParticleColors[i].B = cloud.B[i]/255.0;
+	});
 
+	NumPoints = cloud.X.size();
+	
+	EndTime = FPlatformTime::Seconds(); 
+	DurationMs = (EndTime - StartTime) * 1000.0;
 	UE_LOG(LogTemp, Display, TEXT("ParallelFor took %.3f ms for %d points"), DurationMs, NumPoints);
-
 	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(
 			NiagaraComp,
 			FName("User.ParticlePositions"), // Nombre del parámetro

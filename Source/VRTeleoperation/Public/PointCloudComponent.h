@@ -7,6 +7,8 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 #include "Components/ActorComponent.h"
 
@@ -16,6 +18,7 @@
 
 #include "PointCloudComponent.generated.h"
 
+#define MAX_POINT_CLOUD 50000 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRTELEOPERATION_API UPointCloudComponent : public UActorComponent
@@ -31,15 +34,18 @@ protected:
 
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PointCloud")
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PointCloud")
 	TArray<FVector> ParticlePositions;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PointCloud")
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PointCloud")
 	TArray<FLinearColor> ParticleColors;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PointCloud")
-	int32 NumPoints = 10; 
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PointCloud")
+	int32 NumPoints = MAX_POINT_CLOUD; 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PointCloud")
 	UNiagaraComponent* NiagaraComp = nullptr;
+
+private:
+	RobotMiddleware* middleware;
 };
