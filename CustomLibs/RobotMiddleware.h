@@ -59,6 +59,7 @@ public:
     bool sendControllers(const RobotMiddleware::Controller& left, const RobotMiddleware::Controller& right);
     bool getHaptics(RobotMiddleware::Haptic& left, RobotMiddleware::Haptic& right);
     const ColorCloudData& getColorCloudData();
+    void lockUlockGetColorCloudData(bool lock);
     bool getRobotState(float (&left)[8], float (&right)[8]);
 
 private:

@@ -18,7 +18,7 @@
 
 #include "PointCloudComponent.generated.h"
 
-#define MAX_POINT_CLOUD 50000 
+#define MAX_POINT_CLOUD 3000000 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VRTELEOPERATION_API UPointCloudComponent : public UActorComponent

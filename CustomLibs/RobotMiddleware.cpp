@@ -187,7 +187,7 @@ struct RobotMiddleware::Impl {
     RoboCompVRControllerPub::VRControllerPubPrxPtr vrcontroller_proxy;
 
     // Lidar
-    RoboCompLidar3D::Lidar3DPrxPtr lidar3d_proxy;
+    RoboCompLidar3D::Lidar3DPrxPtr lidar3d_proxy, zed_proxy;
     std::mutex lidar_mutex;
     std::thread lidar_worker;
     RobotMiddleware::ColorCloudData cloudPoints;
@@ -235,6 +235,14 @@ struct RobotMiddleware::Impl {
             if (auto lidar3d_opt = require<RoboCompLidar3D::Lidar3DPrx, RoboCompLidar3D::Lidar3DPrxPtr>(ic,
                                 "lidar3d:tcp -h localhost -p 11990", "Lidar3DProxy"))
                 lidar3d_proxy = *lidar3d_opt;
+            else{
+                running = false;
+                return;
+            }
+
+            if (auto zed_opt = require<RoboCompLidar3D::Lidar3DPrx, RoboCompLidar3D::Lidar3DPrxPtr>(ic,
+                                "lidar3d:tcp -h localhost -p 12000", "Lidar3DProxy"))
+                zed_proxy = *zed_opt;
             else{
                 running = false;
                 return;
@@ -334,10 +342,48 @@ struct RobotMiddleware::Impl {
         {
             auto start = steady_clock::now();
             try {
-                auto ret = lidar3d_proxy->getColorCloudData();
+                auto zed_future = zed_proxy->getColorCloudDataAsync();
+                auto lidar3d_future = lidar3d_proxy->getColorCloudDataAsync();
+
+                RobotMiddleware::ColorCloudData zed_cloud  = iceToCloudPoints(zed_future.get());
+                RobotMiddleware::ColorCloudData lidar_cloud = iceToCloudPoints(lidar3d_future.get());
+
+
+                size_t total = zed_cloud.X.size() + lidar_cloud.X.size();
+                zed_cloud.X.reserve(total);
+                zed_cloud.Y.reserve(total);
+                zed_cloud.Z.reserve(total);
+                zed_cloud.R.reserve(total);
+                zed_cloud.G.reserve(total);
+                zed_cloud.B.reserve(total);
+
+
+                zed_cloud.X.insert(zed_cloud.X.end(),
+                         std::make_move_iterator(lidar_cloud.X.begin()),
+                         std::make_move_iterator(lidar_cloud.X.end()));
+
+                zed_cloud.Y.insert(zed_cloud.Y.end(),
+                         std::make_move_iterator(lidar_cloud.Y.begin()),
+                         std::make_move_iterator(lidar_cloud.Y.end()));
+
+                zed_cloud.Z.insert(zed_cloud.Z.end(),
+                         std::make_move_iterator(lidar_cloud.Z.begin()),
+                         std::make_move_iterator(lidar_cloud.Z.end()));
+
+                zed_cloud.R.insert(zed_cloud.R.end(),
+                         std::make_move_iterator(lidar_cloud.R.begin()),
+                         std::make_move_iterator(lidar_cloud.R.end()));
+
+                zed_cloud.G.insert(zed_cloud.G.end(),
+                         std::make_move_iterator(lidar_cloud.G.begin()),
+                         std::make_move_iterator(lidar_cloud.G.end()));
+
+                zed_cloud.B.insert(zed_cloud.B.end(),
+                         std::make_move_iterator(lidar_cloud.B.begin()),
+                         std::make_move_iterator(lidar_cloud.B.end()));
                 {
                     std::scoped_lock lock(lidar_mutex);
-                    cloudPoints = iceToCloudPoints(ret);
+                    cloudPoints = std::move(zed_cloud);
                 }
             }catch (...){
                 std::cout <<  "\033[1;33mWARNING\033[0m Failed getting lidar data\n";
@@ -451,6 +497,14 @@ const RobotMiddleware::ColorCloudData& RobotMiddleware::getColorCloudData() {
         std::cout <<  "\033[1;33mWARNING\033[0m Failed to get robot state\n";
         return {};
     }
+}
+void RobotMiddleware::lockUlockGetColorCloudData(bool lock){
+    if (lock) 
+        pImpl->lidar_mutex.lock();
+    else
+        pImpl->lidar_mutex.unlock();
+        
+
 }
 
 bool RobotMiddleware::getRobotState(float (&left)[8], float (&right)[8]) {

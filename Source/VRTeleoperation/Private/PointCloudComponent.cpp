@@ -70,14 +70,16 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	}
 	double StartTime = FPlatformTime::Seconds();  
 
-	RobotMiddleware::ColorCloudData cloud  = middleware->getColorCloudData();
+	const RobotMiddleware::ColorCloudData& cloud  = middleware->getColorCloudData();
 
 	double EndTime = FPlatformTime::Seconds(); 
 	double DurationMs = (EndTime - StartTime) * 1000.0;
 	
 	UE_LOG(LogTemp, Display, TEXT("get cloud took %.3f ms for %d points"), DurationMs, cloud.X.size());
 	
-	StartTime = FPlatformTime::Seconds();  
+	StartTime = FPlatformTime::Seconds();
+	middleware->lockUlockGetColorCloudData(true);
+	NumPoints = cloud.X.size();
 	ParallelFor( NumPoints, [&](int32 i)
 	{
 		ParticlePositions[i][0] = cloud.Y[i]/10.0;
@@ -87,8 +89,7 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		ParticleColors[i].G = cloud.G[i]/255.0;
 		ParticleColors[i].B = cloud.B[i]/255.0;
 	});
-
-	NumPoints = cloud.X.size();
+	middleware->lockUlockGetColorCloudData(false);
 	
 	EndTime = FPlatformTime::Seconds(); 
 	DurationMs = (EndTime - StartTime) * 1000.0;
