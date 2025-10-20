@@ -63,6 +63,10 @@ void ARobot::SetupPoseComponent()
     RightController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("RightController"));
     RightController->SetupAttachment(RootComponent);
     RightController->SetTrackingSource(EControllerHand::Right);
+
+	LeftGriper = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LeftGriper"));
+	RightGriper = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RightGriper"));
+
 }
 
 
@@ -279,6 +283,13 @@ void ARobot::Tick(float DeltaTime)
 	middleware->getHaptics(leftHaptic, rightHaptic);
 	TriggerHapticFeedback(EControllerHand::Left, leftHaptic.intensity, leftHaptic.frequency);
 	TriggerHapticFeedback(EControllerHand::Right, rightHaptic.intensity, rightHaptic.frequency);
+
+	LeftGriper->SetWorldRotation(LeftQuat);
+	LeftGriper->SetWorldLocation(LeftPos);
+
+	RightGriper->SetWorldRotation(RightQuat);
+	RightGriper->SetWorldLocation(RightPos);
+
 	
 
 	#pragma region Debug

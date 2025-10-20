@@ -84,6 +84,16 @@ public:
     UPROPERTY(VisibleAnywhere)
     UMotionControllerComponent* RightController;
 
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* LeftGriper;
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* RightGriper;
+
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* MI_Griper;
+	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	UInputMappingContext* IMC_Robot;
 

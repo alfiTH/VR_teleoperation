@@ -82,14 +82,16 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	NumPoints = cloud.X.size();
 	ParallelFor( NumPoints, [&](int32 i)
 	{
-		ParticlePositions[i][0] = cloud.Y[i]/10.0;
-		ParticlePositions[i][1] = cloud.X[i]/10.0;
-		ParticlePositions[i][2] =  cloud.Z[i]/10.0;
-		ParticleColors[i].R = cloud.R[i]/255.0; // entre 0.0 y 1.0
-		ParticleColors[i].G = cloud.G[i]/255.0;
-		ParticleColors[i].B = cloud.B[i]/255.0;
+		ParticlePositions[i][0] = cloud.Y[i]/10.0f;
+		ParticlePositions[i][1] = cloud.X[i]/10.0f;
+		ParticlePositions[i][2] =  cloud.Z[i]/10.0f;
+		ParticleColors[i].R = cloud.R[i]/255.0f; // entre 0.0 y 1.0
+		ParticleColors[i].G = cloud.G[i]/255.0f;
+		ParticleColors[i].B = cloud.B[i]/255.0f;
 	});
 	middleware->lockUlockGetColorCloudData(false);
+	UE_LOG(LogTemp, Display, TEXT("R:%f, G:%f B:%f"), ParticleColors[5000].R, ParticleColors[5000].G, ParticleColors[5000].B);;
+
 	
 	EndTime = FPlatformTime::Seconds(); 
 	DurationMs = (EndTime - StartTime) * 1000.0;
