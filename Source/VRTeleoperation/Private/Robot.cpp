@@ -21,6 +21,7 @@ void ARobot::BeginPlay()
 		middleware = &RobotMiddlewareSingleton::Get();
 		if (!middleware->isRunning())
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Middleware is not running"));
 			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 			if (PlayerController)
 			{
@@ -293,51 +294,51 @@ void ARobot::Tick(float DeltaTime)
 	
 
 	#pragma region Debug
-	auto VecToStr2 = [](const FVector& V) {
-		return FString::Printf(TEXT("X=%.2f, Y=%.2f, Z=%.2f"), V.X, V.Y, V.Z);
-	};
-	auto RotToStr2 = [](const FRotator& V) {
-		return FString::Printf(TEXT("X=%.2f, Y=%.2f, Z=%.2f"), V.Pitch, V.Yaw, V.Roll);
-	};
-	auto QuatToStr2 = [](const FQuat& Q) {
-		return FString::Printf(TEXT("X=%.5f, Y=%.5f, Z=%.5f, W=%.5f"), Q.X, Q.Y, Q.Z, Q.W);
-	};
-
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black,
-		FString::Printf(TEXT("HMD: %s\n%s\n%s"), *VecToStr2(HMDPos), *RotToStr2(HMDRot), *QuatToStr2(HMDQuat)), true, FVector2D(2.5, 2.5));
-
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red,
-		FString::Printf(TEXT("Left: %s\n%s\n%s"), *VecToStr2(LeftPos), *RotToStr2(LeftRot), *QuatToStr2(LeftQuat)), true, FVector2D(2.5, 2.5));
-
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue,
-		FString::Printf(TEXT("Right: %s\n%s\n%s"), *VecToStr2(RightPos), *RotToStr2(RightRot), *QuatToStr2(RightQuat)), true, FVector2D(2.5, 2.5));
+	// auto VecToStr2 = [](const FVector& V) {
+	// 	return FString::Printf(TEXT("X=%.2f, Y=%.2f, Z=%.2f"), V.X, V.Y, V.Z);
+	// };
+	// auto RotToStr2 = [](const FRotator& V) {
+	// 	return FString::Printf(TEXT("X=%.2f, Y=%.2f, Z=%.2f"), V.Pitch, V.Yaw, V.Roll);
+	// };
+	// auto QuatToStr2 = [](const FQuat& Q) {
+	// 	return FString::Printf(TEXT("X=%.5f, Y=%.5f, Z=%.5f, W=%.5f"), Q.X, Q.Y, Q.Z, Q.W);
+	// };
+	//
+	// GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Black,
+	// 	FString::Printf(TEXT("HMD: %s\n%s\n%s"), *VecToStr2(HMDPos), *RotToStr2(HMDRot), *QuatToStr2(HMDQuat)), true, FVector2D(2.5, 2.5));
+	//
+	// GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red,
+	// 	FString::Printf(TEXT("Left: %s\n%s\n%s"), *VecToStr2(LeftPos), *RotToStr2(LeftRot), *QuatToStr2(LeftQuat)), true, FVector2D(2.5, 2.5));
+	//
+	// GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue,
+	// 	FString::Printf(TEXT("Right: %s\n%s\n%s"), *VecToStr2(RightPos), *RotToStr2(RightRot), *QuatToStr2(RightQuat)), true, FVector2D(2.5, 2.5));
 
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Orange,
-		FString::Printf(TEXT("Period: %.3f"), DeltaTime), true, FVector2D(2.5, 2.5));
-
-		// Left controller
-	DrawDebugCoordinateSystem(
-		GetWorld(),
-		LeftPos,                   // Origen
-		LeftRot,        // Orientación
-		10.0f,                     // Longitud de los ejes
-		false,                     // Persistente
-		-1.f,                      // Tiempo de vida (segundos)
-		0,                         // DepthPriority
-		1.f                       // Grosor
-	);
-
-	// Right controller
-	DrawDebugCoordinateSystem(
-		GetWorld(),
-		RightPos,
-		RightRot,
-		10.0f,
-		false,
-		-1.f,
-		0,
-		1.f
-	);
+		FString::Printf(TEXT("HZ: %.3f"), 1/DeltaTime), true, FVector2D(3, 3));
+	//
+	// 	// Left controller
+	// DrawDebugCoordinateSystem(
+	// 	GetWorld(),
+	// 	LeftPos,                   // Origen
+	// 	LeftRot,        // Orientación
+	// 	10.0f,                     // Longitud de los ejes
+	// 	false,                     // Persistente
+	// 	-1.f,                      // Tiempo de vida (segundos)
+	// 	0,                         // DepthPriority
+	// 	1.f                       // Grosor
+	// );
+	//
+	// // Right controller
+	// DrawDebugCoordinateSystem(
+	// 	GetWorld(),
+	// 	RightPos,
+	// 	RightRot,
+	// 	10.0f,
+	// 	false,
+	// 	-1.f,
+	// 	0,
+	// 	1.f
+	// );
 #pragma endregion
 
 }

@@ -9,6 +9,7 @@
 #include <cmath>
 #include <optional>
 #include <mutex>
+#include <shared_mutex>
 #include <future>
 
 # pragma region Templates
@@ -159,7 +160,7 @@ inline RoboCompVRControllerPub::Controller toIceController(const RobotMiddleware
     return {c.trigger, c.grab, c.x, c.y, c.thumbstickCapTouch, c.aButton, c.aButtonCapTouch, c.bButton, c.bButtonCapTouch}; 
 }
 
-inline RobotMiddleware::ColorCloudData iceToCloudPoints(const RoboCompLidar3D::TColorCloudData &cloudIn) {
+inline RobotMiddleware::ColorCloudData iceToCloudPoints( RoboCompLidar3D::TColorCloudData &&cloudIn) {
     RobotMiddleware::ColorCloudData cloudOut;
 
     cloudOut.X = std::move(cloudIn.X);
@@ -188,7 +189,7 @@ struct RobotMiddleware::Impl {
 
     // Lidar
     RoboCompLidar3D::Lidar3DPrxPtr lidar3d_proxy, zed_proxy;
-    std::mutex lidar_mutex;
+    std::shared_timed_mutex lidar_mutex; 
     std::thread lidar_worker;
     RobotMiddleware::ColorCloudData cloudPoints;
 
@@ -224,7 +225,7 @@ struct RobotMiddleware::Impl {
          try
         {
             auto ic = communicator.communicator();
-            topicManager = Ice::checkedCast<IceStorm::TopicManagerPrx>(ic->stringToProxy("IceStorm/TopicManager:default -p 9999"));
+            topicManager = Ice::checkedCast<IceStorm::TopicManagerPrx>(ic->stringToProxy("IceStorm/TopicManager:default -h " + IP_ROBOT + " -p 9999"));
             if (!topicManager)
             {
                 std::cout << "\033[31mERROR\033[0m TopicManager.Proxy not defined in config file."<<std::endl;
@@ -233,7 +234,7 @@ struct RobotMiddleware::Impl {
             std::cout << "\033[32mINFO\033[0m topicManager ptr: " << topicManager.get() << "\n";
             
             if (auto lidar3d_opt = require<RoboCompLidar3D::Lidar3DPrx, RoboCompLidar3D::Lidar3DPrxPtr>(ic,
-                                "lidar3d:tcp -h localhost -p 11990", "Lidar3DProxy"))
+                                "lidar3d:tcp -h " + IP_ROBOT + " -p 12001", "Lidar3DProxy"))
                 lidar3d_proxy = *lidar3d_opt;
             else{
                 running = false;
@@ -241,7 +242,7 @@ struct RobotMiddleware::Impl {
             }
 
             if (auto zed_opt = require<RoboCompLidar3D::Lidar3DPrx, RoboCompLidar3D::Lidar3DPrxPtr>(ic,
-                                "lidar3d:tcp -h localhost -p 12000", "Lidar3DProxy"))
+                                "lidar3d:tcp -h " + IP_ROBOT + " -p 12000", "Lidar3DProxy"))
                 zed_proxy = *zed_opt;
             else{
                 running = false;
@@ -249,7 +250,7 @@ struct RobotMiddleware::Impl {
             }
 
             if (auto arm_left_opt = require<RoboCompKinovaArm::KinovaArmPrx, RoboCompKinovaArm::KinovaArmPrxPtr>(ic,
-                                "kinovaarm1:tcp -h localhost -p 10006", "KinovaArmProxy"))
+                                "kinovaarm:tcp -h " + IP_ROBOT + " -p 10006", "KinovaArmProxy"))
                 arm_left_proxy = *arm_left_opt;
             else{
                 running = false;
@@ -257,7 +258,7 @@ struct RobotMiddleware::Impl {
             }
             
             if (auto arm_right_opt = require<RoboCompKinovaArm::KinovaArmPrx, RoboCompKinovaArm::KinovaArmPrxPtr>(ic,
-                                "kinovaarm:tcp -h localhost -p 10005", "KinovaArmProxy"))
+                                "kinovaarm:tcp -h " + IP_ROBOT + " -p 10005", "KinovaArmProxy"))
                 arm_right_proxy = *arm_right_opt;
             else{
                 running = false;
@@ -272,7 +273,7 @@ struct RobotMiddleware::Impl {
                 return;
             }
 
-            if (not subscribe<VRControllerPubI>(ic, topicManager, "tcp -p 0", "haptic", "VRControllerPub", servant,
+            if (not subscribe<VRControllerPubI>(ic, topicManager, "tcp -h " + IP_ROBOT + " -p 0", "haptic", "VRControllerPub", servant,
                             vrcontrollerpub_topic, vrcontrollerpub)){
                 running = false;
                 return;
@@ -344,11 +345,33 @@ struct RobotMiddleware::Impl {
             try {
                 auto zed_future = zed_proxy->getColorCloudDataAsync();
                 auto lidar3d_future = lidar3d_proxy->getColorCloudDataAsync();
+                RobotMiddleware::ColorCloudData lidar_cloud;
+                RobotMiddleware::ColorCloudData zed_cloud;
+                
+                try
+                {
+                    // auto start = std::chrono::high_resolution_clock::now();
+                    lidar_cloud = iceToCloudPoints(lidar3d_future.get());
+                    // std::cout << "\033[32mINFO\033[0m " << "lidar getted, points "<< lidar_cloud.X.size() << ", time "<<std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count()<< "\n";
+                }
+                catch(const std::exception& e)
+                {
+                    std::cout <<  "\033[1;33mWARNING\033[0m Failed getting cloud data\n";
 
-                RobotMiddleware::ColorCloudData zed_cloud  = iceToCloudPoints(zed_future.get());
-                RobotMiddleware::ColorCloudData lidar_cloud = iceToCloudPoints(lidar3d_future.get());
+                }
+                try
+                {
+                    // auto start = std::chrono::high_resolution_clock::now();
+                    zed_cloud  = iceToCloudPoints(zed_future.get());
+                    // std::cout << "\033[32mINFO\033[0m " << "zed getted, points "<< zed_cloud.X.size() << ", time "<<std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count()<< "\n";
+                }
+                catch(const std::exception& e)
+                {
+                    std::cout <<  "\033[1;33mWARNING\033[0m Failed getting cloud data\n";
 
-
+                }
+                
+                
                 size_t total = zed_cloud.X.size() + lidar_cloud.X.size();
                 zed_cloud.X.reserve(total);
                 zed_cloud.Y.reserve(total);
@@ -382,11 +405,11 @@ struct RobotMiddleware::Impl {
                          std::make_move_iterator(lidar_cloud.B.begin()),
                          std::make_move_iterator(lidar_cloud.B.end()));
                 {
-                    std::scoped_lock lock(lidar_mutex);
+                    std::unique_lock<std::shared_timed_mutex> lock(lidar_mutex);
                     cloudPoints = std::move(zed_cloud);
                 }
             }catch (...){
-                std::cout <<  "\033[1;33mWARNING\033[0m Failed getting lidar data\n";
+                std::cout <<  "\033[1;33mWARNING\033[0m Failed getting cloud data\n";
             }
              // Period
             auto elapsed = steady_clock::now() - start;
@@ -499,11 +522,15 @@ const RobotMiddleware::ColorCloudData& RobotMiddleware::getColorCloudData() {
     }
 }
 void RobotMiddleware::lockUlockGetColorCloudData(bool lock){
-    if (lock) 
-        pImpl->lidar_mutex.lock();
+    static thread_local std::shared_lock<std::shared_timed_mutex> readLock;
+    if (lock)
+    {
+        readLock = std::shared_lock<std::shared_timed_mutex>(pImpl->lidar_mutex);
+    }
     else
-        pImpl->lidar_mutex.unlock();
-        
+    {
+        readLock.unlock();
+    }
 
 }
 

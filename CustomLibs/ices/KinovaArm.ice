@@ -37,7 +37,7 @@ module RoboCompKinovaArm
 		TAxis poseTheta;
 		TAxis twistLinear;
 		TAxis twistAngular;
-		TAxis externalWrenchTorce;
+		TAxis externalWrenchForce;
 		TAxis externalWrenchTorque;
 	};
 	struct TGripper
@@ -87,6 +87,7 @@ module RoboCompKinovaArm
 		void moveJointsWithSpeed (TJointSpeeds speeds);
 		void openGripper ();
 		void setCenterOfTool (TPose pose, ArmJoints referencedTo);
+		bool setGripperPos (float pos);
 	};
 };
 

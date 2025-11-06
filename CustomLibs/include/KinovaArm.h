@@ -116,7 +116,7 @@ struct TToolInfo
     ::RoboCompKinovaArm::TAxis poseTheta;
     ::RoboCompKinovaArm::TAxis twistLinear;
     ::RoboCompKinovaArm::TAxis twistAngular;
-    ::RoboCompKinovaArm::TAxis externalWrenchTorce;
+    ::RoboCompKinovaArm::TAxis externalWrenchForce;
     ::RoboCompKinovaArm::TAxis externalWrenchTorque;
 
     /**
@@ -125,7 +125,7 @@ struct TToolInfo
      */
     std::tuple<const ::RoboCompKinovaArm::TAxis&, const ::RoboCompKinovaArm::TAxis&, const ::RoboCompKinovaArm::TAxis&, const ::RoboCompKinovaArm::TAxis&, const ::RoboCompKinovaArm::TAxis&, const ::RoboCompKinovaArm::TAxis&> ice_tuple() const
     {
-        return std::tie(pose, poseTheta, twistLinear, twistAngular, externalWrenchTorce, externalWrenchTorque);
+        return std::tie(pose, poseTheta, twistLinear, twistAngular, externalWrenchForce, externalWrenchTorque);
     }
 };
 
@@ -307,6 +307,11 @@ public:
     virtual void setCenterOfTool(TPose pose, ArmJoints referencedTo, const ::Ice::Current& current) = 0;
     /// \cond INTERNAL
     bool _iceD_setCenterOfTool(::IceInternal::Incoming&, const ::Ice::Current&);
+    /// \endcond
+
+    virtual bool setGripperPos(float pos, const ::Ice::Current& current) = 0;
+    /// \cond INTERNAL
+    bool _iceD_setGripperPos(::IceInternal::Incoming&, const ::Ice::Current&);
     /// \endcond
 
     /// \cond INTERNAL
@@ -552,6 +557,32 @@ public:
     void _iceI_setCenterOfTool(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<void>>&, const TPose&, ArmJoints, const ::Ice::Context&);
     /// \endcond
 
+    bool setGripperPos(float pos, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    {
+        return _makePromiseOutgoing<bool>(true, this, &KinovaArmPrx::_iceI_setGripperPos, pos, context).get();
+    }
+
+    template<template<typename> class P = ::std::promise>
+    auto setGripperPosAsync(float pos, const ::Ice::Context& context = ::Ice::noExplicitContext)
+        -> decltype(::std::declval<P<bool>>().get_future())
+    {
+        return _makePromiseOutgoing<bool, P>(false, this, &KinovaArmPrx::_iceI_setGripperPos, pos, context);
+    }
+
+    ::std::function<void()>
+    setGripperPosAsync(float pos,
+                       ::std::function<void(bool)> response,
+                       ::std::function<void(::std::exception_ptr)> ex = nullptr,
+                       ::std::function<void(bool)> sent = nullptr,
+                       const ::Ice::Context& context = ::Ice::noExplicitContext)
+    {
+        return _makeLamdaOutgoing<bool>(std::move(response), std::move(ex), std::move(sent), this, &RoboCompKinovaArm::KinovaArmPrx::_iceI_setGripperPos, pos, context);
+    }
+
+    /// \cond INTERNAL
+    void _iceI_setGripperPos(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<bool>>&, float, const ::Ice::Context&);
+    /// \endcond
+
     /**
      * Obtains the Slice type ID of this interface.
      * @return The fully-scoped type ID.
@@ -631,7 +662,7 @@ struct StreamReader<::RoboCompKinovaArm::TToolInfo, S>
 {
     static void read(S* istr, ::RoboCompKinovaArm::TToolInfo& v)
     {
-        istr->readAll(v.pose, v.poseTheta, v.twistLinear, v.twistAngular, v.externalWrenchTorce, v.externalWrenchTorque);
+        istr->readAll(v.pose, v.poseTheta, v.twistLinear, v.twistAngular, v.externalWrenchForce, v.externalWrenchTorque);
     }
 };
 
@@ -809,7 +840,7 @@ struct TToolInfo
     ::RoboCompKinovaArm::TAxis poseTheta;
     ::RoboCompKinovaArm::TAxis twistLinear;
     ::RoboCompKinovaArm::TAxis twistAngular;
-    ::RoboCompKinovaArm::TAxis externalWrenchTorce;
+    ::RoboCompKinovaArm::TAxis externalWrenchForce;
     ::RoboCompKinovaArm::TAxis externalWrenchTorque;
 };
 
@@ -933,6 +964,14 @@ typedef ::IceUtil::Handle< Callback_KinovaArm_openGripper_Base> Callback_KinovaA
  */
 class Callback_KinovaArm_setCenterOfTool_Base : public virtual ::IceInternal::CallbackBase { };
 typedef ::IceUtil::Handle< Callback_KinovaArm_setCenterOfTool_Base> Callback_KinovaArm_setCenterOfToolPtr;
+
+/**
+ * Base class for asynchronous callback wrapper classes used for calls to
+ * IceProxy::RoboCompKinovaArm::KinovaArm::begin_setGripperPos.
+ * Create a wrapper instance by calling ::RoboCompKinovaArm::newCallback_KinovaArm_setGripperPos.
+ */
+class Callback_KinovaArm_setGripperPos_Base : public virtual ::IceInternal::CallbackBase { };
+typedef ::IceUtil::Handle< Callback_KinovaArm_setGripperPos_Base> Callback_KinovaArm_setGripperPosPtr;
 
 }
 
@@ -1288,6 +1327,44 @@ private:
 
 public:
 
+    bool setGripperPos(::Ice::Float pos, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    {
+        return end_setGripperPos(_iceI_begin_setGripperPos(pos, context, ::IceInternal::dummyCallback, 0, true));
+    }
+
+    ::Ice::AsyncResultPtr begin_setGripperPos(::Ice::Float pos, const ::Ice::Context& context = ::Ice::noExplicitContext)
+    {
+        return _iceI_begin_setGripperPos(pos, context, ::IceInternal::dummyCallback, 0);
+    }
+
+    ::Ice::AsyncResultPtr begin_setGripperPos(::Ice::Float pos, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    {
+        return _iceI_begin_setGripperPos(pos, ::Ice::noExplicitContext, cb, cookie);
+    }
+
+    ::Ice::AsyncResultPtr begin_setGripperPos(::Ice::Float pos, const ::Ice::Context& context, const ::Ice::CallbackPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    {
+        return _iceI_begin_setGripperPos(pos, context, cb, cookie);
+    }
+
+    ::Ice::AsyncResultPtr begin_setGripperPos(::Ice::Float pos, const ::RoboCompKinovaArm::Callback_KinovaArm_setGripperPosPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    {
+        return _iceI_begin_setGripperPos(pos, ::Ice::noExplicitContext, cb, cookie);
+    }
+
+    ::Ice::AsyncResultPtr begin_setGripperPos(::Ice::Float pos, const ::Ice::Context& context, const ::RoboCompKinovaArm::Callback_KinovaArm_setGripperPosPtr& cb, const ::Ice::LocalObjectPtr& cookie = 0)
+    {
+        return _iceI_begin_setGripperPos(pos, context, cb, cookie);
+    }
+
+    bool end_setGripperPos(const ::Ice::AsyncResultPtr& result);
+
+private:
+
+    ::Ice::AsyncResultPtr _iceI_begin_setGripperPos(::Ice::Float, const ::Ice::Context&, const ::IceInternal::CallbackBasePtr&, const ::Ice::LocalObjectPtr& cookie = 0, bool sync = false);
+
+public:
+
     /**
      * Obtains the Slice type ID corresponding to this interface.
      * @return A fully-scoped type ID.
@@ -1394,6 +1471,11 @@ public:
     virtual void setCenterOfTool(const TPose& pose, ArmJoints referencedTo, const ::Ice::Current& current = ::Ice::emptyCurrent) = 0;
     /// \cond INTERNAL
     bool _iceD_setCenterOfTool(::IceInternal::Incoming&, const ::Ice::Current&);
+    /// \endcond
+
+    virtual bool setGripperPos(::Ice::Float pos, const ::Ice::Current& current = ::Ice::emptyCurrent) = 0;
+    /// \cond INTERNAL
+    bool _iceD_setGripperPos(::IceInternal::Incoming&, const ::Ice::Current&);
     /// \endcond
 
     /// \cond INTERNAL
@@ -1529,7 +1611,7 @@ struct StreamWriter< ::RoboCompKinovaArm::TToolInfo, S>
         ostr->write(v.poseTheta);
         ostr->write(v.twistLinear);
         ostr->write(v.twistAngular);
-        ostr->write(v.externalWrenchTorce);
+        ostr->write(v.externalWrenchForce);
         ostr->write(v.externalWrenchTorque);
     }
 };
@@ -1543,7 +1625,7 @@ struct StreamReader< ::RoboCompKinovaArm::TToolInfo, S>
         istr->read(v.poseTheta);
         istr->read(v.twistLinear);
         istr->read(v.twistAngular);
-        istr->read(v.externalWrenchTorce);
+        istr->read(v.externalWrenchForce);
         istr->read(v.externalWrenchTorque);
     }
 };
@@ -3092,6 +3174,158 @@ template<class T, typename CT> Callback_KinovaArm_setCenterOfToolPtr
 newCallback_KinovaArm_setCenterOfTool(T* instance, void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
 {
     return new Callback_KinovaArm_setCenterOfTool<T, CT>(instance, 0, excb, sentcb);
+}
+
+/**
+ * Type-safe asynchronous callback wrapper class used for calls to
+ * IceProxy::RoboCompKinovaArm::KinovaArm::begin_setGripperPos.
+ * Create a wrapper instance by calling ::RoboCompKinovaArm::newCallback_KinovaArm_setGripperPos.
+ */
+template<class T>
+class CallbackNC_KinovaArm_setGripperPos : public Callback_KinovaArm_setGripperPos_Base, public ::IceInternal::TwowayCallbackNC<T>
+{
+public:
+
+    typedef IceUtil::Handle<T> TPtr;
+
+    typedef void (T::*Exception)(const ::Ice::Exception&);
+    typedef void (T::*Sent)(bool);
+    typedef void (T::*Response)(bool);
+
+    CallbackNC_KinovaArm_setGripperPos(const TPtr& obj, Response cb, Exception excb, Sent sentcb)
+        : ::IceInternal::TwowayCallbackNC<T>(obj, cb != 0, excb, sentcb), _response(cb)
+    {
+    }
+
+    /// \cond INTERNAL
+    virtual void completed(const ::Ice::AsyncResultPtr& result) const
+    {
+        KinovaArmPrx proxy = KinovaArmPrx::uncheckedCast(result->getProxy());
+        bool ret;
+        try
+        {
+            ret = proxy->end_setGripperPos(result);
+        }
+        catch(const ::Ice::Exception& ex)
+        {
+            ::IceInternal::CallbackNC<T>::exception(result, ex);
+            return;
+        }
+        if(_response)
+        {
+            (::IceInternal::CallbackNC<T>::_callback.get()->*_response)(ret);
+        }
+    }
+    /// \endcond
+
+private:
+
+    Response _response;
+};
+
+/**
+ * Creates a callback wrapper instance that delegates to your object.
+ * @param instance The callback object.
+ * @param cb The success method of the callback object.
+ * @param excb The exception method of the callback object.
+ * @param sentcb The sent method of the callback object.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompKinovaArm::KinovaArm::begin_setGripperPos.
+ */
+template<class T> Callback_KinovaArm_setGripperPosPtr
+newCallback_KinovaArm_setGripperPos(const IceUtil::Handle<T>& instance, void (T::*cb)(bool), void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
+{
+    return new CallbackNC_KinovaArm_setGripperPos<T>(instance, cb, excb, sentcb);
+}
+
+/**
+ * Creates a callback wrapper instance that delegates to your object.
+ * @param instance The callback object.
+ * @param cb The success method of the callback object.
+ * @param excb The exception method of the callback object.
+ * @param sentcb The sent method of the callback object.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompKinovaArm::KinovaArm::begin_setGripperPos.
+ */
+template<class T> Callback_KinovaArm_setGripperPosPtr
+newCallback_KinovaArm_setGripperPos(T* instance, void (T::*cb)(bool), void (T::*excb)(const ::Ice::Exception&), void (T::*sentcb)(bool) = 0)
+{
+    return new CallbackNC_KinovaArm_setGripperPos<T>(instance, cb, excb, sentcb);
+}
+
+/**
+ * Type-safe asynchronous callback wrapper class with cookie support used for calls to
+ * IceProxy::RoboCompKinovaArm::KinovaArm::begin_setGripperPos.
+ * Create a wrapper instance by calling ::RoboCompKinovaArm::newCallback_KinovaArm_setGripperPos.
+ */
+template<class T, typename CT>
+class Callback_KinovaArm_setGripperPos : public Callback_KinovaArm_setGripperPos_Base, public ::IceInternal::TwowayCallback<T, CT>
+{
+public:
+
+    typedef IceUtil::Handle<T> TPtr;
+
+    typedef void (T::*Exception)(const ::Ice::Exception& , const CT&);
+    typedef void (T::*Sent)(bool , const CT&);
+    typedef void (T::*Response)(bool, const CT&);
+
+    Callback_KinovaArm_setGripperPos(const TPtr& obj, Response cb, Exception excb, Sent sentcb)
+        : ::IceInternal::TwowayCallback<T, CT>(obj, cb != 0, excb, sentcb), _response(cb)
+    {
+    }
+
+    /// \cond INTERNAL
+    virtual void completed(const ::Ice::AsyncResultPtr& result) const
+    {
+        KinovaArmPrx proxy = KinovaArmPrx::uncheckedCast(result->getProxy());
+        bool ret;
+        try
+        {
+            ret = proxy->end_setGripperPos(result);
+        }
+        catch(const ::Ice::Exception& ex)
+        {
+            ::IceInternal::Callback<T, CT>::exception(result, ex);
+            return;
+        }
+        if(_response)
+        {
+            (::IceInternal::Callback<T, CT>::_callback.get()->*_response)(ret, CT::dynamicCast(result->getCookie()));
+        }
+    }
+    /// \endcond
+
+private:
+
+    Response _response;
+};
+
+/**
+ * Creates a callback wrapper instance that delegates to your object.
+ * Use this overload when your callback methods receive a cookie value.
+ * @param instance The callback object.
+ * @param cb The success method of the callback object.
+ * @param excb The exception method of the callback object.
+ * @param sentcb The sent method of the callback object.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompKinovaArm::KinovaArm::begin_setGripperPos.
+ */
+template<class T, typename CT> Callback_KinovaArm_setGripperPosPtr
+newCallback_KinovaArm_setGripperPos(const IceUtil::Handle<T>& instance, void (T::*cb)(bool, const CT&), void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
+{
+    return new Callback_KinovaArm_setGripperPos<T, CT>(instance, cb, excb, sentcb);
+}
+
+/**
+ * Creates a callback wrapper instance that delegates to your object.
+ * Use this overload when your callback methods receive a cookie value.
+ * @param instance The callback object.
+ * @param cb The success method of the callback object.
+ * @param excb The exception method of the callback object.
+ * @param sentcb The sent method of the callback object.
+ * @return An object that can be passed to an asynchronous invocation of IceProxy::RoboCompKinovaArm::KinovaArm::begin_setGripperPos.
+ */
+template<class T, typename CT> Callback_KinovaArm_setGripperPosPtr
+newCallback_KinovaArm_setGripperPos(T* instance, void (T::*cb)(bool, const CT&), void (T::*excb)(const ::Ice::Exception&, const CT&), void (T::*sentcb)(bool, const CT&) = 0)
+{
+    return new Callback_KinovaArm_setGripperPos<T, CT>(instance, cb, excb, sentcb);
 }
 
 }

@@ -66,7 +66,8 @@ const ::std::string iceC_RoboCompKinovaArm_KinovaArm_ops[] =
     "moveJointsWithAngle",
     "moveJointsWithSpeed",
     "openGripper",
-    "setCenterOfTool"
+    "setCenterOfTool",
+    "setGripperPos"
 };
 const ::std::string iceC_RoboCompKinovaArm_KinovaArm_closeGripper_name = "closeGripper";
 const ::std::string iceC_RoboCompKinovaArm_KinovaArm_getCenterOfTool_name = "getCenterOfTool";
@@ -77,6 +78,7 @@ const ::std::string iceC_RoboCompKinovaArm_KinovaArm_moveJointsWithAngle_name = 
 const ::std::string iceC_RoboCompKinovaArm_KinovaArm_moveJointsWithSpeed_name = "moveJointsWithSpeed";
 const ::std::string iceC_RoboCompKinovaArm_KinovaArm_openGripper_name = "openGripper";
 const ::std::string iceC_RoboCompKinovaArm_KinovaArm_setCenterOfTool_name = "setCenterOfTool";
+const ::std::string iceC_RoboCompKinovaArm_KinovaArm_setGripperPos_name = "setGripperPos";
 
 }
 
@@ -238,9 +240,26 @@ RoboCompKinovaArm::KinovaArm::_iceD_setCenterOfTool(::IceInternal::Incoming& inS
 
 /// \cond INTERNAL
 bool
+RoboCompKinovaArm::KinovaArm::_iceD_setGripperPos(::IceInternal::Incoming& inS, const ::Ice::Current& current)
+{
+    _iceCheckMode(::Ice::OperationMode::Normal, current.mode);
+    auto istr = inS.startReadParams();
+    float iceP_pos;
+    istr->readAll(iceP_pos);
+    inS.endReadParams();
+    bool ret = this->setGripperPos(iceP_pos, current);
+    auto ostr = inS.startWriteParams();
+    ostr->writeAll(ret);
+    inS.endWriteParams();
+    return true;
+}
+/// \endcond
+
+/// \cond INTERNAL
+bool
 RoboCompKinovaArm::KinovaArm::_iceDispatch(::IceInternal::Incoming& in, const ::Ice::Current& current)
 {
-    ::std::pair<const ::std::string*, const ::std::string*> r = ::std::equal_range(iceC_RoboCompKinovaArm_KinovaArm_ops, iceC_RoboCompKinovaArm_KinovaArm_ops + 13, current.operation);
+    ::std::pair<const ::std::string*, const ::std::string*> r = ::std::equal_range(iceC_RoboCompKinovaArm_KinovaArm_ops, iceC_RoboCompKinovaArm_KinovaArm_ops + 14, current.operation);
     if(r.first == r.second)
     {
         throw ::Ice::OperationNotExistException(__FILE__, __LINE__, current.id, current.facet, current.operation);
@@ -299,6 +318,10 @@ RoboCompKinovaArm::KinovaArm::_iceDispatch(::IceInternal::Incoming& in, const ::
         case 12:
         {
             return _iceD_setCenterOfTool(in, current);
+        }
+        case 13:
+        {
+            return _iceD_setGripperPos(in, current);
         }
         default:
         {
@@ -417,6 +440,20 @@ RoboCompKinovaArm::KinovaArmPrx::_iceI_setCenterOfTool(const ::std::shared_ptr<:
 /// \endcond
 
 /// \cond INTERNAL
+void
+RoboCompKinovaArm::KinovaArmPrx::_iceI_setGripperPos(const ::std::shared_ptr<::IceInternal::OutgoingAsyncT<bool>>& outAsync, float iceP_pos, const ::Ice::Context& context)
+{
+    _checkTwowayOnly(iceC_RoboCompKinovaArm_KinovaArm_setGripperPos_name);
+    outAsync->invoke(iceC_RoboCompKinovaArm_KinovaArm_setGripperPos_name, ::Ice::OperationMode::Normal, ::Ice::FormatType::DefaultFormat, context,
+        [&](::Ice::OutputStream* ostr)
+        {
+            ostr->writeAll(iceP_pos);
+        },
+        nullptr);
+}
+/// \endcond
+
+/// \cond INTERNAL
 ::std::shared_ptr<::Ice::ObjectPrx>
 RoboCompKinovaArm::KinovaArmPrx::_newInstance() const
 {
@@ -456,6 +493,8 @@ const ::std::string iceC_RoboCompKinovaArm_KinovaArm_moveJointsWithSpeed_name = 
 const ::std::string iceC_RoboCompKinovaArm_KinovaArm_openGripper_name = "openGripper";
 
 const ::std::string iceC_RoboCompKinovaArm_KinovaArm_setCenterOfTool_name = "setCenterOfTool";
+
+const ::std::string iceC_RoboCompKinovaArm_KinovaArm_setGripperPos_name = "setGripperPos";
 
 }
 
@@ -780,6 +819,48 @@ IceProxy::RoboCompKinovaArm::KinovaArm::end_setCenterOfTool(const ::Ice::AsyncRe
     _end(result, iceC_RoboCompKinovaArm_KinovaArm_setCenterOfTool_name);
 }
 
+::Ice::AsyncResultPtr
+IceProxy::RoboCompKinovaArm::KinovaArm::_iceI_begin_setGripperPos(::Ice::Float iceP_pos, const ::Ice::Context& context, const ::IceInternal::CallbackBasePtr& del, const ::Ice::LocalObjectPtr& cookie, bool sync)
+{
+    _checkTwowayOnly(iceC_RoboCompKinovaArm_KinovaArm_setGripperPos_name, sync);
+    ::IceInternal::OutgoingAsyncPtr result = new ::IceInternal::CallbackOutgoing(this, iceC_RoboCompKinovaArm_KinovaArm_setGripperPos_name, del, cookie, sync);
+    try
+    {
+        result->prepare(iceC_RoboCompKinovaArm_KinovaArm_setGripperPos_name, ::Ice::Normal, context);
+        ::Ice::OutputStream* ostr = result->startWriteParams(::Ice::DefaultFormat);
+        ostr->write(iceP_pos);
+        result->endWriteParams();
+        result->invoke(iceC_RoboCompKinovaArm_KinovaArm_setGripperPos_name);
+    }
+    catch(const ::Ice::Exception& ex)
+    {
+        result->abort(ex);
+    }
+    return result;
+}
+
+bool
+IceProxy::RoboCompKinovaArm::KinovaArm::end_setGripperPos(const ::Ice::AsyncResultPtr& result)
+{
+    ::Ice::AsyncResult::_check(result, this, iceC_RoboCompKinovaArm_KinovaArm_setGripperPos_name);
+    bool ret;
+    if(!result->_waitForResponse())
+    {
+        try
+        {
+            result->_throwUserException();
+        }
+        catch(const ::Ice::UserException& ex)
+        {
+            throw ::Ice::UnknownUserException(__FILE__, __LINE__, ex.ice_id());
+        }
+    }
+    ::Ice::InputStream* istr = result->_startReadParams();
+    istr->read(ret);
+    result->_endReadParams();
+    return ret;
+}
+
 /// \cond INTERNAL
 ::IceProxy::Ice::Object*
 IceProxy::RoboCompKinovaArm::KinovaArm::_newInstance() const
@@ -974,6 +1055,23 @@ RoboCompKinovaArm::KinovaArm::_iceD_setCenterOfTool(::IceInternal::Incoming& inS
 }
 /// \endcond
 
+/// \cond INTERNAL
+bool
+RoboCompKinovaArm::KinovaArm::_iceD_setGripperPos(::IceInternal::Incoming& inS, const ::Ice::Current& current)
+{
+    _iceCheckMode(::Ice::Normal, current.mode);
+    ::Ice::InputStream* istr = inS.startReadParams();
+    ::Ice::Float iceP_pos;
+    istr->read(iceP_pos);
+    inS.endReadParams();
+    bool ret = this->setGripperPos(iceP_pos, current);
+    ::Ice::OutputStream* ostr = inS.startWriteParams();
+    ostr->write(ret);
+    inS.endWriteParams();
+    return true;
+}
+/// \endcond
+
 namespace
 {
 const ::std::string iceC_RoboCompKinovaArm_KinovaArm_all[] =
@@ -990,7 +1088,8 @@ const ::std::string iceC_RoboCompKinovaArm_KinovaArm_all[] =
     "moveJointsWithAngle",
     "moveJointsWithSpeed",
     "openGripper",
-    "setCenterOfTool"
+    "setCenterOfTool",
+    "setGripperPos"
 };
 
 }
@@ -999,7 +1098,7 @@ const ::std::string iceC_RoboCompKinovaArm_KinovaArm_all[] =
 bool
 RoboCompKinovaArm::KinovaArm::_iceDispatch(::IceInternal::Incoming& in, const ::Ice::Current& current)
 {
-    ::std::pair<const ::std::string*, const ::std::string*> r = ::std::equal_range(iceC_RoboCompKinovaArm_KinovaArm_all, iceC_RoboCompKinovaArm_KinovaArm_all + 13, current.operation);
+    ::std::pair<const ::std::string*, const ::std::string*> r = ::std::equal_range(iceC_RoboCompKinovaArm_KinovaArm_all, iceC_RoboCompKinovaArm_KinovaArm_all + 14, current.operation);
     if(r.first == r.second)
     {
         throw ::Ice::OperationNotExistException(__FILE__, __LINE__, current.id, current.facet, current.operation);
@@ -1058,6 +1157,10 @@ RoboCompKinovaArm::KinovaArm::_iceDispatch(::IceInternal::Incoming& in, const ::
         case 12:
         {
             return _iceD_setCenterOfTool(in, current);
+        }
+        case 13:
+        {
+            return _iceD_setGripperPos(in, current);
         }
         default:
         {

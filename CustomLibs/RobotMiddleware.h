@@ -3,6 +3,8 @@
 #include <vector>
 #include <memory>
 
+const std::string IP_ROBOT  = "192.168.50.78";
+
 class RobotMiddleware {
 public:
 

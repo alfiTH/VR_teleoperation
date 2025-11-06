@@ -21,13 +21,16 @@ void UPointCloudComponent::BeginPlay()
 	Super::BeginPlay();
 	if (GetWorld() && GetWorld()->IsGameWorld())
 	{
+		NiagaraComp->SetAutoActivate(true);
+		NiagaraComp->Activate(true);
 		if (!NiagaraComp)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("⚠️ Niagara Component not assigned in %s"), *GetOwner()->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("⚠️ Niagara Component not assigned in %s⚠️"), *GetOwner()->GetName());
 		}
 		middleware = &RobotMiddlewareSingleton::Get();
 		if (!middleware->isRunning() or !NiagaraComp)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("⚠️Middleware or Niagara is not running⚠️"));
 			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 			if (PlayerController)
 			{
@@ -53,6 +56,7 @@ void UPointCloudComponent::BeginPlay()
 // Called every frame
 void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	UE_LOG(LogTemp, Warning, TEXT("⚠️ Niagara tiking⚠️"));
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (!GEngine or !GetWorld() or !GetWorld()->IsGameWorld())
 		return ;
@@ -68,6 +72,19 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		UE_LOG(LogTemp, Warning, TEXT("⚠️ Niagara Component does not activate"));
 		return ;
 	}
+
+	if (NiagaraComp && NiagaraComp->IsRegistered())
+	{
+		bool bIsActive = NiagaraComp->IsActive();
+		bool bIsPaused = NiagaraComp->IsPaused();
+		ENiagaraTickBehavior TickBehavior = NiagaraComp->GetTickBehavior();
+
+		UE_LOG(LogTemp, Warning, TEXT("Niagara: Active=%d Paused=%d TickBehavior=%d"),
+			bIsActive ? 1 : 0,
+			bIsPaused ? 1 : 0,
+			(int32)TickBehavior);
+	}
+	
 	double StartTime = FPlatformTime::Seconds();  
 
 	const RobotMiddleware::ColorCloudData& cloud  = middleware->getColorCloudData();
@@ -77,6 +94,10 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	
 	UE_LOG(LogTemp, Display, TEXT("get cloud took %.3f ms for %d points"), DurationMs, cloud.X.size());
 	
+	auto SRGBToLinear = [](float c) {
+		return (c <= 0.04045f) ? (c / 12.92f) : FMath::Pow((c + 0.055f) / 1.055f, 2.4f);
+	};
+	
 	StartTime = FPlatformTime::Seconds();
 	middleware->lockUlockGetColorCloudData(true);
 	NumPoints = cloud.X.size();
@@ -85,9 +106,9 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		ParticlePositions[i][0] = cloud.Y[i]/10.0f;
 		ParticlePositions[i][1] = cloud.X[i]/10.0f;
 		ParticlePositions[i][2] =  cloud.Z[i]/10.0f;
-		ParticleColors[i].R = cloud.R[i]/255.0f; // entre 0.0 y 1.0
-		ParticleColors[i].G = cloud.G[i]/255.0f;
-		ParticleColors[i].B = cloud.B[i]/255.0f;
+		ParticleColors[i].R = SRGBToLinear(cloud.R[i]/255.0f); // entre 0.0 y 1.0
+		ParticleColors[i].G = SRGBToLinear(cloud.G[i]/255.0f);
+		ParticleColors[i].B = SRGBToLinear(cloud.B[i]/255.0f);
 	});
 	middleware->lockUlockGetColorCloudData(false);
 	UE_LOG(LogTemp, Display, TEXT("R:%f, G:%f B:%f"), ParticleColors[5000].R, ParticleColors[5000].G, ParticleColors[5000].B);;
@@ -107,7 +128,7 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 			ParticleColors
 		);
 
-	NiagaraComp->SetNiagaraVariableInt(FString("User.NumPoints"), NumPoints);
+	NiagaraComp->SetVariableInt(FName("User.NumPoints"), NumPoints);
 
 
 }
