@@ -3,6 +3,29 @@
 
 const float TOLERANCE_FLOAT = 0.01f;
 
+inline void exportFPSQueueToCSV(const std::deque<float>& FPSQueue, 
+						 const std::string& filename = "fps_data.csv",
+						 const std::string& columnName = "FPS") {
+    
+	std::ofstream file(filename);
+    
+	if (!file.is_open()) {
+		std::cerr << "Error: No se pudo abrir el archivo " << filename << std::endl;
+		return;
+	}
+	
+	file << columnName << "\n";
+    
+	for (const float& fps : FPSQueue) {
+		file << std::fixed << std::setprecision(5) << fps << "\n";
+	}
+    
+	file.close();
+    
+	std::cout << "Datos exportados exitosamente a " << filename << std::endl;
+	std::cout << "Total de registros exportados: " << FPSQueue.size() << std::endl;
+}
+
 // Sets default values
 ARobot::ARobot()
 {
@@ -48,6 +71,7 @@ void ARobot::BeginPlay()
 void ARobot::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+	exportFPSQueueToCSV(FPSQueue, "fps_data.csv", "FPS");
 }
 
 void ARobot::SetupPoseComponent()
@@ -69,7 +93,6 @@ void ARobot::SetupPoseComponent()
 	RightGriper = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RightGriper"));
 
 }
-
 
 void ARobot::TriggerHapticFeedback(
 	EControllerHand Hand,
@@ -143,76 +166,57 @@ void ARobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 #pragma region Triggers
 void ARobot::GraspLeft(const FInputActionValue& Value){
 	left.grab = Value.Get<float>();
-	controllerChanged = true;
-	
 };
 void ARobot::GraspReleaseLeft(const FInputActionValue& Value){
 	left.grab = 0;
-	controllerChanged = true;
-	
 };
 void ARobot::GraspRight(const FInputActionValue& Value){
 	right.grab =  Value.Get<float>();
-	controllerChanged = true;
+	std::cout<< right.grab<< std::endl;
 	
 };
 
 void ARobot::GraspReleaseRight(const FInputActionValue& Value){
 	right.grab = 0;
-	controllerChanged = true;
-	
+	std::cout<< right.grab<< std::endl;
 };
 void ARobot::TriggerLeft(const FInputActionValue& Value){
 	left.trigger = Value.Get<float>();
-	controllerChanged = true;
 };
 void ARobot::TriggerReleaseLeft(const FInputActionValue& Value){
 	left.trigger = 0;
-	controllerChanged = true;
 };
 void ARobot::TriggerRight(const FInputActionValue& Value){
 	right.trigger = Value.Get<float>();
-	controllerChanged = true;
-
 };
 void ARobot::TriggerReleaseRight(const FInputActionValue& Value){
 	right.trigger = 0;
-	controllerChanged = true;
-
 };
 #pragma endregion
 #pragma region Button
 void ARobot::PushA(const FInputActionValue& Value){
 	right.aButton= true;
-	controllerChanged = true;
 };
 void ARobot::ReleaseA(const FInputActionValue& Value){
 	right.aButton= false;
-	controllerChanged = true;
 };
 void ARobot::PushB(const FInputActionValue& Value){
 	right.bButton= true;
-	controllerChanged = true;
 };
 void ARobot::ReleaseB(const FInputActionValue& Value){
 	right.bButton= false;
-	controllerChanged = true;
 };
 void ARobot::PushX(const FInputActionValue& Value){
 	left.aButton= true;
-	controllerChanged = true;
 };
 void ARobot::ReleaseX(const FInputActionValue& Value){
 	left.aButton= false;
-	controllerChanged = true;
 };
 void ARobot::PushY(const FInputActionValue& Value){
 	left.bButton= true;
-	controllerChanged = true;
 };
 void ARobot::ReleaseY(const FInputActionValue& Value){
 	left.bButton= false;
-	controllerChanged = true;
 };
 #pragma endregion
 #pragma region ThumbStick
@@ -221,28 +225,22 @@ void ARobot::ThumbStickLeft(const FInputActionValue& Value)
     FVector2D StickValue = Value.Get<FVector2D>();
 	left.x = StickValue.X;
 	left.y = StickValue.Y;
-
-    controllerChanged = true;
 }
 void ARobot::ThumbStickReleaseLeft(const FInputActionValue& Value)
 {
 	left.x = 0;
     left.y = 0;
-    controllerChanged = true;
-
 }
 void ARobot::ThumbStickRight(const FInputActionValue& Value)
 {
     FVector2D StickValue = Value.Get<FVector2D>();
 	right.x = StickValue.X;
 	right.y = StickValue.Y;
-	controllerChanged = true;
 }
 void ARobot::ThumbStickReleaseRight(const FInputActionValue& Value)
 {
 	right.x = 0;
 	right.y = 0;
-	controllerChanged = true;
 }
 #pragma endregion
 #pragma endregion
@@ -256,34 +254,26 @@ void ARobot::Tick(float DeltaTime)
 		return ;
 
 	FVector HMDPos = VRCamera->GetComponentLocation();
-	FRotator HMDRot = VRCamera->GetComponentRotation();
 	FQuat HMDQuat = VRCamera->GetComponentQuat();
 
-
 	FVector LeftPos = LeftController->GetComponentLocation();
-	FRotator LeftRot = LeftController->GetComponentRotation();
 	FQuat LeftQuat = LeftController->GetComponentQuat();
 
 	FVector RightPos = RightController->GetComponentLocation();
-	FRotator RightRot = RightController->GetComponentRotation();
 	FQuat RightQuat = RightController->GetComponentQuat();
 
-
-	middleware->sendPoses(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDRot.Pitch, HMDRot.Yaw, HMDRot.Roll, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W},
-		RobotMiddleware::Pose{LeftPos.X, LeftPos.Y, LeftPos.Z, LeftRot.Pitch, LeftRot.Yaw, LeftRot.Roll, LeftQuat.X, LeftQuat.Y, LeftQuat.Z, LeftQuat.W},
-		RobotMiddleware::Pose{RightPos.X, RightPos.Y, RightPos.Z, RightRot.Pitch, RightRot.Yaw, RightRot.Roll, RightQuat.X, RightQuat.Y, RightQuat.Z, RightQuat.W}
+	middleware->sendData(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W},
+		RobotMiddleware::Pose{LeftPos.X, LeftPos.Y, LeftPos.Z, LeftQuat.X, LeftQuat.Y, LeftQuat.Z, LeftQuat.W}, left,
+		RobotMiddleware::Pose{RightPos.X, RightPos.Y, RightPos.Z, RightQuat.X, RightQuat.Y, RightQuat.Z, RightQuat.W}, right
 	);
 
-	if (controllerChanged)
-	{	
-		controllerChanged = false;
-		middleware->sendControllers(left, right);
+	RobotMiddleware::Haptic leftHaptic, rightHaptic;
+	if (middleware->receiveHaptics(leftHaptic, rightHaptic))
+	{
+		TriggerHapticFeedback(EControllerHand::Left, leftHaptic.intensity, leftHaptic.frequency);
+		TriggerHapticFeedback(EControllerHand::Right, rightHaptic.intensity, rightHaptic.frequency);
 	}
 
-	RobotMiddleware::Haptic leftHaptic, rightHaptic;
-	middleware->getHaptics(leftHaptic, rightHaptic);
-	TriggerHapticFeedback(EControllerHand::Left, leftHaptic.intensity, leftHaptic.frequency);
-	TriggerHapticFeedback(EControllerHand::Right, rightHaptic.intensity, rightHaptic.frequency);
 
 	LeftGriper->SetWorldRotation(LeftQuat);
 	LeftGriper->SetWorldLocation(LeftPos);
@@ -291,6 +281,10 @@ void ARobot::Tick(float DeltaTime)
 	RightGriper->SetWorldRotation(RightQuat);
 	RightGriper->SetWorldLocation(RightPos);
 
+	if (FPSQueue.size() == maxSize) {
+		FPSQueue.pop_front();
+	}
+	FPSQueue.push_back(1/DeltaTime);
 	
 
 	#pragma region Debug
@@ -313,8 +307,8 @@ void ARobot::Tick(float DeltaTime)
 	// GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue,
 	// 	FString::Printf(TEXT("Right: %s\n%s\n%s"), *VecToStr2(RightPos), *RotToStr2(RightRot), *QuatToStr2(RightQuat)), true, FVector2D(2.5, 2.5));
 
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Orange,
-		FString::Printf(TEXT("HZ: %.3f"), 1/DeltaTime), true, FVector2D(3, 3));
+	// GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Orange,
+	// 	FString::Printf(TEXT("HZ: %.3f"), 1/DeltaTime), true, FVector2D(3, 3));
 	//
 	// 	// Left controller
 	// DrawDebugCoordinateSystem(

@@ -21,12 +21,17 @@ void UPointCloudComponent::BeginPlay()
 	Super::BeginPlay();
 	if (GetWorld() && GetWorld()->IsGameWorld())
 	{
-		NiagaraComp->SetAutoActivate(true);
-		NiagaraComp->Activate(true);
+
 		if (!NiagaraComp)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("⚠️ Niagara Component not assigned in %s⚠️"), *GetOwner()->GetName());
 		}
+		else
+		{
+			NiagaraComp->SetAutoActivate(true);
+			NiagaraComp->Activate(true);
+		}
+		
 		middleware = &RobotMiddlewareSingleton::Get();
 		if (!middleware->isRunning() or !NiagaraComp)
 		{
@@ -51,8 +56,6 @@ void UPointCloudComponent::BeginPlay()
 	ParticleColors.SetNumUninitialized(MAX_POINT_CLOUD);	
 }
 
-
-
 // Called every frame
 void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -72,6 +75,7 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		UE_LOG(LogTemp, Warning, TEXT("⚠️ Niagara Component does not activate"));
 		return ;
 	}
+
 
 	if (NiagaraComp && NiagaraComp->IsRegistered())
 	{
@@ -93,42 +97,44 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	double DurationMs = (EndTime - StartTime) * 1000.0;
 	
 	UE_LOG(LogTemp, Display, TEXT("get cloud took %.3f ms for %d points"), DurationMs, cloud.X.size());
-	
-	auto SRGBToLinear = [](float c) {
-		return (c <= 0.04045f) ? (c / 12.92f) : FMath::Pow((c + 0.055f) / 1.055f, 2.4f);
-	};
-	
-	StartTime = FPlatformTime::Seconds();
-	middleware->lockUlockGetColorCloudData(true);
-	NumPoints = cloud.X.size();
-	ParallelFor( NumPoints, [&](int32 i)
+	if (cloud.X.size() > 0)
 	{
-		ParticlePositions[i][0] = cloud.Y[i]/10.0f;
-		ParticlePositions[i][1] = cloud.X[i]/10.0f;
-		ParticlePositions[i][2] =  cloud.Z[i]/10.0f;
-		ParticleColors[i].R = SRGBToLinear(cloud.R[i]/255.0f); // entre 0.0 y 1.0
-		ParticleColors[i].G = SRGBToLinear(cloud.G[i]/255.0f);
-		ParticleColors[i].B = SRGBToLinear(cloud.B[i]/255.0f);
-	});
-	middleware->lockUlockGetColorCloudData(false);
-	UE_LOG(LogTemp, Display, TEXT("R:%f, G:%f B:%f"), ParticleColors[5000].R, ParticleColors[5000].G, ParticleColors[5000].B);;
+		auto SRGBToLinear = [](float c) {
+			return (c <= 0.04045f) ? (c / 12.92f) : FMath::Pow((c + 0.055f) / 1.055f, 2.4f);
+		};
+		
+		StartTime = FPlatformTime::Seconds();
+		middleware->lockUlockGetColorCloudData(true);
+		NumPoints = cloud.X.size();
+		ParallelFor( NumPoints, [&](int32 i)
+		{
+			ParticlePositions[i][0] = cloud.Y[i]/10.0f;
+			ParticlePositions[i][1] = cloud.X[i]/10.0f;
+			ParticlePositions[i][2] =  cloud.Z[i]/10.0f;
+			ParticleColors[i].R = SRGBToLinear(cloud.R[i]/255.0f); // entre 0.0 y 1.0
+			ParticleColors[i].G = SRGBToLinear(cloud.G[i]/255.0f);
+			ParticleColors[i].B = SRGBToLinear(cloud.B[i]/255.0f);
+		});
+		middleware->lockUlockGetColorCloudData(false);
+		UE_LOG(LogTemp, Display, TEXT("R:%f, G:%f B:%f"), ParticleColors[5000].R, ParticleColors[5000].G, ParticleColors[5000].B);;
 
-	
-	EndTime = FPlatformTime::Seconds(); 
-	DurationMs = (EndTime - StartTime) * 1000.0;
-	UE_LOG(LogTemp, Display, TEXT("ParallelFor took %.3f ms for %d points"), DurationMs, NumPoints);
-	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(
-			NiagaraComp,
-			FName("User.ParticlePositions"), // Nombre del parámetro
-			ParticlePositions
-		);
-	UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayColor(
-			NiagaraComp,
-			FName("User.ParticleColors"), // Nombre del parámetro
-			ParticleColors
-		);
+		
+		EndTime = FPlatformTime::Seconds(); 
+		DurationMs = (EndTime - StartTime) * 1000.0;
+		UE_LOG(LogTemp, Display, TEXT("ParallelFor took %.3f ms for %d points"), DurationMs, NumPoints);
+		UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(
+				NiagaraComp,
+				FName("User.ParticlePositions"), // Nombre del parámetro
+				ParticlePositions
+			);
+		UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayColor(
+				NiagaraComp,
+				FName("User.ParticleColors"), // Nombre del parámetro
+				ParticleColors
+			);
 
-	NiagaraComp->SetVariableInt(FName("User.NumPoints"), NumPoints);
+		NiagaraComp->SetVariableInt(FName("User.NumPoints"), NumPoints);
+	}
 
 
 }

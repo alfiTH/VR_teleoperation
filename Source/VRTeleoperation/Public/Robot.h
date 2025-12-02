@@ -21,6 +21,8 @@
 #include "RobotMiddlewareSingleton.h"
 #include <atomic>
 #include <iostream>
+#include <deque>
+#include <fstream>
 
 #include "PointCloudComponent.h"
 
@@ -133,6 +135,8 @@ private:
 	TWeakObjectPtr<APlayerController> CachedPC;
 	RobotMiddleware::Controller left, right;
 	std::atomic<bool> controllerChanged = false;
+	std::deque<float> FPSQueue;
+	const size_t maxSize = 2000;
 public:
 	UPROPERTY(VisibleAnywhere)
 	UPointCloudComponent* PointCloudComponent;
