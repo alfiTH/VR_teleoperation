@@ -156,14 +156,20 @@ struct TColorCloudData
     ::RoboCompLidar3D::TByteArray R;
     ::RoboCompLidar3D::TByteArray G;
     ::RoboCompLidar3D::TByteArray B;
+    long long int timestamp;
+    long long int numberPoints;
+    bool compressed;
+    ::RoboCompLidar3D::TByteArray cX;
+    ::RoboCompLidar3D::TByteArray cY;
+    ::RoboCompLidar3D::TByteArray cZ;
 
     /**
      * Obtains a tuple containing all of the struct's data members.
      * @return The data members in a tuple.
      */
-    std::tuple<const ::RoboCompLidar3D::TShortArray&, const ::RoboCompLidar3D::TShortArray&, const ::RoboCompLidar3D::TShortArray&, const ::RoboCompLidar3D::TByteArray&, const ::RoboCompLidar3D::TByteArray&, const ::RoboCompLidar3D::TByteArray&> ice_tuple() const
+    std::tuple<const ::RoboCompLidar3D::TShortArray&, const ::RoboCompLidar3D::TShortArray&, const ::RoboCompLidar3D::TShortArray&, const ::RoboCompLidar3D::TByteArray&, const ::RoboCompLidar3D::TByteArray&, const ::RoboCompLidar3D::TByteArray&, const long long int&, const long long int&, const bool&, const ::RoboCompLidar3D::TByteArray&, const ::RoboCompLidar3D::TByteArray&, const ::RoboCompLidar3D::TByteArray&> ice_tuple() const
     {
-        return std::tie(X, Y, Z, R, G, B);
+        return std::tie(X, Y, Z, R, G, B, timestamp, numberPoints, compressed, cX, cY, cZ);
     }
 };
 
@@ -506,7 +512,7 @@ template<>
 struct StreamableTraits<::RoboCompLidar3D::TColorCloudData>
 {
     static const StreamHelperCategory helper = StreamHelperCategoryStruct;
-    static const int minWireSize = 6;
+    static const int minWireSize = 26;
     static const bool fixedLength = false;
 };
 
@@ -515,7 +521,7 @@ struct StreamReader<::RoboCompLidar3D::TColorCloudData, S>
 {
     static void read(S* istr, ::RoboCompLidar3D::TColorCloudData& v)
     {
-        istr->readAll(v.X, v.Y, v.Z, v.R, v.G, v.B);
+        istr->readAll(v.X, v.Y, v.Z, v.R, v.G, v.B, v.timestamp, v.numberPoints, v.compressed, v.cX, v.cY, v.cZ);
     }
 };
 
@@ -630,6 +636,12 @@ struct TColorCloudData
     ::RoboCompLidar3D::TByteArray R;
     ::RoboCompLidar3D::TByteArray G;
     ::RoboCompLidar3D::TByteArray B;
+    ::Ice::Long timestamp;
+    ::Ice::Long numberPoints;
+    bool compressed;
+    ::RoboCompLidar3D::TByteArray cX;
+    ::RoboCompLidar3D::TByteArray cY;
+    ::RoboCompLidar3D::TByteArray cZ;
 };
 
 }
@@ -1198,7 +1210,7 @@ template<>
 struct StreamableTraits< ::RoboCompLidar3D::TColorCloudData>
 {
     static const StreamHelperCategory helper = StreamHelperCategoryStruct;
-    static const int minWireSize = 6;
+    static const int minWireSize = 26;
     static const bool fixedLength = false;
 };
 
@@ -1213,6 +1225,12 @@ struct StreamWriter< ::RoboCompLidar3D::TColorCloudData, S>
         ostr->write(v.R);
         ostr->write(v.G);
         ostr->write(v.B);
+        ostr->write(v.timestamp);
+        ostr->write(v.numberPoints);
+        ostr->write(v.compressed);
+        ostr->write(v.cX);
+        ostr->write(v.cY);
+        ostr->write(v.cZ);
     }
 };
 
@@ -1227,6 +1245,12 @@ struct StreamReader< ::RoboCompLidar3D::TColorCloudData, S>
         istr->read(v.R);
         istr->read(v.G);
         istr->read(v.B);
+        istr->read(v.timestamp);
+        istr->read(v.numberPoints);
+        istr->read(v.compressed);
+        istr->read(v.cX);
+        istr->read(v.cY);
+        istr->read(v.cZ);
     }
 };
 

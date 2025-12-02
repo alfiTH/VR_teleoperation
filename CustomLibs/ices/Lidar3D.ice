@@ -61,6 +61,12 @@ module RoboCompLidar3D
 		TByteArray R;
 		TByteArray G;
 		TByteArray B;
+		long timestamp;
+		long numberPoints;
+		bool compressed;
+		TByteArray cX;
+		TByteArray cY;
+		TByteArray cZ;
 	};
 	interface Lidar3D
 	{

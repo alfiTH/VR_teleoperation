@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 
-const std::string IP_ROBOT  = "192.168.50.78";
+const std::string IP_ROBOT  = "192.168.3.110";
 
 class RobotMiddleware {
 public:
@@ -13,9 +13,6 @@ public:
         float x;
         float y;
         float z;
-        float rx;
-        float ry;
-        float rz;
         float qrx;
         float qry;
         float qrz;
@@ -56,10 +53,10 @@ public:
     RobotMiddleware();
     ~RobotMiddleware();
     bool isRunning();
-
-    bool sendPoses(const RobotMiddleware::Pose& head, const RobotMiddleware::Pose& left, const RobotMiddleware::Pose& right);
-    bool sendControllers(const RobotMiddleware::Controller& left, const RobotMiddleware::Controller& right);
-    bool getHaptics(RobotMiddleware::Haptic& left, RobotMiddleware::Haptic& right);
+    bool sendData(const RobotMiddleware::Pose& head, 
+                  const RobotMiddleware::Pose& left, const RobotMiddleware::Controller& leftController,
+                  const RobotMiddleware::Pose& right, const RobotMiddleware::Controller& rightController);
+    bool receiveHaptics(RobotMiddleware::Haptic& left, RobotMiddleware::Haptic& right);
     const ColorCloudData& getColorCloudData();
     void lockUlockGetColorCloudData(bool lock);
     bool getRobotState(float (&left)[8], float (&right)[8]);

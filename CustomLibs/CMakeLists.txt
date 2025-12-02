@@ -8,15 +8,18 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 ADD_DEFINITIONS ("-DICE_CPP11_MAPPING")
 FIND_PACKAGE( Ice REQUIRED COMPONENTS Ice IceStorm OPTIONAL_COMPONENTS IceUtil )
 
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+    LIST(APPEND LIBS ${LIBS} OpenMP::OpenMP_CXX)
+endif()
 
 
 # Crear la librería compartida
 add_library(Middleware SHARED
     RobotMiddleware.cpp
-    include/VRControllerPub.cpp
+    include/VRController.cpp
     include/Lidar3D.cpp
     include/KinovaArm.cpp
-    include/vrcontrollerpubI.cpp
 )
 
 # Incluir directorios
@@ -26,17 +29,17 @@ target_include_directories(Middleware PUBLIC
     ${ICE_INCLUDE_DIRS}
 )
 
+
+
 # Opciones de compilación
 target_compile_options(Middleware PRIVATE -fmax-errors=1 -fno-char8_t -O3)
 
 set(ICE_LIBRARIES /usr/lib/x86_64-linux-gnu/libIce++11.so /usr/lib/x86_64-linux-gnu/libIceStorm++11.so)
 
-target_link_libraries(Middleware PRIVATE ${ICE_LIBRARIES})
-
 message(STATUS "ICE_LIBRARIES = ${ICE_LIBRARIES}")
 
 # Enlazar con librerías de Ice
-target_link_libraries(Middleware PRIVATE ${ICE_LIBRARIES})
+target_link_libraries(Middleware PRIVATE ${ICE_LIBRARIES} ${LIBS})
 
 # RPATH para que el loader encuentre Ice al cargar el .so
 set_target_properties(Middleware PROPERTIES
