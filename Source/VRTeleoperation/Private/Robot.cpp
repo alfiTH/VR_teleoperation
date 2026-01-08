@@ -71,7 +71,7 @@ void ARobot::BeginPlay()
 void ARobot::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	exportFPSQueueToCSV(FPSQueue, "fps_data.csv", "FPS");
+	// exportFPSQueueToCSV(FPSQueue, "/home/robolab/fps_data.csv", "FPS");
 }
 
 void ARobot::SetupPoseComponent()
@@ -281,11 +281,11 @@ void ARobot::Tick(float DeltaTime)
 	RightGriper->SetWorldRotation(RightQuat);
 	RightGriper->SetWorldLocation(RightPos);
 
-	if (FPSQueue.size() == maxSize) {
-		FPSQueue.pop_front();
-	}
-	FPSQueue.push_back(1/DeltaTime);
-	
+	// if (FPSQueue.size() == maxSize) {
+	// 	FPSQueue.pop_front();
+	// }
+	// FPSQueue.push_back(1/DeltaTime);
+	//
 
 	#pragma region Debug
 	// auto VecToStr2 = [](const FVector& V) {

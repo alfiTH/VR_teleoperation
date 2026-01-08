@@ -327,7 +327,7 @@ struct RobotMiddleware::Impl {
   void updateLidarData() {
     using namespace std::chrono;
     const auto period = 50ms;
-    const auto timeout = period/2;
+    const auto timeout = period*5;
     std::deque<long long> zed_timestamps, lidar3d_timestamps;
     size_t max_size = 100;
     auto add_time = [max_size](std::deque<long long> &buffer, long long value) {
@@ -361,6 +361,9 @@ struct RobotMiddleware::Impl {
             std::cout << "\033[1;32mINFO\033[0m timestamps diff Lidar3D: "
                           << mean_time(lidar3d_timestamps) << std::endl;
           }
+          else {
+            std::cout << "\033[1;33mWARNING\033[0m Lidar3D not ready\n";
+          }
           
           // std::cout << "\033[32mINFO\033[0m " << "lidar getted, points "<<
           // lidar_cloud.X.size() << ", time "<<timestamp - start).count()<<
@@ -379,6 +382,9 @@ struct RobotMiddleware::Impl {
             add_time(zed_timestamps, timestamp - zed_timestamp);
             std::cout << "\033[1;32mINFO\033[0m timestamps diff zed: "
                     << mean_time(zed_timestamps) << std::endl;
+          }
+          else {
+            std::cout << "\033[1;33mWARNING\033[0m Zed not ready\n";
           }
           // std::cout << "\033[32mINFO\033[0m " << "zed getted, points "<<
           // zed_cloud.X.size() << ", time "<<timestamp - start).count()<< "\n";
@@ -500,8 +506,8 @@ bool RobotMiddleware::sendData(
     auto retLeft = toIceController(leftController);
     retLeft.pose = toIcePose(left);
     auto retRight = toIceController(rightController);
-    std::cout << "\033[1;33mWARNING\033[0m"<< rightController.trigger<<"\n";
     retRight.pose = toIcePose(right);
+    
     pImpl->haptics_future = pImpl->vrcontroller_proxy->sendDataReceiveHapticsAsync(
                                     toIcePose(head), retLeft, retRight);
     return true;

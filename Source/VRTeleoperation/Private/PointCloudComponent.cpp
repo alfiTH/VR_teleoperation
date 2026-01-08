@@ -30,6 +30,12 @@ void UPointCloudComponent::BeginPlay()
 		{
 			NiagaraComp->SetAutoActivate(true);
 			NiagaraComp->Activate(true);
+			FNiagaraParameterStore& Params = NiagaraComp->GetOverrideParameters();
+			FNiagaraVariableBase Var(FNiagaraTypeDefinition::GetIntDef(), FName("User.NumPoints"));
+			NumPoints = Params.GetParameterValue<int32>(Var);
+	
+			ParticlePositions.SetNumUninitialized(NumPoints);
+			ParticleColors.SetNumUninitialized(NumPoints);	
 		}
 		
 		middleware = &RobotMiddlewareSingleton::Get();
@@ -52,14 +58,13 @@ void UPointCloudComponent::BeginPlay()
 	{
 		UE_LOG(LogTemp, Display, TEXT("Editor mode"));
 	}
-	ParticlePositions.SetNumUninitialized(MAX_POINT_CLOUD);
-	ParticleColors.SetNumUninitialized(MAX_POINT_CLOUD);	
+
 }
 
 // Called every frame
 void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	UE_LOG(LogTemp, Warning, TEXT("⚠️ Niagara tiking⚠️"));
+	// UE_LOG(LogTemp, Warning, TEXT("⚠️ Niagara tiking⚠️"));
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (!GEngine or !GetWorld() or !GetWorld()->IsGameWorld())
 		return ;
@@ -77,17 +82,17 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	}
 
 
-	if (NiagaraComp && NiagaraComp->IsRegistered())
-	{
-		bool bIsActive = NiagaraComp->IsActive();
-		bool bIsPaused = NiagaraComp->IsPaused();
-		ENiagaraTickBehavior TickBehavior = NiagaraComp->GetTickBehavior();
-
-		UE_LOG(LogTemp, Warning, TEXT("Niagara: Active=%d Paused=%d TickBehavior=%d"),
-			bIsActive ? 1 : 0,
-			bIsPaused ? 1 : 0,
-			(int32)TickBehavior);
-	}
+	// if (NiagaraComp && NiagaraComp->IsRegistered())
+	// {
+	// 	bool bIsActive = NiagaraComp->IsActive();
+	// 	bool bIsPaused = NiagaraComp->IsPaused();
+	// 	ENiagaraTickBehavior TickBehavior = NiagaraComp->GetTickBehavior();
+	//
+	// 	UE_LOG(LogTemp, Warning, TEXT("Niagara: Active=%d Paused=%d TickBehavior=%d"),
+	// 		bIsActive ? 1 : 0,
+	// 		bIsPaused ? 1 : 0,
+	// 		(int32)TickBehavior);
+	// }
 	
 	double StartTime = FPlatformTime::Seconds();  
 
@@ -96,7 +101,7 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	double EndTime = FPlatformTime::Seconds(); 
 	double DurationMs = (EndTime - StartTime) * 1000.0;
 	
-	UE_LOG(LogTemp, Display, TEXT("get cloud took %.3f ms for %d points"), DurationMs, cloud.X.size());
+	// UE_LOG(LogTemp, Display, TEXT("get cloud took %.3f ms for %d points"), DurationMs, cloud.X.size());
 	if (cloud.X.size() > 0)
 	{
 		auto SRGBToLinear = [](float c) {
@@ -116,7 +121,7 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 			ParticleColors[i].B = SRGBToLinear(cloud.B[i]/255.0f);
 		});
 		middleware->lockUlockGetColorCloudData(false);
-		UE_LOG(LogTemp, Display, TEXT("R:%f, G:%f B:%f"), ParticleColors[5000].R, ParticleColors[5000].G, ParticleColors[5000].B);;
+		// UE_LOG(LogTemp, Display, TEXT("R:%f, G:%f B:%f"), ParticleColors[5000].R, ParticleColors[5000].G, ParticleColors[5000].B);;
 
 		
 		EndTime = FPlatformTime::Seconds(); 
