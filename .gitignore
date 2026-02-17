@@ -43,13 +43,17 @@
 #################################
 # Unreal Engine Generated Files #
 #################################
-CustomLibs/build
 [Bb]uild
 [Bb]uilds
 /Binaries
 /DerivedDataCache
 /Intermediate
 /Saved
+CustomLibs/include
+.vscode
+.idea
+.cache
+
 
 #################################
 # Visual Studio Generated Files #

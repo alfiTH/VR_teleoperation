@@ -5,9 +5,7 @@ void UP3botAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 	if (GetWorld() && GetWorld()->IsGameWorld())
 	{
-		middleware = &RobotMiddlewareSingleton::Get();
-
-		if (!middleware->isRunning())
+		if (!middleware.isRunning())
 		{
 			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 			if (PlayerController)
@@ -33,7 +31,7 @@ void UP3botAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (!GEngine or !GetWorld() or !GetWorld()->IsGameWorld())
 		return ;
 	
-	if (!middleware) 
+	if (!middleware.isRunning()) 
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Middleware not initialized in UP3botAnimInstance"));
 		return;
@@ -43,7 +41,7 @@ void UP3botAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	float right[8] = {0.0f};
 	
 	// Leer el estado del robot desde la memoria (no bloqueante)
-	if (middleware->getRobotState(left, right))
+	if (middleware.getRobotState(left, right))
 	{
 		LeftQ0 = -left[0];
 		LeftQ1 = -left[1];

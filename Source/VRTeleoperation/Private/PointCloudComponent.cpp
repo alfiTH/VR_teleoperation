@@ -38,8 +38,7 @@ void UPointCloudComponent::BeginPlay()
 			ParticleColors.SetNumUninitialized(NumPoints);	
 		}
 		
-		middleware = &RobotMiddlewareSingleton::Get();
-		if (!middleware->isRunning() or !NiagaraComp)
+		if (!middleware.isRunning() or !NiagaraComp)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("⚠️Middleware or Niagara is not running⚠️"));
 			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
@@ -69,7 +68,7 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	if (!GEngine or !GetWorld() or !GetWorld()->IsGameWorld())
 		return ;
 		
-	if (!middleware) 
+	if (!middleware.isRunning()) 
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Middleware not initialized in UP3botAnimInstance"));
 		return;
@@ -96,7 +95,7 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	
 	double StartTime = FPlatformTime::Seconds();  
 
-	const RobotMiddleware::ColorCloudData& cloud  = middleware->getColorCloudData();
+	const RobotMiddleware::ColorCloudData& cloud  = middleware.getColorCloudData();
 
 	double EndTime = FPlatformTime::Seconds(); 
 	double DurationMs = (EndTime - StartTime) * 1000.0;
@@ -109,7 +108,7 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		};
 		
 		StartTime = FPlatformTime::Seconds();
-		middleware->lockUlockGetColorCloudData(true);
+		middleware.lockUlockGetColorCloudData(true);
 		NumPoints = cloud.X.size();
 		ParallelFor( NumPoints, [&](int32 i)
 		{
@@ -120,7 +119,7 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 			ParticleColors[i].G = SRGBToLinear(cloud.G[i]/255.0f);
 			ParticleColors[i].B = SRGBToLinear(cloud.B[i]/255.0f);
 		});
-		middleware->lockUlockGetColorCloudData(false);
+		middleware.lockUlockGetColorCloudData(false);
 		// UE_LOG(LogTemp, Display, TEXT("R:%f, G:%f B:%f"), ParticleColors[5000].R, ParticleColors[5000].G, ParticleColors[5000].B);;
 
 		

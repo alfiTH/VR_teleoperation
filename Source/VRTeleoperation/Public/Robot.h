@@ -18,7 +18,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 
 #include "Engine/Engine.h"
-#include "RobotMiddlewareSingleton.h"
+#include "RobotMiddleware.h"
 #include <atomic>
 #include <iostream>
 #include <deque>
@@ -131,7 +131,7 @@ public:
 
 
 private:
-	RobotMiddleware* middleware;
+	RobotMiddleware& middleware = RobotMiddleware::getInstance();
 	TWeakObjectPtr<APlayerController> CachedPC;
 	RobotMiddleware::Controller left, right;
 	std::atomic<bool> controllerChanged = false;

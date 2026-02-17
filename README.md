@@ -52,7 +52,7 @@ The system uses a custom middleware to interface with RoboComp components via Ze
 1. *Generate C++ classes from Slice files*:
 ```bash
 cd CustomLibs/include
-slice2cpp ../ices/KinovaArm.ice ../ices/Lidar3D.ice ../ices/VRController.ice 
+slice2cpp ../ices/KinovaArm.ice ../ices/Lidar3D.ice ../ices/VRController.ice  ../ices/GenericBase.ice ../ices/OmniRobot.ice
 ```
 2. *Build the Shared Library*:
 ```bash

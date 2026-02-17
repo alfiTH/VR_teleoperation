@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "RobotMiddlewareSingleton.h"
+#include "RobotMiddleware.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -61,6 +61,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="P3Bot|RightArm")
 	float RightQ7;
 
-	RobotMiddleware* middleware;
+	RobotMiddleware& middleware = RobotMiddleware::getInstance();
 	
 };

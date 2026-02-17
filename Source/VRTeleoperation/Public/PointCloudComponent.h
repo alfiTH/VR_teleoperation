@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include  "RobotMiddlewareSingleton.h"
+#include  "RobotMiddleware.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
@@ -49,5 +49,5 @@ public:
 	UNiagaraComponent* NiagaraComp = nullptr;
 
 private:
-	RobotMiddleware* middleware;
+	RobotMiddleware& middleware = RobotMiddleware::getInstance();
 };

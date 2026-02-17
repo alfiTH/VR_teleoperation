@@ -16,10 +16,15 @@ endif()
 
 # Crear la librería compartida
 add_library(Middleware SHARED
-    RobotMiddleware.cpp
+    src/RobotMiddleware.cpp
+    src/RobotMiddlewareParsers.cpp
+    src/RobotMiddleware.tpp
     include/VRController.cpp
     include/Lidar3D.cpp
     include/KinovaArm.cpp
+    include/OmniRobot.cpp
+    include/GenericBase.cpp
+
 )
 
 # Incluir directorios

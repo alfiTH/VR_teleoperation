@@ -41,8 +41,7 @@ void ARobot::BeginPlay()
 	Super::BeginPlay();
 	if (GetWorld() && GetWorld()->IsGameWorld())
 	{
-		middleware = &RobotMiddlewareSingleton::Get();
-		if (!middleware->isRunning())
+		if (!middleware.isRunning())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Middleware is not running"));
 			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
@@ -253,6 +252,13 @@ void ARobot::Tick(float DeltaTime)
     if (!GEngine or !GetWorld() or !GetWorld()->IsGameWorld())
 		return ;
 
+
+	FVector NuevaPosicion = FVector(100.0f, 50.0f, 0.0f);
+	FQuat NuevaRotacion = FQuat(FRotator(0.0f, 90.0f, 0.0f)); // O creado desde ejes
+
+	// Aplicar al Actor completo
+	SetActorLocationAndRotation(NuevaPosicion, NuevaRotacion);
+	
 	FVector HMDPos = VRCamera->GetComponentLocation();
 	FQuat HMDQuat = VRCamera->GetComponentQuat();
 
@@ -262,13 +268,13 @@ void ARobot::Tick(float DeltaTime)
 	FVector RightPos = RightController->GetComponentLocation();
 	FQuat RightQuat = RightController->GetComponentQuat();
 
-	middleware->sendData(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W},
+	middleware.sendData(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W},
 		RobotMiddleware::Pose{LeftPos.X, LeftPos.Y, LeftPos.Z, LeftQuat.X, LeftQuat.Y, LeftQuat.Z, LeftQuat.W}, left,
 		RobotMiddleware::Pose{RightPos.X, RightPos.Y, RightPos.Z, RightQuat.X, RightQuat.Y, RightQuat.Z, RightQuat.W}, right
 	);
 
 	RobotMiddleware::Haptic leftHaptic, rightHaptic;
-	if (middleware->receiveHaptics(leftHaptic, rightHaptic))
+	if (middleware.receiveHaptics(leftHaptic, rightHaptic))
 	{
 		TriggerHapticFeedback(EControllerHand::Left, leftHaptic.intensity, leftHaptic.frequency);
 		TriggerHapticFeedback(EControllerHand::Right, rightHaptic.intensity, rightHaptic.frequency);
