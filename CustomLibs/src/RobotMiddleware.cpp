@@ -176,12 +176,13 @@ bool RobotMiddleware::getRobotState(float (&left)[8], float (&right)[8]) {
 }
 
 bool RobotMiddleware::getRobotPose(RobotMiddleware::Pose &robot) {
-  if (!pImpl)
+  if (!pImpl or !pImpl->poseChanged)
     return false;
   try {
     {
       std::scoped_lock lock(pImpl->robot_mutex);
       robot = pImpl->robot_pose;
+      pImpl->poseChanged = false;
     }
     return true;
   } catch (const std::system_error &ex) {

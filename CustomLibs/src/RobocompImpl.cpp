@@ -45,6 +45,7 @@ struct RobotMiddleware::Impl {
   std::mutex omnirobot_mutex;
   std::thread omnirobot_worker;
   RobotMiddleware::Pose robot_pose;
+  bool poseChanged = false;
 
   Impl() : communicator(makeInitData()) {
     try {
@@ -193,11 +194,11 @@ struct RobotMiddleware::Impl {
           long long int lidar_timestamp;
           if (lidar3d_future.wait_for(timeout) == std::future_status::ready) {
             lidar_cloud = iceToCloudPoints(lidar3d_future.get(), lidar_timestamp);
-            auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
-                                std::chrono::system_clock::now().time_since_epoch()).count();
-            add_time(lidar3d_timestamps, timestamp - lidar_timestamp);
-            std::cout << "\033[1;32mINFO\033[0m timestamps diff Lidar3D: "
-                      << mean_time(lidar3d_timestamps) << std::endl;
+            // auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+            //                     std::chrono::system_clock::now().time_since_epoch()).count();
+            // add_time(lidar3d_timestamps, timestamp - lidar_timestamp);
+            // std::cout << "\033[1;32mINFO\033[0m timestamps diff Lidar3D: "
+            //           << mean_time(lidar3d_timestamps) << std::endl;
           } else {
             std::cout << "\033[1;33mWARNING\033[0m Lidar3D not ready\n";
           }
@@ -235,11 +236,11 @@ struct RobotMiddleware::Impl {
           long long int zed_timestamp;
           if (zed_future.wait_for(timeout) == std::future_status::ready) {
             zed_cloud = iceToCloudPoints(zed_future.get(), zed_timestamp);
-            auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
-                                std::chrono::system_clock::now().time_since_epoch()).count();
-            add_time(zed_timestamps, timestamp - zed_timestamp);
-            std::cout << "\033[1;32mINFO\033[0m timestamps diff zed: "
-                      << mean_time(zed_timestamps) << std::endl;
+            // auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+            //                     std::chrono::system_clock::now().time_since_epoch()).count();
+            // add_time(zed_timestamps, timestamp - zed_timestamp);
+            // std::cout << "\033[1;32mINFO\033[0m timestamps diff zed: "
+            //           << mean_time(zed_timestamps) << std::endl;
           } else {
             std::cout << "\033[1;33mWARNING\033[0m Zed not ready\n";
           }
@@ -401,12 +402,17 @@ struct RobotMiddleware::Impl {
     using namespace std::chrono;
     const auto period = 20ms;
     const auto timeout = period / 2;
-    RoboCompGenericBase::TBaseState state;
+    RoboCompGenericBase::TBaseState state{};
     while (running) {
       auto start = steady_clock::now();
       try {
         omnirobot_proxy->getBaseState(state); 
-        robot_pose = angle2DToQuaternion(state.alpha, state.x, state.z, 0);
+        {
+          std::unique_lock<std::mutex> lock(robot_mutex);
+          robot_pose = angle2DToQuaternion(static_cast<float>(state.alpha), static_cast<float>(state.z)*100, static_cast<float>(state.x)*100, 0.0);
+          std::cout << "\033[32mINFO\033[0m " << "Robot pose: " << robot_pose.x << " " << robot_pose.y << " " << robot_pose.z << " " << robot_pose.qrx << " " << robot_pose.qry << " " << robot_pose.qrz << " " << robot_pose.qrw << "\n";
+          poseChanged = true;
+        }
       } catch (const Ice::ConnectionRefusedException &ex) {
         std::cout << "\033[31mERROR\033[0m Robot pose connection refused: "
                   << ex.what() << "\n";

@@ -24,8 +24,6 @@
 #include <deque>
 #include <fstream>
 
-#include "PointCloudComponent.h"
-
 #include "DrawDebugHelpers.h"
 #include "Robot.generated.h"
 
@@ -138,7 +136,5 @@ private:
 	std::deque<float> FPSQueue;
 	const size_t maxSize = 2000;
 public:
-	UPROPERTY(VisibleAnywhere)
-	UPointCloudComponent* PointCloudComponent;
 
 };

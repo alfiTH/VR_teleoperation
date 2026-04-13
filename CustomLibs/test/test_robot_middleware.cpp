@@ -296,3 +296,16 @@ TEST_F(MiddlewareLifecycleTest, GetHapticsReturns) {
   EXPECT_FALSE(std::isinf(right.frequency));
 }
   
+TEST_F(MiddlewareLifecycleTest, GetOmniBaseStateReturns) {
+  RobotMiddleware::Pose omniBaseState={INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY};
+  sleep(1);
+  bool result = RobotMiddleware::getInstance().getRobotPose(omniBaseState);
+  EXPECT_TRUE(result);
+  EXPECT_FALSE(std::isinf(omniBaseState.x));
+  EXPECT_FALSE(std::isinf(omniBaseState.y));
+  EXPECT_FALSE(std::isinf(omniBaseState.z));
+  EXPECT_FALSE(std::isinf(omniBaseState.qrx));
+  EXPECT_FALSE(std::isinf(omniBaseState.qry));
+  EXPECT_FALSE(std::isinf(omniBaseState.qrz));
+  EXPECT_FALSE(std::isinf(omniBaseState.qrw));
+}

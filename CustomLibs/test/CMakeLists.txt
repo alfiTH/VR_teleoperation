@@ -43,7 +43,7 @@ target_include_directories(MiddlewareStatic PUBLIC
     ${ICE_INCLUDE_DIRS}
 )
 
-target_compile_options(MiddlewareStatic PRIVATE -fmax-errors=5 -fno-char8_t -O0 -g)
+target_compile_options(MiddlewareStatic PRIVATE -fmax-errors=5 -fno-char8_t -O3 -g)
 
 set(ICE_LIBRARIES
     /usr/lib/x86_64-linux-gnu/libIce++11.so

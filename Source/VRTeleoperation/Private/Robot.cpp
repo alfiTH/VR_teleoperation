@@ -32,7 +32,6 @@ ARobot::ARobot()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
     SetupPoseComponent();
-	PointCloudComponent = CreateDefaultSubobject<UPointCloudComponent>(TEXT("PointCloudComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -251,13 +250,6 @@ void ARobot::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
     if (!GEngine or !GetWorld() or !GetWorld()->IsGameWorld())
 		return ;
-
-
-	FVector NuevaPosicion = FVector(100.0f, 50.0f, 0.0f);
-	FQuat NuevaRotacion = FQuat(FRotator(0.0f, 90.0f, 0.0f)); // O creado desde ejes
-
-	// Aplicar al Actor completo
-	SetActorLocationAndRotation(NuevaPosicion, NuevaRotacion);
 	
 	FVector HMDPos = VRCamera->GetComponentLocation();
 	FQuat HMDQuat = VRCamera->GetComponentQuat();
