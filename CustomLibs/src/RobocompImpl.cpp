@@ -40,25 +40,27 @@ struct RobotMiddleware::Impl {
   float right_arm[8]{};
 
   // Robot
-  std::mutex robot_mutex;
   RoboCompOmniRobot::OmniRobotPrxPtr omnirobot_proxy;
-  std::mutex omnirobot_mutex;
   std::thread omnirobot_worker;
+  std::mutex robot_mutex;
   RobotMiddleware::Pose robot_pose;
   bool poseChanged = false;
+  
 
   Impl() : communicator(makeInitData()) {
     try {
       auto ic = communicator.communicator();
 
-      if (auto lidar3d_opt = require<RoboCompLidar3D::Lidar3DPrx,
-                                     RoboCompLidar3D::Lidar3DPrxPtr>(
-              ic, "lidar3d:tcp -h " + IP_ROBOT + " -p 12001", "Lidar3DProxy"))
-        lidar3d_proxy = *lidar3d_opt;
-      else {
-        running = false;
-        return;
-      }
+      #ifdef P3BOT
+        if (auto lidar3d_opt = require<RoboCompLidar3D::Lidar3DPrx,
+                                      RoboCompLidar3D::Lidar3DPrxPtr>(
+                ic, "lidar3d:tcp -h " + IP_ROBOT + " -p 12001", "Lidar3DProxy"))
+          lidar3d_proxy = *lidar3d_opt;
+        else {
+          running = false;
+          return;
+        }
+      #endif
 
       if (auto zed_opt = require<RoboCompLidar3D::Lidar3DPrx,
                                  RoboCompLidar3D::Lidar3DPrxPtr>(
@@ -69,15 +71,17 @@ struct RobotMiddleware::Impl {
         return;
       }
 
-      if (auto arm_left_opt = require<RoboCompKinovaArm::KinovaArmPrx,
+      #ifdef P3BOT
+        if (auto arm_left_opt = require<RoboCompKinovaArm::KinovaArmPrx,
                                       RoboCompKinovaArm::KinovaArmPrxPtr>(
-              ic, "kinovaarm1:tcp -h " + IP_ROBOT + " -p 10006",
-              "KinovaArmProxy"))
-        arm_left_proxy = *arm_left_opt;
-      else {
-        running = false;
-        return;
-      }
+                ic, "kinovaarm1:tcp -h " + IP_ROBOT + " -p 10006",
+                "KinovaArmProxy"))
+          arm_left_proxy = *arm_left_opt;
+        else {
+          running = false;
+          return;
+        }
+      #endif
 
       if (auto arm_right_opt = require<RoboCompKinovaArm::KinovaArmPrx,
                                        RoboCompKinovaArm::KinovaArmPrxPtr>(
@@ -100,15 +104,17 @@ struct RobotMiddleware::Impl {
         return;
       }
 
-      if (auto omnirobot_opt = require<RoboCompOmniRobot::OmniRobotPrx,
-                                       RoboCompOmniRobot::OmniRobotPrxPtr>(
-              ic, "omnirobot:tcp -h " + IP_ROBOT + " -p 10004",
-              "OmniRobotProxy"))
-        omnirobot_proxy = *omnirobot_opt;
-      else {
-        running = false;
-        return;
-      }
+      #ifdef P3BOT
+        if (auto omnirobot_opt = require<RoboCompOmniRobot::OmniRobotPrx,
+                                        RoboCompOmniRobot::OmniRobotPrxPtr>(
+                ic, "omnirobot:tcp -h " + IP_ROBOT + " -p 10004",
+                "OmniRobotProxy"))
+          omnirobot_proxy = *omnirobot_opt;
+        else {
+          running = false;
+          return;
+        }
+      #endif
 
     } catch (const Ice::Exception &ex) {
       std::cout << "\033[31mERROR\033[0m Exception: 'rcnode' not running: "
@@ -130,17 +136,21 @@ struct RobotMiddleware::Impl {
     if (running) {
       lidar_worker = std::thread(&RobotMiddleware::Impl::updateLidarData, this);
       arm_worker = std::thread(&RobotMiddleware::Impl::updateRobotState, this);
-      omnirobot_worker = std::thread(&RobotMiddleware::Impl::updateRobotPose, this);
+      #ifdef P3BOT
+        omnirobot_worker = std::thread(&RobotMiddleware::Impl::updateRobotPose, this);
+      #endif
     }
   }
   ~Impl() {
     running = false;
 
     vrcontroller_proxy = nullptr;
-    lidar3d_proxy = nullptr;
-    arm_left_proxy = nullptr;
     arm_right_proxy = nullptr;
-    omnirobot_proxy = nullptr;
+    #ifdef P3BOT
+      lidar3d_proxy = nullptr;
+      arm_left_proxy = nullptr;
+      omnirobot_proxy = nullptr;
+    #endif
 
     auto ic = communicator.communicator();
     if (ic) {
@@ -186,51 +196,54 @@ struct RobotMiddleware::Impl {
       auto start = steady_clock::now();
       try {
         auto zed_future = zed_proxy->getColorCloudDataAsync();
-        auto lidar3d_future = lidar3d_proxy->getColorCloudDataAsync();
         RobotMiddleware::ColorCloudData lidar_cloud;
-        RobotMiddleware::ColorCloudData zed_cloud;
-        try {
-          // auto start = std::chrono::high_resolution_clock::now();
-          long long int lidar_timestamp;
-          if (lidar3d_future.wait_for(timeout) == std::future_status::ready) {
-            lidar_cloud = iceToCloudPoints(lidar3d_future.get(), lidar_timestamp);
-            // auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
-            //                     std::chrono::system_clock::now().time_since_epoch()).count();
-            // add_time(lidar3d_timestamps, timestamp - lidar_timestamp);
-            // std::cout << "\033[1;32mINFO\033[0m timestamps diff Lidar3D: "
-            //           << mean_time(lidar3d_timestamps) << std::endl;
-          } else {
-            std::cout << "\033[1;33mWARNING\033[0m Lidar3D not ready\n";
+        #ifdef P3BOT
+          auto lidar3d_future = lidar3d_proxy->getColorCloudDataAsync();
+
+          try {
+            // auto start = std::chrono::high_resolution_clock::now();
+            long long int lidar_timestamp;
+            if (lidar3d_future.wait_for(timeout) == std::future_status::ready) {
+              lidar_cloud = iceToCloudPoints(lidar3d_future.get(), lidar_timestamp);
+              // auto timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(
+              //                     std::chrono::system_clock::now().time_since_epoch()).count();
+              // add_time(lidar3d_timestamps, timestamp - lidar_timestamp);
+              // std::cout << "\033[1;32mINFO\033[0m timestamps diff Lidar3D: "
+              //           << mean_time(lidar3d_timestamps) << std::endl;
+            } else {
+              std::cout << "\033[1;33mWARNING\033[0m Lidar3D not ready\n";
+            }
+
+            // std::cout << "\033[32mINFO\033[0m " << "lidar getted, points "<<
+            // lidar_cloud.X.size() << ", time "<<timestamp - start).count()<<
+            // "\n";
+          } catch (const Ice::ConnectionRefusedException &ex) {
+            std::cout << "\033[31mERROR\033[0m Lidar3D connection refused: "
+                      << ex.what() << "\n";
+          } catch (const Ice::ConnectionLostException &ex) {
+            std::cout << "\033[1;33mWARNING\033[0m Lidar3D connection lost: "
+                      << ex.what() << "\n";
+          } catch (const Ice::TimeoutException &ex) {
+            std::cout << "\033[1;33mWARNING\033[0m Lidar3D timeout: " << ex.what()
+                      << "\n";
+          } catch (const Ice::ObjectNotExistException &ex) {
+            std::cout << "\033[31mERROR\033[0m Lidar3D object not found: "
+                      << ex.what() << "\n";
+          } catch (const Ice::InvocationCanceledException &ex) {
+            std::cout << "\033[1;33mWARNING\033[0m Lidar3D invocation cancelled: "
+                      << ex.what() << "\n";
+          } catch (const Ice::Exception &ex) {
+            std::cout << "\033[1;33mWARNING\033[0m Lidar3D Ice exception: "
+                      << ex.what() << "\n";
+          } catch (const std::exception &ex) {
+            std::cout << "\033[1;33mWARNING\033[0m Lidar3D std::exception: "
+                      << ex.what() << "\n";
+          } catch (...) {
+            std::cout << "\033[1;33mWARNING\033[0m Failed getting Lidar data\n";
           }
+        #endif
 
-          // std::cout << "\033[32mINFO\033[0m " << "lidar getted, points "<<
-          // lidar_cloud.X.size() << ", time "<<timestamp - start).count()<<
-          // "\n";
-        } catch (const Ice::ConnectionRefusedException &ex) {
-          std::cout << "\033[31mERROR\033[0m Lidar3D connection refused: "
-                    << ex.what() << "\n";
-        } catch (const Ice::ConnectionLostException &ex) {
-          std::cout << "\033[1;33mWARNING\033[0m Lidar3D connection lost: "
-                    << ex.what() << "\n";
-        } catch (const Ice::TimeoutException &ex) {
-          std::cout << "\033[1;33mWARNING\033[0m Lidar3D timeout: " << ex.what()
-                    << "\n";
-        } catch (const Ice::ObjectNotExistException &ex) {
-          std::cout << "\033[31mERROR\033[0m Lidar3D object not found: "
-                    << ex.what() << "\n";
-        } catch (const Ice::InvocationCanceledException &ex) {
-          std::cout << "\033[1;33mWARNING\033[0m Lidar3D invocation cancelled: "
-                    << ex.what() << "\n";
-        } catch (const Ice::Exception &ex) {
-          std::cout << "\033[1;33mWARNING\033[0m Lidar3D Ice exception: "
-                    << ex.what() << "\n";
-        } catch (const std::exception &ex) {
-          std::cout << "\033[1;33mWARNING\033[0m Lidar3D std::exception: "
-                    << ex.what() << "\n";
-        } catch (...) {
-          std::cout << "\033[1;33mWARNING\033[0m Failed getting Lidar data\n";
-        }
-
+        RobotMiddleware::ColorCloudData zed_cloud;
         try {
           // auto start = std::chrono::high_resolution_clock::now();
           long long int zed_timestamp;
@@ -338,27 +351,34 @@ struct RobotMiddleware::Impl {
     const double rad_to_deg = 180.0 / M_PI;
     RoboCompKinovaArm::TJoints left_joints, right_joints;
 
-    left_joints.joints.resize(8);
+    #ifdef P3BOT
+      left_joints.joints.resize(8);
+      left_joints.timestamp = 0;
+    #endif
     right_joints.joints.resize(8);
+    right_joints.timestamp = 0;
 
     for (int i = 0; i < 8; ++i) {
-      left_joints.joints[i].angle = 0.0;
+      #ifdef P3BOT
+        left_joints.joints[i].angle = 0.0;
+      #endif
       right_joints.joints[i].angle = 0.0;
-
-      left_joints.timestamp = 0;
-      right_joints.timestamp = 0;
     }
 
     while (running) {
       auto start = steady_clock::now();
       try {
         // Llamadas asíncronas no bloqueantes
-        auto left_future = arm_left_proxy->getJointsStateAsync();
+        #ifdef P3BOT
+          auto left_future = arm_left_proxy->getJointsStateAsync();
+        #endif
         auto right_future = arm_right_proxy->getJointsStateAsync();
 
-        if (left_future.wait_for(timeout) == std::future_status::ready) {
-          left_joints = left_future.get();
-        }
+        #ifdef P3BOT
+          if (left_future.wait_for(timeout) == std::future_status::ready) {
+            left_joints = left_future.get();
+          }
+        #endif
         if (right_future.wait_for(timeout) == std::future_status::ready) {
           right_joints = right_future.get();
         }
@@ -366,7 +386,9 @@ struct RobotMiddleware::Impl {
         {
           std::scoped_lock lock(arm_mutex);
           for (int i = 0; i < 8; ++i) {
-            left_arm[i] = left_joints.joints[i].angle * rad_to_deg;
+            #ifdef P3BOT
+              left_arm[i] = left_joints.joints[i].angle * rad_to_deg;
+            #endif
             right_arm[i] = right_joints.joints[i].angle * rad_to_deg;
           }
         }
@@ -399,47 +421,49 @@ struct RobotMiddleware::Impl {
     }
   }
    void updateRobotPose() {
-    using namespace std::chrono;
-    const auto period = 20ms;
-    const auto timeout = period / 2;
-    RoboCompGenericBase::TBaseState state{};
-    while (running) {
-      auto start = steady_clock::now();
-      try {
-        omnirobot_proxy->getBaseState(state); 
-        {
-          std::unique_lock<std::mutex> lock(robot_mutex);
-          robot_pose = angle2DToQuaternion(static_cast<float>(state.alpha), static_cast<float>(state.z)*100, static_cast<float>(state.x)*100, 0.0);
-          std::cout << "\033[32mINFO\033[0m " << "Robot pose: " << robot_pose.x << " " << robot_pose.y << " " << robot_pose.z << " " << robot_pose.qrx << " " << robot_pose.qry << " " << robot_pose.qrz << " " << robot_pose.qrw << "\n";
-          poseChanged = true;
+    #ifdef P3BOT
+      using namespace std::chrono;
+      const auto period = 20ms;
+      const auto timeout = period / 2;
+      RoboCompGenericBase::TBaseState state{};
+      while (running) {
+        auto start = steady_clock::now();
+        try {
+          omnirobot_proxy->getBaseState(state); 
+          {
+            std::unique_lock<std::mutex> lock(robot_mutex);
+            robot_pose = angle2DToQuaternion(static_cast<float>(state.alpha), static_cast<float>(state.z)*100, static_cast<float>(state.x)*100, 0.0);
+            std::cout << "\033[32mINFO\033[0m " << "Robot pose: " << robot_pose.x << " " << robot_pose.y << " " << robot_pose.z << " " << robot_pose.qrx << " " << robot_pose.qry << " " << robot_pose.qrz << " " << robot_pose.qrw << "\n";
+            poseChanged = true;
+          }
+        } catch (const Ice::ConnectionRefusedException &ex) {
+          std::cout << "\033[31mERROR\033[0m Robot pose connection refused: "
+                    << ex.what() << "\n";
+        } catch (const Ice::ConnectionLostException &ex) {
+          std::cout << "\033[1;33mWARNING\033[0m Robot pose connection lost: "
+                    << ex.what() << "\n";
+        } catch (const Ice::TimeoutException &ex) {
+          std::cout << "\033[1;33mWARNING\033[0m Robot pose timeout: "
+                    << ex.what() << "\n";
+        } catch (const Ice::ObjectNotExistException &ex) {
+          std::cout << "\033[31mERROR\033[0m Robot arm object not found: "
+                    << ex.what() << "\n";
+        } catch (const Ice::Exception &ex) {
+          std::cout << "\033[1;33mWARNING\033[0m Robot pose Ice exception: "
+                    << ex.what() << "\n";
+        } catch (const std::exception &ex) {
+          std::cout << "\033[1;33mWARNING\033[0m Robot pose std::exception: "
+                    << ex.what() << "\n";
+        } catch (...) {
+          std::cout << "\033[1;33mWARNING\033[0m Failed to update robot pose\n";
         }
-      } catch (const Ice::ConnectionRefusedException &ex) {
-        std::cout << "\033[31mERROR\033[0m Robot pose connection refused: "
-                  << ex.what() << "\n";
-      } catch (const Ice::ConnectionLostException &ex) {
-        std::cout << "\033[1;33mWARNING\033[0m Robot pose connection lost: "
-                  << ex.what() << "\n";
-      } catch (const Ice::TimeoutException &ex) {
-        std::cout << "\033[1;33mWARNING\033[0m Robot pose timeout: "
-                  << ex.what() << "\n";
-      } catch (const Ice::ObjectNotExistException &ex) {
-        std::cout << "\033[31mERROR\033[0m Robot arm object not found: "
-                  << ex.what() << "\n";
-      } catch (const Ice::Exception &ex) {
-        std::cout << "\033[1;33mWARNING\033[0m Robot pose Ice exception: "
-                  << ex.what() << "\n";
-      } catch (const std::exception &ex) {
-        std::cout << "\033[1;33mWARNING\033[0m Robot pose std::exception: "
-                  << ex.what() << "\n";
-      } catch (...) {
-        std::cout << "\033[1;33mWARNING\033[0m Failed to update robot pose\n";
-      }
 
-      // Period
-      auto elapsed = steady_clock::now() - start;
-      if (elapsed < period)
-        std::this_thread::sleep_for(period - elapsed);
-    }
+        // Period
+        auto elapsed = steady_clock::now() - start;
+        if (elapsed < period)
+          std::this_thread::sleep_for(period - elapsed);
+      }
+    #endif
   }
 
 };

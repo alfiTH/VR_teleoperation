@@ -37,7 +37,15 @@ target_include_directories(Middleware PUBLIC
 
 
 # Opciones de compilación
-target_compile_options(Middleware PRIVATE -fmax-errors=1 -fno-char8_t -O3 -std=c++26)
+target_compile_options(Middleware PRIVATE 
+    -fmax-errors=1 
+    -fno-char8_t 
+    -O3 
+    -std=c++26 
+    -flto=auto 
+    -fno-plt 
+    -fopenmp
+)
 
 set(ICE_LIBRARIES /usr/lib/x86_64-linux-gnu/libIce++11.so /usr/lib/x86_64-linux-gnu/libIceStorm++11.so)
 

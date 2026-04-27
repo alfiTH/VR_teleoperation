@@ -18,6 +18,7 @@
 
 
 #define ROBOCOMP
+#define P3BOT
 
 #ifdef ROBOCOMP
   #include "RobocompImpl.cpp"

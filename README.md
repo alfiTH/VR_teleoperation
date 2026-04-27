@@ -84,4 +84,4 @@ To build the project from the terminal:
 - Asset Pipeline (URDF to FBX):
     - Use Blender 3.1.2 with the urdf_importer.
     - Ensure urdf_parser_py and yamlpy are in Blender’s internal Python environment.
-    - Import Settings: Right-click in Content Drawer -> Import -> Select FBX -> Set type to Skeletal Mesh.
+    - Import Settings: Right-click in Content Drawer -> Import to Current Folder -> Select FBX -> In Force All Mesh as Type select "Set type to Skeletal Mesh".
