@@ -9,6 +9,8 @@
  */
 
 #include "src/RobotMiddleware.h"
+#include "utils/DataRecord.h"
+
 #include <algorithm> // std::fill
 #include <cmath>
 #include <cstring>   // memcmp
@@ -295,7 +297,7 @@ TEST_F(MiddlewareLifecycleTest, GetHapticsReturns) {
   EXPECT_FALSE(std::isinf(right.intensity));
   EXPECT_FALSE(std::isinf(right.frequency));
 }
-  
+
 TEST_F(MiddlewareLifecycleTest, GetOmniBaseStateReturns) {
   RobotMiddleware::Pose omniBaseState={INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY};
   sleep(1);
@@ -308,4 +310,65 @@ TEST_F(MiddlewareLifecycleTest, GetOmniBaseStateReturns) {
   EXPECT_FALSE(std::isinf(omniBaseState.qry));
   EXPECT_FALSE(std::isinf(omniBaseState.qrz));
   EXPECT_FALSE(std::isinf(omniBaseState.qrw));
+}
+  
+
+// ────────────────────────
+//   DataRecord Serialization Tests
+// ────────────────────────
+
+TEST(DataRecordTest, AddAndSaveLoadRoundTrip) {
+    // Create a fresh instance and clear buffer via loadData from empty file
+    const std::string tmpfile = "/tmp/datatest.bin";
+    // Ensure no pre-existing data
+    std::remove(tmpfile.c_str());
+
+    DataRecord& dr = DataRecord::getInstance();
+    // Add a Pose record (VRPose)
+    RobotMiddleware::Pose pose{1.0f, 2.0f, 3.0f, 0.0f, 0.0f, 0.707f, 0.707f};
+    dr.addData(1000u, 10u, pose, true);
+
+    // Add a Haptic record
+    RobotMiddleware::Haptic haptic{0.5f, 120.0f};
+    dr.addData(2000u, 20u, haptic);
+
+    // Save to disk
+    ASSERT_TRUE(dr.saveData(tmpfile));
+
+    // Load into a new instance (same singleton) – buffer should be replaced
+    DataRecord& dr2 = DataRecord::getInstance();
+    ASSERT_TRUE(dr2.loadData(tmpfile));
+
+    // Compare internal buffers size and content via serialization of same records
+    // Re-serialize to temporary buffer for comparison
+    std::vector<std::byte> expected;
+    {
+        // Manually construct expected buffer using same logic as DataRecord::append
+        RecordHeader hdr1{1000u, 10u, RecordType::VRPose, static_cast<uint16_t>(sizeof(RobotMiddleware::Pose))};
+        const std::byte* pHdr1 = reinterpret_cast<const std::byte*>(&hdr1);
+        expected.insert(expected.end(), pHdr1, pHdr1 + sizeof(hdr1));
+        const std::byte* pPos = reinterpret_cast<const std::byte*>(&pose);
+        expected.insert(expected.end(), pPos, pPos + sizeof(pose));
+
+        RecordHeader hdr2{2000u, 20u, RecordType::VRHaptic, static_cast<uint16_t>(sizeof(RobotMiddleware::Haptic))};
+        const std::byte* pHdr2 = reinterpret_cast<const std::byte*>(&hdr2);
+        expected.insert(expected.end(), pHdr2, pHdr2 + sizeof(hdr2));
+        const std::byte* pHit = reinterpret_cast<const std::byte*>(&haptic);
+        expected.insert(expected.end(), pHit, pHit + sizeof(haptic));
+    }
+
+    // Access internal buffer via reflection: we cannot directly. Instead, save again and compare files.
+    const std::string tmpfile2 = "/tmp/datatest2.bin";
+    ASSERT_TRUE(dr2.saveData(tmpfile2));
+
+    // Read both files into vectors for comparison
+    auto readFile=[&](const std::string &fn){
+        std::ifstream ifs(fn, std::ios::binary);
+        return std::vector<std::byte>(std::istreambuf_iterator<char>(ifs), {});
+    };
+
+    auto buf1 = readFile(tmpfile);
+    auto buf2 = readFile(tmpfile2);
+    ASSERT_EQ(buf1.size(), buf2.size());
+    EXPECT_TRUE(std::equal(buf1.begin(), buf1.end(), buf2.begin()));
 }

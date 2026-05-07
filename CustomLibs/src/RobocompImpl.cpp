@@ -5,6 +5,9 @@
 #include <include/OmniRobot.h>
 #include <include/VRController.h>
 
+#include <utils/DataRecord.h>
+
+
 #include <Ice/Communicator.h>
 #include <IceStorm/IceStorm.h>
 #include <optional>

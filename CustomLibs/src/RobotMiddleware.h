@@ -28,17 +28,19 @@ public:
     float qrw;
   };
 
-  struct Controller {
+#pragma pack(push,1)          
+struct Controller {
     float trigger;
     float grab;
     float x;
     float y;
     float thumbstickCapTouch;
-    bool aButton;
-    float aButtonCapTouch;
-    bool bButton;
-    float bButtonCapTouch;
-  };
+    float aButtonCapTouch;      
+    float bButtonCapTouch;      
+    bool  bButton;              
+    bool  aButton;             
+};
+#pragma pack(pop)    
 
   struct Haptic {
     float intensity;

@@ -35,11 +35,15 @@ add_library(MiddlewareStatic STATIC
     ${LIB_SRC_DIR}/include/KinovaArm.cpp
     ${LIB_SRC_DIR}/include/OmniRobot.cpp
     ${LIB_SRC_DIR}/include/GenericBase.cpp
+    ${LIB_SRC_DIR}/utils/DataRecord.cpp
+    ${LIB_SRC_DIR}/utils/CloudCompressor.h
 )
 
 target_include_directories(MiddlewareStatic PUBLIC
     ${LIB_SRC_DIR}
     ${LIB_SRC_DIR}/include
+    ${LIB_SRC_DIR}/utils
+    ${LIB_SRC_DIR}/src
     ${ICE_INCLUDE_DIRS}
 )
 

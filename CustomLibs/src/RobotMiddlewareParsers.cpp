@@ -4,7 +4,7 @@
 #include <include/Lidar3D.h>
 #include <include/OmniRobot.h>
 #include <include/VRController.h>
-#include <include/CloudCompressor.h>
+#include <utils/CloudCompressor.h>
 #include <cmath>
 
 inline RoboCompVRController::Pose toIcePose(const RobotMiddleware::Pose &p) {

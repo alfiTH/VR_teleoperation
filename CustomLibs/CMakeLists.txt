@@ -24,12 +24,15 @@ add_library(Middleware SHARED
     include/KinovaArm.cpp
     include/OmniRobot.cpp
     include/GenericBase.cpp
+    utils/DataRecord.cpp
 
 )
 
 # Incluir directorios
 target_include_directories(Middleware PUBLIC
     include
+    utils
+    src
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${ICE_INCLUDE_DIRS}
 )
