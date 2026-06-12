@@ -36,7 +36,7 @@ void AP3Bot::Tick(float DeltaTime)
 		SetActorLocationAndRotation(Pos, Rot);
 
 		// 4. Printado por terminal (Output Log)
-		UE_LOG(LogTemp, Log, TEXT("Robot Pose -> Pos: %s | Rot: %s"), *Pos.ToString(), *Rot.ToString());
+		// UE_LOG(LogTemp, Log, TEXT("Robot Pose -> Pos: %s | Rot: %s"), *Pos.ToString(), *Rot.ToString());
 	}
 	else 
 	{

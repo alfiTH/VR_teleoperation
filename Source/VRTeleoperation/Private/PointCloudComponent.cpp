@@ -107,7 +107,7 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 			return (c <= 0.04045f) ? (c / 12.92f) : FMath::Pow((c + 0.055f) / 1.055f, 2.4f);
 		};
 		
-		StartTime = FPlatformTime::Seconds();
+		//StartTime = FPlatformTime::Seconds();
 		middleware.lockUlockGetColorCloudData(true);
 		NumPoints = cloud.X.size();
 		ParallelFor( NumPoints, [&](int32 i)
@@ -123,9 +123,9 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		// UE_LOG(LogTemp, Display, TEXT("R:%f, G:%f B:%f"), ParticleColors[5000].R, ParticleColors[5000].G, ParticleColors[5000].B);;
 
 		
-		EndTime = FPlatformTime::Seconds(); 
-		DurationMs = (EndTime - StartTime) * 1000.0;
-		UE_LOG(LogTemp, Display, TEXT("ParallelFor took %.3f ms for %d points"), DurationMs, NumPoints);
+		// EndTime = FPlatformTime::Seconds(); 
+		// DurationMs = (EndTime - StartTime) * 1000.0;
+		// UE_LOG(LogTemp, Display, TEXT("ParallelFor took %.3f ms for %d points"), DurationMs, NumPoints);
 		UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(
 				NiagaraComp,
 				FName("User.ParticlePositions"), // Nombre del parámetro

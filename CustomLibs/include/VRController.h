@@ -87,18 +87,19 @@ struct Controller
     float x;
     float y;
     float thumbstickCapTouch;
-    bool aButton;
     float aButtonCapTouch;
-    bool bButton;
     float bButtonCapTouch;
+    bool aButton;
+    bool bButton;
+    bool thumbstickButton;
 
     /**
      * Obtains a tuple containing all of the struct's data members.
      * @return The data members in a tuple.
      */
-    std::tuple<const ::RoboCompVRController::Pose&, const float&, const float&, const float&, const float&, const float&, const bool&, const float&, const bool&, const float&> ice_tuple() const
+    std::tuple<const ::RoboCompVRController::Pose&, const float&, const float&, const float&, const float&, const float&, const float&, const float&, const bool&, const bool&, const bool&> ice_tuple() const
     {
-        return std::tie(pose, trigger, grab, x, y, thumbstickCapTouch, aButton, aButtonCapTouch, bButton, bButtonCapTouch);
+        return std::tie(pose, trigger, grab, x, y, thumbstickCapTouch, aButtonCapTouch, bButtonCapTouch, aButton, bButton, thumbstickButton);
     }
 };
 
@@ -266,7 +267,7 @@ template<>
 struct StreamableTraits<::RoboCompVRController::Controller>
 {
     static const StreamHelperCategory helper = StreamHelperCategoryStruct;
-    static const int minWireSize = 58;
+    static const int minWireSize = 59;
     static const bool fixedLength = true;
 };
 
@@ -275,7 +276,7 @@ struct StreamReader<::RoboCompVRController::Controller, S>
 {
     static void read(S* istr, ::RoboCompVRController::Controller& v)
     {
-        istr->readAll(v.pose, v.trigger, v.grab, v.x, v.y, v.thumbstickCapTouch, v.aButton, v.aButtonCapTouch, v.bButton, v.bButtonCapTouch);
+        istr->readAll(v.pose, v.trigger, v.grab, v.x, v.y, v.thumbstickCapTouch, v.aButtonCapTouch, v.bButtonCapTouch, v.aButton, v.bButton, v.thumbstickButton);
     }
 };
 
@@ -382,10 +383,11 @@ struct Controller
     ::Ice::Float x;
     ::Ice::Float y;
     ::Ice::Float thumbstickCapTouch;
-    bool aButton;
     ::Ice::Float aButtonCapTouch;
-    bool bButton;
     ::Ice::Float bButtonCapTouch;
+    bool aButton;
+    bool bButton;
+    bool thumbstickButton;
 };
 
 struct Haptic
@@ -603,7 +605,7 @@ template<>
 struct StreamableTraits< ::RoboCompVRController::Controller>
 {
     static const StreamHelperCategory helper = StreamHelperCategoryStruct;
-    static const int minWireSize = 58;
+    static const int minWireSize = 59;
     static const bool fixedLength = true;
 };
 
@@ -618,10 +620,11 @@ struct StreamWriter< ::RoboCompVRController::Controller, S>
         ostr->write(v.x);
         ostr->write(v.y);
         ostr->write(v.thumbstickCapTouch);
-        ostr->write(v.aButton);
         ostr->write(v.aButtonCapTouch);
-        ostr->write(v.bButton);
         ostr->write(v.bButtonCapTouch);
+        ostr->write(v.aButton);
+        ostr->write(v.bButton);
+        ostr->write(v.thumbstickButton);
     }
 };
 
@@ -636,10 +639,11 @@ struct StreamReader< ::RoboCompVRController::Controller, S>
         istr->read(v.x);
         istr->read(v.y);
         istr->read(v.thumbstickCapTouch);
-        istr->read(v.aButton);
         istr->read(v.aButtonCapTouch);
-        istr->read(v.bButton);
         istr->read(v.bButtonCapTouch);
+        istr->read(v.aButton);
+        istr->read(v.bButton);
+        istr->read(v.thumbstickButton);
     }
 };
 

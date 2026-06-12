@@ -28,10 +28,11 @@ module RoboCompVRController
 		float x;
 		float y;
 		float thumbstickCapTouch;
-		bool aButton;
 		float aButtonCapTouch;
-		bool bButton;
 		float bButtonCapTouch;
+		bool aButton;
+		bool bButton;
+		bool thumbstickButton;
 	};
 	struct Haptic
 	{

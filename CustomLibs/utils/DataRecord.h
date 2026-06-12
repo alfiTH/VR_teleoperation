@@ -7,7 +7,10 @@
 #include <string>
 #include <mutex>
 #include <fstream>
-#include <RobotMiddleware.h>   // <-- tu cabecera con Pose, Haptic, …
+#include <RobotMiddleware.h>  
+
+#include <map>
+#include <variant>
 
 
 /*  Estructura de cada registro en el fichero binario:
@@ -25,7 +28,7 @@ enum class RecordType : std::uint8_t {
     VRController    = 1,
     VRHaptic        = 2,
     ColorCloudData  = 3,
-    RobotState      = 4,
+    ArmJoints       = 4,
     RobotPose       = 5
 };
 
@@ -35,6 +38,35 @@ struct RecordHeader {
     std::uint32_t delay;         // 32 bits (puedes recortar si lo necesitas)
     RecordType   type;           // 8 bits
     std::uint16_t payloadSize;   // 16 bits (máx. 65 535 bytes)
+};
+#pragma pack(pop)
+
+#pragma pack(push,1)
+struct VRData {
+    RobotMiddleware::Pose hmd;
+    RobotMiddleware::Pose left;
+    RobotMiddleware::Pose right;
+};
+#pragma pack(pop)
+
+#pragma pack(push,1)
+struct HapticData {
+    RobotMiddleware::Haptic left;
+    RobotMiddleware::Haptic right;
+};
+#pragma pack(pop)
+
+#pragma pack(push,1)
+struct JointData {
+    RobotMiddleware::ArmJoint left;
+    RobotMiddleware::ArmJoint right;
+};
+#pragma pack(pop)
+
+#pragma pack(push,1)
+struct ControllerData {
+    RobotMiddleware::Controller left;
+    RobotMiddleware::Controller right;
 };
 #pragma pack(pop)
 
@@ -49,21 +81,37 @@ public:
 
     /* ---------- API pública ---------- */
 
-    /// Añade un registro con Pose
     bool addData(const std::uint32_t timestamp,
                  const std::uint32_t delay,
-                 const RobotMiddleware::Pose& pose,
-                 const bool VR = true);
+                 const VRData& data);
+
+    bool addData(const std::uint32_t timestamp,
+                 const std::uint32_t delay,
+                 const ControllerData& data);
 
     /// Añade un registro con Haptic
     bool addData(const std::uint32_t timestamp,
                  const std::uint32_t delay,
-                 const RobotMiddleware::Haptic& haptic);
+                 const HapticData& data);
 
-    /// Añade un registro con ColorCloudData
+
+    // /// Añade un registro con ColorCloudData
+    // bool addData(const std::uint32_t timestamp,
+    //              const std::uint32_t delay,
+    //              const RobotMiddleware::ColorCloudData& cloud);
+                 
     bool addData(const std::uint32_t timestamp,
                  const std::uint32_t delay,
-                 const RobotMiddleware::ColorCloudData& cloud);
+                 const JointData& data);
+                 
+    /// Añade un registro con Pose
+    bool addData(const std::uint32_t timestamp,
+                 const std::uint32_t delay,
+                 const RobotMiddleware::Pose& data);
+
+
+
+    
 
     /// Guarda todo el buffer en disco (binario)
     bool saveData(const std::string& filename) const;
@@ -71,6 +119,24 @@ public:
     /// Carga un fichero binario y reemplaza el buffer interno
     bool loadData(const std::string& filename);
 
+    /// Limpia el buffer interno
+    bool clearData();
+
+    /* Tipo para los datos deserializados */
+    using DeserializedData = std::map<std::pair<std::uint32_t, RecordType>, 
+                                            std::variant<   VRData, 
+                                                            HapticData, 
+                                                            ControllerData, 
+                                                            RobotMiddleware::ColorCloudData,
+                                                            JointData,
+                                                            RobotMiddleware::Pose>>;
+
+    /// Recupera los datos del buffer_ deserializados en el map
+    DeserializedData getDeserializedData() const;
+
+    /// Imprime el contenido del map en consola
+    static void printData(const DeserializedData& data);
+    
 private:
     /* ---------- Constructores privados ---------- */
     DataRecord() = default;
@@ -94,6 +160,8 @@ private:
 
     /*  Deserializa el fichero completo a `buffer_`  */
     bool deserializeFile(const std::string& filename);
+
+
 };
 
 #endif // DATA_RECORD_H

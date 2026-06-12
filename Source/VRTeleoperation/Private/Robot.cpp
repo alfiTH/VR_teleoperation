@@ -159,6 +159,10 @@ void ARobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		Input->BindAction(IA_Hand_Thumbstick_Left, ETriggerEvent::Completed, this, &ARobot::ThumbStickReleaseLeft);
 		Input->BindAction(IA_Hand_Thumbstick_Right, ETriggerEvent::Triggered, this, &ARobot::ThumbStickRight);
 		Input->BindAction(IA_Hand_Thumbstick_Right, ETriggerEvent::Completed, this, &ARobot::ThumbStickReleaseRight);
+		Input->BindAction(IA_Hand_Thumbstick_Press_Left, ETriggerEvent::Started, this, &ARobot::PushThumbStickLeft);
+		Input->BindAction(IA_Hand_Thumbstick_Press_Left, ETriggerEvent::Completed, this, &ARobot::ReleaseThumbStickLeft);
+		Input->BindAction(IA_Hand_Thumbstick_Press_Right, ETriggerEvent::Started, this, &ARobot::PushThumbStickRight);
+		Input->BindAction(IA_Hand_Thumbstick_Press_Right, ETriggerEvent::Completed, this, &ARobot::ReleaseThumbStickRight);
 
 }
 #pragma region Triggers
@@ -170,13 +174,9 @@ void ARobot::GraspReleaseLeft(const FInputActionValue& Value){
 };
 void ARobot::GraspRight(const FInputActionValue& Value){
 	right.grab =  Value.Get<float>();
-	std::cout<< right.grab<< std::endl;
-	
 };
-
 void ARobot::GraspReleaseRight(const FInputActionValue& Value){
 	right.grab = 0;
-	std::cout<< right.grab<< std::endl;
 };
 void ARobot::TriggerLeft(const FInputActionValue& Value){
 	left.trigger = Value.Get<float>();
@@ -240,6 +240,21 @@ void ARobot::ThumbStickReleaseRight(const FInputActionValue& Value)
 	right.x = 0;
 	right.y = 0;
 }
+void ARobot::PushThumbStickLeft(const FInputActionValue& Value){
+	left.thumbstickButton = true;
+};
+void ARobot::ReleaseThumbStickLeft(const FInputActionValue& Value){
+	left.thumbstickButton = false;
+};
+void ARobot::PushThumbStickRight(const FInputActionValue& Value){
+	right.thumbstickButton = true;
+	followRobot = !followRobot;
+	middleware.stopBase();
+
+};
+void ARobot::ReleaseThumbStickRight(const FInputActionValue& Value){
+	right.thumbstickButton = false;
+};
 #pragma endregion
 #pragma endregion
 
@@ -250,7 +265,7 @@ void ARobot::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
     if (!GEngine or !GetWorld() or !GetWorld()->IsGameWorld())
 		return ;
-	
+
 	FVector HMDPos = VRCamera->GetComponentLocation();
 	FQuat HMDQuat = VRCamera->GetComponentQuat();
 
@@ -264,6 +279,13 @@ void ARobot::Tick(float DeltaTime)
 		RobotMiddleware::Pose{LeftPos.X, LeftPos.Y, LeftPos.Z, LeftQuat.X, LeftQuat.Y, LeftQuat.Z, LeftQuat.W}, left,
 		RobotMiddleware::Pose{RightPos.X, RightPos.Y, RightPos.Z, RightQuat.X, RightQuat.Y, RightQuat.Z, RightQuat.W}, right
 	);
+
+	if (followRobot){
+		middleware.setBasePose(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W});	
+	}
+	else{
+		middleware.setSpeedBase(left.x*500, left.y*500, -right.x*1.5);
+	}
 
 	RobotMiddleware::Haptic leftHaptic, rightHaptic;
 	if (middleware.receiveHaptics(leftHaptic, rightHaptic))

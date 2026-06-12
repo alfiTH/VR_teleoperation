@@ -18,10 +18,11 @@ toIceController(const RobotMiddleware::Controller &c) {
           c.x,
           c.y,
           c.thumbstickCapTouch,
-          c.aButton,
           c.aButtonCapTouch,
+          c.bButtonCapTouch,
+          c.aButton,
           c.bButton,
-          c.bButtonCapTouch};
+          c.thumbstickButton};
 }
 
 inline RobotMiddleware::ColorCloudData
@@ -65,6 +66,7 @@ iceToCloudPoints(RoboCompLidar3D::TColorCloudData &&cloudIn,
   timestamp = cloudIn.timestamp;
   return cloudOut;
 }
+
 inline RobotMiddleware::Haptic
 iceToHaptic(const RoboCompVRController::Haptic &haptic) {
   return {haptic.intensity, haptic.frequency};
@@ -83,4 +85,13 @@ inline RobotMiddleware::Pose angle2DToQuaternion(float angle2D, float x, float y
     p.qrz = std::sin(angle2D / 2.0f);
 
     return p;
+}
+
+inline double getYawFromQuaternion(double x, double y, double z,double w) {
+    double ysquared = y * y;
+    double zsquared = z * z;
+    double num = 2.0 * (w * z + x * y);
+    double den = 1.0 - 2.0 * (ysquared + zsquared);
+    double yaw = std::atan2(num, den);
+    return yaw;
 }

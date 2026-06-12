@@ -38,7 +38,8 @@ struct Controller {
     float aButtonCapTouch;      
     float bButtonCapTouch;      
     bool  bButton;              
-    bool  aButton;             
+    bool  aButton;  
+    bool  thumbstickButton;           
 };
 #pragma pack(pop)    
 
@@ -56,6 +57,8 @@ struct Controller {
     std::vector<unsigned char> B;
   };
 
+  using ArmJoint = float[8];
+
   bool isRunning();
   bool sendData(const RobotMiddleware::Pose &head,
                 const RobotMiddleware::Pose &left,
@@ -68,6 +71,9 @@ struct Controller {
   void lockUlockGetColorCloudData(bool lock);
   bool getRobotState(float (&left)[8], float (&right)[8]);
   bool getRobotPose(RobotMiddleware::Pose &robot);
+  bool setSpeedBase(float x, float y, float yaw);
+  bool setBasePose(const RobotMiddleware::Pose &target);
+  bool stopBase();
 
 private:
   RobotMiddleware();

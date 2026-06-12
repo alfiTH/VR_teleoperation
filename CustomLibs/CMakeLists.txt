@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(Middleware)
 
-
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)  
 
 # Buscar Ice y componentes
@@ -13,19 +12,11 @@ if(OpenMP_CXX_FOUND)
     LIST(APPEND LIBS ${LIBS} OpenMP::OpenMP_CXX)
 endif()
 
-
 # Crear la librería compartida
 add_library(Middleware SHARED
     src/RobotMiddleware.cpp
-    src/RobotMiddlewareParsers.cpp
-    src/RobotMiddleware.tpp
-    include/VRController.cpp
-    include/Lidar3D.cpp
-    include/KinovaArm.cpp
-    include/OmniRobot.cpp
-    include/GenericBase.cpp
     utils/DataRecord.cpp
-
+    utils/CloudCompressor.h
 )
 
 # Incluir directorios
@@ -34,10 +25,7 @@ target_include_directories(Middleware PUBLIC
     utils
     src
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${ICE_INCLUDE_DIRS}
 )
-
-
 
 # Opciones de compilación
 target_compile_options(Middleware PRIVATE 
@@ -57,12 +45,33 @@ message(STATUS "ICE_LIBRARIES = ${ICE_LIBRARIES}")
 # Enlazar con librerías de Ice
 target_link_libraries(Middleware PRIVATE ${ICE_LIBRARIES} ${LIBS})
 
+#Seleccion de Robocomp, P3BOT
+option(P3BOT "Enable P3BOT" ON)
+option(ROBOCOMP "Enable ROBOCOMP" ON)
+
+if(P3BOT)
+  message(STATUS "Building with P3BOT support")
+  target_compile_definitions(Middleware PRIVATE P3BOT)
+endif()
+
+if(ROBOCOMP)
+  message(STATUS "Building with ROBOCOMP support")
+  target_compile_definitions(Middleware PRIVATE ROBOCOMP)
+  target_sources(Middleware PRIVATE
+    src/RobocompMiddlewareParsers.cpp
+    src/RobocompMiddleware.tpp
+    include/VRController.cpp
+    include/Lidar3D.cpp
+    include/KinovaArm.cpp
+    include/OmniRobot.cpp
+    include/GenericBase.cpp
+    include/Navigator.cpp
+)
+endif()
+
 # RPATH para que el loader encuentre Ice al cargar el .so
 set_target_properties(Middleware PROPERTIES
     OUTPUT_NAME "RobotMiddleware"
-    CXX_STANDARD 20
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS OFF
     BUILD_WITH_INSTALL_RPATH TRUE
     INSTALL_RPATH "$ORIGIN:/usr/lib/x86_64-linux-gnu"
     INSTALL_RPATH_USE_LINK_PATH TRUE

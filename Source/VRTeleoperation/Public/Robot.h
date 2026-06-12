@@ -73,6 +73,10 @@ public:
 	void ThumbStickReleaseLeft(const FInputActionValue& Value);
 	void ThumbStickRight(const FInputActionValue& Value);
 	void ThumbStickReleaseRight(const FInputActionValue& Value);
+	void PushThumbStickLeft(const FInputActionValue& Value);
+	void ReleaseThumbStickLeft(const FInputActionValue& Value);
+	void PushThumbStickRight(const FInputActionValue& Value);
+	void ReleaseThumbStickRight(const FInputActionValue& Value);
 
 
     UPROPERTY(VisibleAnywhere)
@@ -127,6 +131,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	UInputAction* IA_Hand_Thumbstick_Right;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_Hand_Thumbstick_Press_Left;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
+	UInputAction* IA_Hand_Thumbstick_Press_Right;
+
 
 private:
 	RobotMiddleware& middleware = RobotMiddleware::getInstance();
@@ -135,6 +145,7 @@ private:
 	std::atomic<bool> controllerChanged = false;
 	std::deque<float> FPSQueue;
 	const size_t maxSize = 2000;
+	std::atomic<bool> followRobot = false;
 public:
 
 };

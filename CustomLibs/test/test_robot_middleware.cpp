@@ -8,8 +8,8 @@
  *   - Comportamiento seguro de métodos sin conexión activa
  */
 
-#include "src/RobotMiddleware.h"
-#include "utils/DataRecord.h"
+#include <RobotMiddleware.h>
+#include <DataRecord.h>
 
 #include <algorithm> // std::fill
 #include <cmath>
@@ -317,7 +317,53 @@ TEST_F(MiddlewareLifecycleTest, GetOmniBaseStateReturns) {
 //   DataRecord Serialization Tests
 // ────────────────────────
 
-TEST(DataRecordTest, AddAndSaveLoadRoundTrip) {
+class DataRecordTest : public ::testing::Test {
+protected:
+    // Opcional: Variables compartidas entre pruebas
+    // MySingleton* instance = nullptr;
+
+    void SetUp() override {
+        // Código que se ejecuta antes de CADA prueba
+        // Ejemplo: Reiniciar el singleton o limpiar datos
+    }
+
+    void TearDown() override {
+        // Código que se ejecuta después de CADA prueba
+      DataRecord& dr = DataRecord::getInstance();
+      dr.clearData();
+
+    }
+};
+
+TEST_F(DataRecordTest, TypesData) {
+  DataRecord& dr = DataRecord::getInstance();
+
+  VRData vr{{1.0f, 2.0f, 3.0f, 0.0f, 0.0f, 0.707f, 0.707f}, 
+                      {1.0f, 2.0f, 3.0f, 0.0f, 0.0f, 0.707f, 0.707f},
+                      {1.0f, 2.0f, 3.0f, 0.0f, 0.0f, 0.707f, 0.707f}};
+  dr.addData(100u, 0u, vr);
+
+  ControllerData controllers{{0.0f, 0.0f, 0.2f, 0.53f, 0.0f, 0.0f, 0.0f, false, false, false}, 
+                            {0.0f, 0.0f, 0.1f, 1.0f, 0.0f, 0.0f, 0.0f, false, false, false}};
+  dr.addData(200u, 0u, controllers);
+    
+  // Add a Haptic record
+  HapticData haptic{{0.5f, 120.0f}, {0.5f, 120.0f}};
+  dr.addData(2000u, 20u, haptic);
+
+  JointData armJoins{ {1.30f, 2.40f, 3.05f, 0.40f, 02.0f, 0.7077f, 0.707f, 2.1},
+                                  {-1.30f, -2.40f, -3.05f, -0.40f, -2.0f, -0.7077f, 5.707f, -2.1}};
+
+  RobotMiddleware::Pose pose{1.0f, 2.0f, 3.0f, 0.0f, 0.0f, 0.707f, 0.707f};
+  dr.addData(1000u, 10u, pose);
+
+  DataRecord::printData(dr.getDeserializedData());
+
+}
+
+
+
+TEST_F(DataRecordTest, AddAndSaveLoadRoundTrip) {
     // Create a fresh instance and clear buffer via loadData from empty file
     const std::string tmpfile = "/tmp/datatest.bin";
     // Ensure no pre-existing data
@@ -326,10 +372,10 @@ TEST(DataRecordTest, AddAndSaveLoadRoundTrip) {
     DataRecord& dr = DataRecord::getInstance();
     // Add a Pose record (VRPose)
     RobotMiddleware::Pose pose{1.0f, 2.0f, 3.0f, 0.0f, 0.0f, 0.707f, 0.707f};
-    dr.addData(1000u, 10u, pose, true);
+    dr.addData(1000u, 10u, pose);
 
     // Add a Haptic record
-    RobotMiddleware::Haptic haptic{0.5f, 120.0f};
+    HapticData haptic{{0.5f, 120.0f}, {0.5f, 120.0f}};
     dr.addData(2000u, 20u, haptic);
 
     // Save to disk
@@ -337,6 +383,7 @@ TEST(DataRecordTest, AddAndSaveLoadRoundTrip) {
 
     // Load into a new instance (same singleton) – buffer should be replaced
     DataRecord& dr2 = DataRecord::getInstance();
+    ASSERT_TRUE(dr2.clearData());
     ASSERT_TRUE(dr2.loadData(tmpfile));
 
     // Compare internal buffers size and content via serialization of same records
@@ -364,11 +411,17 @@ TEST(DataRecordTest, AddAndSaveLoadRoundTrip) {
     // Read both files into vectors for comparison
     auto readFile=[&](const std::string &fn){
         std::ifstream ifs(fn, std::ios::binary);
-        return std::vector<std::byte>(std::istreambuf_iterator<char>(ifs), {});
+        return std::vector<char>(std::istreambuf_iterator<char>(ifs), {});
     };
 
     auto buf1 = readFile(tmpfile);
     auto buf2 = readFile(tmpfile2);
     ASSERT_EQ(buf1.size(), buf2.size());
     EXPECT_TRUE(std::equal(buf1.begin(), buf1.end(), buf2.begin()));
+    DataRecord::printData(dr2.getDeserializedData());
+
+    RobotMiddleware::Pose pose2{1.45f, 2.45f, 3.0f, 0.0f, 0.0f, 0.707f, 0.707f};
+    dr.addData(1100u, 10u, pose2);
+
+    DataRecord::printData(dr2.getDeserializedData());
 }
