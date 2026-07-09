@@ -21,26 +21,21 @@ void AP3Bot::BeginPlay()
 void AP3Bot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 	RobotMiddleware::Pose pose;
 	if (middleware.getRobotPose(pose))
 	{
-		// 1. Conversión de metros a centímetros (si tu middleware usa metros)
-		FVector Pos = FVector(pose.x, pose.y, pose.z);
-    
-		// 2. Crear el Cuaternión explícitamente y normalizarlo
-		// El constructor es FQuat(x, y, z, w)
-		FQuat Rot = FQuat(pose.qrx, pose.qry, pose.qrz, pose.qrw);
-		Rot.Normalize(); 
-
-		// 3. Aplicar movimiento
-		SetActorLocationAndRotation(Pos, Rot);
-
-		// 4. Printado por terminal (Output Log)
-		// UE_LOG(LogTemp, Log, TEXT("Robot Pose -> Pos: %s | Rot: %s"), *Pos.ToString(), *Rot.ToString());
+		lastPose = pose;
+		hasPose = true;
+		UE_LOG(LogTemp, Log, TEXT("Robot Pose -> Pos: (%f, %f, %f)"), pose.x, pose.y, pose.z);
 	}
-	else 
+
+	if (hasPose)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No se pudo obtener la pose del middleware"));
+		FVector Pos(lastPose.x, lastPose.y, lastPose.z);
+		FQuat Rot(lastPose.qrx, lastPose.qry, lastPose.qrz, lastPose.qrw);
+		Rot.Normalize();
+		SetActorLocationAndRotation(Pos, Rot);
 	}
 }
 

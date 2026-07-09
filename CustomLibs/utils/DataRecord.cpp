@@ -34,20 +34,20 @@ bool DataRecord::append(const RecordType type,
     return true;
 }
 
-// void serialize(const ColorCloudData& cloud, std::ostream& os)
-// {
-//     // 1. Escribir la cantidad de puntos
-//     uint32_t n = static_cast<uint32_t>(cloud.X.size());
-//     os.write(reinterpret_cast<const char*>(&n), sizeof(n));
+void serialize(const RobotMiddleware::ColorCloudData& cloud, std::ostream& os)
+{
+    // 1. Escribir la cantidad de puntos
+    uint32_t n = static_cast<uint32_t>(cloud.X.size());
+    os.write(reinterpret_cast<const char*>(&n), sizeof(n));
 
-//     // 2. Escribir los arrays (asumimos que X,Y,Z,R,G,B tienen el mismo tamaño)
-//     os.write(reinterpret_cast<const char*>(cloud.X.data()), n * sizeof(cloud.X[0]));
-//     os.write(reinterpret_cast<const char*>(cloud.Y.data()), n * sizeof(cloud.Y[0]));
-//     os.write(reinterpret_cast<const char*>(cloud.Z.data()), n * sizeof(cloud.Z[0]));
-//     os.write(reinterpret_cast<const char*>(cloud.R.data()), n * sizeof(cloud.R[0]));
-//     os.write(reinterpret_cast<const char*>(cloud.G.data()), n * sizeof(cloud.G[0]));
-//     os.write(reinterpret_cast<const char*>(cloud.B.data()), n * sizeof(cloud.B[0]));
-// }
+    // 2. Escribir los arrays (asumimos que X,Y,Z,R,G,B tienen el mismo tamaño)
+    os.write(reinterpret_cast<const char*>(cloud.X.data()), n * sizeof(cloud.X[0]));
+    os.write(reinterpret_cast<const char*>(cloud.Y.data()), n * sizeof(cloud.Y[0]));
+    os.write(reinterpret_cast<const char*>(cloud.Z.data()), n * sizeof(cloud.Z[0]));
+    os.write(reinterpret_cast<const char*>(cloud.R.data()), n * sizeof(cloud.R[0]));
+    os.write(reinterpret_cast<const char*>(cloud.G.data()), n * sizeof(cloud.G[0]));
+    os.write(reinterpret_cast<const char*>(cloud.B.data()), n * sizeof(cloud.B[0]));
+}
 
 /* ---------- overloads ---------- */
 bool DataRecord::addData(const std::uint32_t timestamp,
@@ -71,12 +71,12 @@ bool DataRecord::addData(const std::uint32_t timestamp,
     return append<HapticData>(RecordType::VRHaptic, data, timestamp, delay);
 }
 
-// bool DataRecord::addData(const std::uint32_t timestamp,
-//                          const std::uint32_t delay,
-//                          const RobotMiddleware::ColorCloudData& cloud)
-// {
-//     return append<RobotMiddleware::ColorCloudData>(RecordType::ColorCloudData, {cloud}, timestamp, delay);
-// }
+bool DataRecord::addData(const std::uint32_t timestamp,
+                         const std::uint32_t delay,
+                         const RobotMiddleware::ColorCloudData& cloud)
+{
+    return append<RobotMiddleware::ColorCloudData>(RecordType::ColorCloudData, {cloud}, timestamp, delay);
+}
 
 bool DataRecord::addData(const std::uint32_t timestamp,
                          const std::uint32_t delay,
@@ -99,14 +99,14 @@ bool DataRecord::addData(const std::uint32_t timestamp,
 /* ---------- Guardar en disco ---------- */
 bool DataRecord::saveData(const std::string& filename) const
 {
-    std::print("\033[32mSave Data: {} in {}\033[0m\n", buffer_.size(), filename);
+    // std::print("\033[32mSave Data: {} in {}\033[0m\n", buffer_.size(), filename);
     std::ofstream ofs(filename, std::ios::binary | std::ios::trunc);
     if (!ofs.is_open()) return false;
 
     std::lock_guard lock(mtx_);
     ofs.write(reinterpret_cast<const char*>(buffer_.data()), buffer_.size());
     ofs.close();
-    std::print("\033[32mData saved successfully\033[0m\n");
+    // std::print("\033[32mData saved successfully\033[0m\n");
     return ofs.good();
 }
 
@@ -188,7 +188,7 @@ DataRecord::DeserializedData DataRecord::getDeserializedData() const {
             result[key] = jointData;
         } else {
             // Unknown payload size, skip
-            std::print("\033[33mSkipping record with unknown payload size: {}\033[0m\n", header.payloadSize);
+            // std::print("\033[33mSkipping record with unknown payload size: {}\033[0m\n", header.payloadSize);
         }
         
         offset += recordSize;
@@ -197,62 +197,62 @@ DataRecord::DeserializedData DataRecord::getDeserializedData() const {
 }
 
 void DataRecord::printData(const DeserializedData& data) {
-    std::print("\n--- Deserialized Data ({}) ---\n", data.size());
+    // std::print("\n--- Deserialized Data ({}) ---\n", data.size());
     
-    for (const auto& [key, variant] : data) {
-        std::uint32_t time = key.first;
-        RecordType type = key.second;
+    // for (const auto& [key, variant] : data) {
+    //     std::uint32_t time = key.first;
+    //     RecordType type = key.second;
         
-        std::print("Time: {}, Type: ", time);
-        switch (type) {
-            case RecordType::VRPose: std::print("VRPose"); break;
-            case RecordType::RobotPose: std::print("RobotPose"); break;
-            case RecordType::VRHaptic: std::print("VRHaptic"); break;
-            case RecordType::ColorCloudData: std::print("ColorCloudData"); break;
-            case RecordType::ArmJoints: std::print("ArmJoints"); break;
-            case RecordType::VRController: std::print("VRController"); break;
-            default: std::print("Unknown"); break;
-        }
-        std::print(": ");
+    //     // std::print("Time: {}, Type: ", time);
+    //     switch (type) {
+    //         case RecordType::VRPose: std::print("VRPose"); break;
+    //         case RecordType::RobotPose: std::print("RobotPose"); break;
+    //         case RecordType::VRHaptic: std::print("VRHaptic"); break;
+    //         case RecordType::ColorCloudData: std::print("ColorCloudData"); break;
+    //         case RecordType::ArmJoints: std::print("ArmJoints"); break;
+    //         case RecordType::VRController: std::print("VRController"); break;
+    //         default: std::print("Unknown"); break;
+    //     }
+    //     std::print(": ");
         
-        std::visit([](const auto& val) {
-            using T = std::decay_t<decltype(val)>;
-            if constexpr (std::is_same_v<T, RobotMiddleware::Pose>) {
-                std::print("Pose(x={}, y={}, z={}, qrx={}, qry={}, qrz={}, qrw={})", 
-                           val.x, val.y, val.z, val.qrx, val.qry, val.qrz, val.qrw);
-            } else if constexpr (std::is_same_v<T, HapticData>) {
-                std::print("Haptic(left(intensity={}, frequency={}), right(intensity={}, frequency={}))", 
-                val.left.intensity, val.left.frequency, val.right.intensity, val.right.frequency);
-            } else if constexpr (std::is_same_v<T, ControllerData>) {
-                std::print("Controller(left(trigger={}, grab={}, x={}, y={}, aButton={}, bButton={}, "
-                           "aCapTouch={}, bCapTouch={}, thumbstickCapTouch={}, thumbstickButton={}), "
-                           "right(trigger={}, grab={}, x={}, y={}, aButton={}, bButton={}, "
-                           "aCapTouch={}, bCapTouch={}, thumbstickCapTouch={}, thumbstickButton={})"
-                           ")",
-                           // Argumentos izquierda
-                            val.left.trigger, val.left.grab, val.left.x, val.left.y,
-                            val.left.aButton, val.left.bButton, val.left.aButtonCapTouch,
-                            val.left.bButtonCapTouch, val.left.thumbstickCapTouch, val.left.thumbstickButton,
-                            // Argumentos derecha
-                            val.right.trigger, val.right.grab, val.right.x, val.right.y,
-                            val.right.aButton, val.right.bButton, val.right.aButtonCapTouch,
-                            val.right.bButtonCapTouch, val.right.thumbstickCapTouch, val.right.thumbstickButton
-                        );
-            } else if constexpr (std::is_same_v<T, VRData>) {
-                std::print("VRData(hmd(x={}, y={}, z={}, qrx={}, qry={}, qrz={}, qrw={}),"
-                            "left(x={}, y={}, z={}, qrx={}, qry={}, qrz={}, qrw={}), "
-                            "right(x={}, y={}, z={}, qrx={}, qry={}, qrz={}, qrw={}))", 
-                           val.hmd.x, val.hmd.y, val.hmd.z, val.hmd.qrx, val.hmd.qry, val.hmd.qrz, val.hmd.qrw, 
-                           val.left.x, val.left.y, val.left.z, val.left.qrx, val.left.qry, val.left.qrz, val.left.qrw, 
-                           val.right.x, val.right.y, val.right.z, val.right.qrx, val.right.qry, val.right.qrz, val.right.qrw);
-            } else if constexpr (std::is_same_v<T, JointData>) {
-                std::print("JointData(left(j1={}, j2={}, j3={}, j4={}, j5={}, j6={}, j7={}, gripper={}), "
-                           "right(j1={}, j2={}, j3={}, j4={}, j5={}, j6={}, j7={}, gripper={}))", 
-                           val.left[0], val.left[1], val.left[2], val.left[3], val.left[4], val.left[5], val.left[6], val.left[7], 
-                           val.right[0], val.right[1], val.right[2], val.right[3], val.right[4], val.right[5], val.right[6], val.right[7]);
-            }
-        }, variant);
-        std::print("\n");
-    }
-    std::print("--- End Data ---\n");
+    //     std::visit([](const auto& val) {
+    //         using T = std::decay_t<decltype(val)>;
+    //         if constexpr (std::is_same_v<T, RobotMiddleware::Pose>) {
+    //             std::print("Pose(x={}, y={}, z={}, qrx={}, qry={}, qrz={}, qrw={})", 
+    //                        val.x, val.y, val.z, val.qrx, val.qry, val.qrz, val.qrw);
+    //         } else if constexpr (std::is_same_v<T, HapticData>) {
+    //             std::print("Haptic(left(intensity={}, frequency={}), right(intensity={}, frequency={}))", 
+    //             val.left.intensity, val.left.frequency, val.right.intensity, val.right.frequency);
+    //         } else if constexpr (std::is_same_v<T, ControllerData>) {
+    //             std::print("Controller(left(trigger={}, grab={}, x={}, y={}, aButton={}, bButton={}, "
+    //                        "aCapTouch={}, bCapTouch={}, thumbstickCapTouch={}, thumbstickButton={}), "
+    //                        "right(trigger={}, grab={}, x={}, y={}, aButton={}, bButton={}, "
+    //                        "aCapTouch={}, bCapTouch={}, thumbstickCapTouch={}, thumbstickButton={})"
+    //                        ")",
+    //                        // Argumentos izquierda
+    //                         val.left.trigger, val.left.grab, val.left.x, val.left.y,
+    //                         val.left.aButton, val.left.bButton, val.left.aButtonCapTouch,
+    //                         val.left.bButtonCapTouch, val.left.thumbstickCapTouch, val.left.thumbstickButton,
+    //                         // Argumentos derecha
+    //                         val.right.trigger, val.right.grab, val.right.x, val.right.y,
+    //                         val.right.aButton, val.right.bButton, val.right.aButtonCapTouch,
+    //                         val.right.bButtonCapTouch, val.right.thumbstickCapTouch, val.right.thumbstickButton
+    //                     );
+    //         } else if constexpr (std::is_same_v<T, VRData>) {
+    //             std::print("VRData(hmd(x={}, y={}, z={}, qrx={}, qry={}, qrz={}, qrw={}),"
+    //                         "left(x={}, y={}, z={}, qrx={}, qry={}, qrz={}, qrw={}), "
+    //                         "right(x={}, y={}, z={}, qrx={}, qry={}, qrz={}, qrw={}))", 
+    //                        val.hmd.x, val.hmd.y, val.hmd.z, val.hmd.qrx, val.hmd.qry, val.hmd.qrz, val.hmd.qrw, 
+    //                        val.left.x, val.left.y, val.left.z, val.left.qrx, val.left.qry, val.left.qrz, val.left.qrw, 
+    //                        val.right.x, val.right.y, val.right.z, val.right.qrx, val.right.qry, val.right.qrz, val.right.qrw);
+    //         } else if constexpr (std::is_same_v<T, JointData>) {
+    //             std::print("JointData(left(j1={}, j2={}, j3={}, j4={}, j5={}, j6={}, j7={}, gripper={}), "
+    //                        "right(j1={}, j2={}, j3={}, j4={}, j5={}, j6={}, j7={}, gripper={}))", 
+    //                        val.left[0], val.left[1], val.left[2], val.left[3], val.left[4], val.left[5], val.left[6], val.left[7], 
+    //                        val.right[0], val.right[1], val.right[2], val.right[3], val.right[4], val.right[5], val.right[6], val.right[7]);
+    //         }
+    //     }, variant);
+    //     std::print("\n");
+    // }
+    // std::print("--- End Data ---\n");
 }

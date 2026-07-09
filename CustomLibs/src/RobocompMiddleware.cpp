@@ -22,6 +22,7 @@
 #include <deque>
 #include <shared_mutex>
 
+
 #include "RobocompMiddleware.tpp"
 #include "RobocompMiddlewareParsers.cpp"
 
@@ -36,9 +37,10 @@ struct RobotMiddleware::Impl {
 
   // Lidar
   RoboCompLidar3D::Lidar3DPrxPtr lidar3d_proxy, zed_proxy;
-  std::shared_timed_mutex lidar_mutex;
+  std::mutex lidar_mutex;
   std::thread lidar_worker;
   RobotMiddleware::ColorCloudData cloudPoints;
+  uint64_t cloudVersion = 0;
 
   // Arm
   RoboCompKinovaArm::KinovaArmPrxPtr arm_left_proxy, arm_right_proxy;
@@ -190,6 +192,8 @@ struct RobotMiddleware::Impl {
       lidar_worker.join();
     if (arm_worker.joinable())
       arm_worker.join();
+    if (omnirobot_worker.joinable())
+      omnirobot_worker.join();
   }
 
   static Ice::InitializationData makeInitData() {
@@ -228,8 +232,8 @@ struct RobotMiddleware::Impl {
       auto start = steady_clock::now();
       try {
         auto zed_future = zed_proxy->getColorCloudDataAsync();
-        RobotMiddleware::ColorCloudData lidar_cloud;
         #ifdef P3BOT
+          RobotMiddleware::ColorCloudData lidar_cloud;
           auto lidar3d_future = lidar3d_proxy->getColorCloudDataAsync();
 
           try {
@@ -315,7 +319,8 @@ struct RobotMiddleware::Impl {
         } catch (...) {
           std::cerr << "\033[1;33mWARNING\033[0m Failed getting Zed data\n";
         }
-
+        
+        #ifdef P3BOT
         size_t total = zed_cloud.X.size() + lidar_cloud.X.size();
         zed_cloud.X.reserve(total);
         zed_cloud.Y.reserve(total);
@@ -347,9 +352,12 @@ struct RobotMiddleware::Impl {
         zed_cloud.B.insert(zed_cloud.B.end(),
                            std::make_move_iterator(lidar_cloud.B.begin()),
                            std::make_move_iterator(lidar_cloud.B.end()));
+        #endif
+
         {
-          std::unique_lock<std::shared_timed_mutex> lock(lidar_mutex);
+          std::unique_lock lock(lidar_mutex);
           cloudPoints = std::move(zed_cloud);
+          ++cloudVersion;
         }
       } catch (const Ice::ConnectionRefusedException &ex) {
         std::cerr << "\033[31mERROR\033[0m Cloud data connection refused: "
@@ -378,8 +386,8 @@ struct RobotMiddleware::Impl {
 
   void updateRobotState() {
     using namespace std::chrono;
-    const auto period = 20ms;
-    const auto timeout = period / 2;
+    const auto period = 50ms;
+    const auto timeout = period;
     const double rad_to_deg = 180.0 / M_PI;
     RoboCompKinovaArm::TJoints left_joints, right_joints;
 
@@ -461,41 +469,53 @@ struct RobotMiddleware::Impl {
     #ifdef P3BOT
       using namespace std::chrono;
       const auto period = 20ms;
-      const auto timeout = period / 2;
-      RoboCompGenericBase::TBaseState state{};
+      std::future<RoboCompGenericBase::TBaseState> state_future;
+
       while (running) {
         auto start = steady_clock::now();
-        try {
-          omnirobot_proxy->getBaseState(state); 
-          {
-            std::unique_lock<std::mutex> lock(robot_mutex);
-            robot_pose = angle2DToQuaternion(static_cast<float>(state.alpha), static_cast<float>(state.z)/10, static_cast<float>(state.x)/10, 0.0);
-            // std::cout << "\033[32mINFO\033[0m " << "Robot pose: " << robot_pose.x << " " << robot_pose.y << " " << robot_pose.z << " " << robot_pose.qrx << " " << robot_pose.qry << " " << robot_pose.qrz << " " << robot_pose.qrw << "\n";
-            poseChanged = true;
+
+        // Lanzar nueva llamada solo si no hay una pendiente
+        if (!state_future.valid()) {
+          try {
+            state_future = omnirobot_proxy->getBaseStateAsync();
+          } catch (const Ice::Exception &ex) {
+            std::cerr << "\033[31mERROR\033[0m Robot pose async launch failed: " << ex.what() << "\n";
+          } catch (...) {
+            std::cerr << "\033[31mERROR\033[0m Robot pose async launch failed\n";
           }
-        } catch (const Ice::ConnectionRefusedException &ex) {
-          std::cerr << "\033[31mERROR\033[0m Robot pose connection refused: "
-                    << ex.what() << "\n";
-        } catch (const Ice::ConnectionLostException &ex) {
-          std::cerr << "\033[1;33mWARNING\033[0m Robot pose connection lost: "
-                    << ex.what() << "\n";
-        } catch (const Ice::TimeoutException &ex) {
-          std::cerr << "\033[1;33mWARNING\033[0m Robot pose timeout: "
-                    << ex.what() << "\n";
-        } catch (const Ice::ObjectNotExistException &ex) {
-          std::cerr << "\033[31mERROR\033[0m Robot pose object not found: "
-                    << ex.what() << "\n";
-        } catch (const Ice::Exception &ex) {
-          std::cerr << "\033[1;33mWARNING\033[0m Robot pose Ice exception: "
-                    << ex.what() << "\n";
-        } catch (const std::exception &ex) {
-          std::cerr << "\033[1;33mWARNING\033[0m Robot pose std::exception: "
-                    << ex.what() << "\n";
-        } catch (...) {
-          std::cerr << "\033[1;33mWARNING\033[0m Failed to update robot pose\n";
         }
 
-        // Period
+        // Comprobar si la llamada pendiente ya tiene resultado (sin bloquear)
+        if (state_future.valid() &&
+            state_future.wait_for(0ms) == std::future_status::ready) {
+          try {
+            auto state = state_future.get();
+            {
+              std::unique_lock<std::mutex> lock(robot_mutex);
+              robot_pose = angle2DToQuaternion(static_cast<float>(state.alpha), static_cast<float>(state.z)*100, static_cast<float>(state.x)*100, 0.0);
+              poseChanged = true;
+            }
+          } catch (const Ice::ConnectionRefusedException &ex) {
+            std::cerr << "\033[31mERROR\033[0m Robot pose connection refused: " << ex.what() << "\n";
+          } catch (const Ice::ConnectionLostException &ex) {
+            std::cerr << "\033[1;33mWARNING\033[0m Robot pose connection lost: " << ex.what() << "\n";
+          } catch (const Ice::TimeoutException &ex) {
+            std::cerr << "\033[1;33mWARNING\033[0m Robot pose timeout: " << ex.what() << "\n";
+          } catch (const Ice::ObjectNotExistException &ex) {
+            std::cerr << "\033[31mERROR\033[0m Robot pose object not found: " << ex.what() << "\n";
+          } catch (const Ice::Exception &ex) {
+            std::cerr << "\033[1;33mWARNING\033[0m Robot pose Ice exception: " << ex.what() << "\n";
+          } catch (const std::exception &ex) {
+            std::cerr << "\033[1;33mWARNING\033[0m Robot pose std::exception: " << ex.what() << "\n";
+          } catch (...) {
+            std::cerr << "\033[1;33mWARNING\033[0m Failed to update robot pose\n";
+          }
+          // Lanzar la siguiente llamada inmediatamente tras consumir el resultado
+          try {
+            state_future = omnirobot_proxy->getBaseStateAsync();
+          } catch (...) {}
+        }
+
         auto elapsed = steady_clock::now() - start;
         if (elapsed < period)
           std::this_thread::sleep_for(period - elapsed);
@@ -576,7 +596,7 @@ struct RobotMiddleware::Impl {
   bool setBasePose(const RobotMiddleware::Pose &target){
     #ifdef P3BOT
        try {
-          navigator_proxy->gotoPoseAsync(RoboCompNavigator::TPose(target.x*10, target.y*10, getYawFromQuaternion(target.qrx, target.qry, target.qrz, target.qrw))); 
+          navigator_proxy->gotoPoseAsync(RoboCompNavigator::TPose(-target.y*10, target.x*10, getYawFromQuaternion(target.qrx, target.qry, target.qrz, target.qrw))); 
           return true;
         } catch (const Ice::ConnectionRefusedException &ex) {
           std::cerr << "\033[31mERROR\033[0m Set robot pose connection refused: "
@@ -606,6 +626,7 @@ struct RobotMiddleware::Impl {
   bool setSpeedBase(float x, float y, float yaw){
     #ifdef P3BOT
        try {
+          // std::cerr << "\033[32mINFO\033[0m " << "Set robot speed: " << x << " " << y << " " << yaw << "\n";
           omnirobot_proxy->setSpeedBaseAsync(x, y, yaw); 
           return true;
         } catch (const Ice::ConnectionRefusedException &ex) {
@@ -662,6 +683,37 @@ struct RobotMiddleware::Impl {
         } catch (...) {
           std::cerr << "\033[1;33mWARNING\033[0m Failed to stop robot speed\n";
         }
+    #endif
+    return false;
+  }
+
+  bool resetOdometer(){
+    #ifdef P3BOT
+      try {
+        omnirobot_proxy->resetOdometerAsync();
+        return true;
+      } catch (const Ice::ConnectionRefusedException &ex) {
+        std::cerr << "\033[31mERROR\033[0m Reset odometer connection refused: "
+                  << ex.what() << "\n";
+        return false;
+      } catch (const Ice::ConnectionLostException &ex) {
+        std::cerr << "\033[1;33mWARNING\033[0m Reset odometer connection lost: "
+                  << ex.what() << "\n";
+      } catch (const Ice::TimeoutException &ex) {
+        std::cerr << "\033[1;33mWARNING\033[0m Reset odometer timeout: "
+                  << ex.what() << "\n";
+      } catch (const Ice::ObjectNotExistException &ex) {
+        std::cerr << "\033[31mERROR\033[0m Reset odometer object not found: "
+                  << ex.what() << "\n";
+      } catch (const Ice::Exception &ex) {
+        std::cerr << "\033[1;33mWARNING\033[0m Reset odometer Ice exception: "
+                  << ex.what() << "\n";
+      } catch (const std::exception &ex) {
+        std::cerr << "\033[1;33mWARNING\033[0m Reset odometer std::exception: "
+                  << ex.what() << "\n";
+      } catch (...) {
+        std::cerr << "\033[1;33mWARNING\033[0m Failed to reset odometer\n";
+      }
     #endif
     return false;
   }

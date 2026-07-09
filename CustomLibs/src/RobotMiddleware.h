@@ -1,6 +1,10 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <mutex>
+#include <cstdint>
+#include <string>
+
 
 const std::string IP_ROBOT = "localhost";
 
@@ -57,6 +61,24 @@ struct Controller {
     std::vector<unsigned char> B;
   };
 
+  class ColorCloudDataGuard {
+  public:
+    ColorCloudDataGuard() = default;
+    ColorCloudDataGuard(std::mutex& m, const ColorCloudData& d, uint64_t version)
+        : lock_(m, std::try_to_lock), 
+        data_(lock_.owns_lock() ? &d : nullptr), 
+        version_(lock_.owns_lock() ? version : 0) {}
+    const ColorCloudData& get() const { return *data_; }
+    uint64_t getVersion() const { return version_; }
+    bool valid() const { return data_ != nullptr; }
+    void unlock() { if (lock_.owns_lock()) lock_.unlock(); }
+    void lock() { if (lock_.owns_lock()) lock_.lock(); }
+  private:
+    std::unique_lock<std::mutex> lock_;
+    const ColorCloudData* data_ = nullptr;
+    uint64_t version_ = 0;
+  };
+
   using ArmJoint = float[8];
 
   bool isRunning();
@@ -67,13 +89,15 @@ struct Controller {
                 const RobotMiddleware::Controller &rightController);
   bool receiveHaptics(RobotMiddleware::Haptic &left,
                       RobotMiddleware::Haptic &right);
-  const ColorCloudData &getColorCloudData();
-  void lockUlockGetColorCloudData(bool lock);
+  ColorCloudDataGuard lockColorCloudData();
+  // const ColorCloudData &getColorCloudData();
+  // void lockUlockGetColorCloudData(bool lock);
   bool getRobotState(float (&left)[8], float (&right)[8]);
   bool getRobotPose(RobotMiddleware::Pose &robot);
   bool setSpeedBase(float x, float y, float yaw);
   bool setBasePose(const RobotMiddleware::Pose &target);
   bool stopBase();
+  bool resetOdometer();
 
 private:
   RobotMiddleware();

@@ -30,12 +30,17 @@ void UPointCloudComponent::BeginPlay()
 		{
 			NiagaraComp->SetAutoActivate(true);
 			NiagaraComp->Activate(true);
+			NiagaraComp->AddTickPrerequisiteComponent(this);
 			FNiagaraParameterStore& Params = NiagaraComp->GetOverrideParameters();
 			FNiagaraVariableBase Var(FNiagaraTypeDefinition::GetIntDef(), FName("User.NumPoints"));
 			NumPoints = Params.GetParameterValue<int32>(Var);
-	
-			ParticlePositions.SetNumUninitialized(NumPoints);
-			ParticleColors.SetNumUninitialized(NumPoints);	
+			PointCapacity = NumPoints;
+
+			// SetNumZeroed (no SetNumUninitialized): así todo el array arranca ya en (0,0,0),
+			// que es el invariante que TickComponent mantiene después solo tocando el delta.
+			ParticlePositions.SetNumZeroed(PointCapacity);
+			ParticleColors.SetNumZeroed(PointCapacity);
+			PrevNumPoints = 0;
 		}
 		
 		if (!middleware.isRunning() or !NiagaraComp)
@@ -92,55 +97,67 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// 		bIsPaused ? 1 : 0,
 	// 		(int32)TickBehavior);
 	// }
-	
-	double StartTime = FPlatformTime::Seconds();  
 
-	const RobotMiddleware::ColorCloudData& cloud  = middleware.getColorCloudData();
-
-	double EndTime = FPlatformTime::Seconds(); 
-	double DurationMs = (EndTime - StartTime) * 1000.0;
-	
-	// UE_LOG(LogTemp, Display, TEXT("get cloud took %.3f ms for %d points"), DurationMs, cloud.X.size());
-	if (cloud.X.size() > 0)
 	{
+		RobotMiddleware::ColorCloudDataGuard guard = middleware.lockColorCloudData();
+		if (!guard.valid()) return;
+		const RobotMiddleware::ColorCloudData& cloud = guard.get();
+		if (cloud.X.empty()) {
+			// UE_LOG(LogTemp, Warning, TEXT("⚠️cloud.X.empty()"));
+			guard.unlock();
+			return; }
+		const uint64 CurrentVersion = guard.getVersion();
+		if (CurrentVersion == lastCloudVersion)
+		{
+			guard.unlock();
+			return;
+		}
+		lastCloudVersion = CurrentVersion;
+
 		auto SRGBToLinear = [](float c) {
 			return (c <= 0.04045f) ? (c / 12.92f) : FMath::Pow((c + 0.055f) / 1.055f, 2.4f);
 		};
-		
-		//StartTime = FPlatformTime::Seconds();
-		middleware.lockUlockGetColorCloudData(true);
-		NumPoints = cloud.X.size();
-		ParallelFor( NumPoints, [&](int32 i)
+
+		// Clamp por seguridad: nunca escribir más allá de la capacidad instanciada en Niagara.
+		NumPoints = FMath::Min(static_cast<int32>(cloud.X.size()), PointCapacity);
+
+		ParallelFor(NumPoints, [&](int32 i)
 		{
-			ParticlePositions[i][0] = cloud.Y[i]/10.0f;
-			ParticlePositions[i][1] = cloud.X[i]/10.0f;
-			ParticlePositions[i][2] =  cloud.Z[i]/10.0f;
-			ParticleColors[i].R = SRGBToLinear(cloud.R[i]/255.0f); // entre 0.0 y 1.0
-			ParticleColors[i].G = SRGBToLinear(cloud.G[i]/255.0f);
-			ParticleColors[i].B = SRGBToLinear(cloud.B[i]/255.0f);
+			ParticlePositions[i][0] = cloud.Y[i] / 10.0f;
+			ParticlePositions[i][1] = cloud.X[i] / 10.0f;
+			ParticlePositions[i][2] = cloud.Z[i] / 10.0f;
+			ParticleColors[i].R = SRGBToLinear(cloud.R[i] / 255.0f);
+			ParticleColors[i].G = SRGBToLinear(cloud.G[i] / 255.0f);
+			ParticleColors[i].B = SRGBToLinear(cloud.B[i] / 255.0f);
 		});
-		middleware.lockUlockGetColorCloudData(false);
-		// UE_LOG(LogTemp, Display, TEXT("R:%f, G:%f B:%f"), ParticleColors[5000].R, ParticleColors[5000].G, ParticleColors[5000].B);;
 
-		
-		// EndTime = FPlatformTime::Seconds(); 
-		// DurationMs = (EndTime - StartTime) * 1000.0;
-		// UE_LOG(LogTemp, Display, TEXT("ParallelFor took %.3f ms for %d points"), DurationMs, NumPoints);
+		// Los puntos [0, PointCapacity) fuera de [0, NumPoints) ya están garantizados a 0
+		// desde el frame anterior (invariante). Si este frame tiene MENOS puntos válidos
+		// que el anterior, solo hay que relocar a (0,0,0) la diferencia; si tiene más o
+		// igual, no hace falta tocar nada más: ya estaban a cero y se acaban de sobrescribir.
+		if (NumPoints < PrevNumPoints)
+		{
+			const int32 ClearCount = PrevNumPoints - NumPoints;
+			FMemory::Memzero(ParticlePositions.GetData() + NumPoints, ClearCount * sizeof(FVector));
+			FMemory::Memzero(ParticleColors.GetData() + NumPoints, ClearCount * sizeof(FLinearColor));
+		}
+		PrevNumPoints = NumPoints;
+
+
+
 		UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVector(
-				NiagaraComp,
-				FName("User.ParticlePositions"), // Nombre del parámetro
-				ParticlePositions
-			);
+			NiagaraComp,
+			FName("User.ParticlePositions"),
+			ParticlePositions
+		);
 		UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayColor(
-				NiagaraComp,
-				FName("User.ParticleColors"), // Nombre del parámetro
-				ParticleColors
-			);
-
+			NiagaraComp,
+			FName("User.ParticleColors"),
+			ParticleColors
+		);
 		NiagaraComp->SetVariableInt(FName("User.NumPoints"), NumPoints);
+		guard.unlock();
 	}
-
-
 }
 	
 

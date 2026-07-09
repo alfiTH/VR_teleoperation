@@ -26,10 +26,14 @@ protected:
 
 	RobotMiddleware& middleware = RobotMiddleware::getInstance();
 	
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
 	UPROPERTY(VisibleAnywhere)
 	UPointCloudComponent* PointCloudComponent;
+
+private:
+	RobotMiddleware::Pose lastPose{};
+	bool hasPose = false;
 };

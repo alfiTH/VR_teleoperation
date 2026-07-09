@@ -32,11 +32,10 @@ target_compile_options(Middleware PRIVATE
     -fmax-errors=1 
     -fno-char8_t 
     -O3 
-    -std=c++26 
-    -flto=auto 
-    -fno-plt 
-    -fopenmp
+    -std=c++20 
+
 )
+#    -flto=auto    -fno-plt     -fopenmp
 
 set(ICE_LIBRARIES /usr/lib/x86_64-linux-gnu/libIce++11.so /usr/lib/x86_64-linux-gnu/libIceStorm++11.so)
 
@@ -52,6 +51,8 @@ option(ROBOCOMP "Enable ROBOCOMP" ON)
 if(P3BOT)
   message(STATUS "Building with P3BOT support")
   target_compile_definitions(Middleware PRIVATE P3BOT)
+else()
+  message(STATUS "Building without P3BOT support")
 endif()
 
 if(ROBOCOMP)

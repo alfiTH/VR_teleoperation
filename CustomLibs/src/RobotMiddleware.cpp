@@ -3,6 +3,7 @@
 #include <mutex>
 #include <shared_mutex>
 
+
 #ifdef ROBOCOMP
   #include "RobocompMiddleware.cpp"
 #endif
@@ -54,31 +55,43 @@ bool RobotMiddleware::receiveHaptics(RobotMiddleware::Haptic &left,
   }
 }
 
-const RobotMiddleware::ColorCloudData &RobotMiddleware::getColorCloudData() {
-  static const RobotMiddleware::ColorCloudData empty{};
-  if (!pImpl) {
-    return empty;
-  }
+// const RobotMiddleware::ColorCloudData &RobotMiddleware::getColorCloudData() {
+//   static const RobotMiddleware::ColorCloudData empty{};
+//   if (!pImpl) {
+//     return empty;
+//   }
+//   try {
+//     std::scoped_lock lock(pImpl->lidar_mutex);
+//     return pImpl->cloudPoints;
+//   } catch (const std::system_error &ex) {
+//     std::cout << "\033[1;33mWARNING\033[0m getColorCloudData mutex error: "
+//               << ex.what() << "\n";
+//   } catch (const std::exception &ex) {
+//     std::cout << "\033[1;33mWARNING\033[0m getColorCloudData std::exception: "
+//               << ex.what() << "\n";
+//   } catch (...) {
+//     std::cout << "\033[1;33mWARNING\033[0m Failed to get cloud data\n";
+//   }
+//   return empty;
+// }
+// void RobotMiddleware::lockUlockGetColorCloudData(bool lock) {
+//   static thread_local std::shared_lock<std::shared_timed_mutex> readLock;
+//   if (lock) {
+//     readLock = std::shared_lock<std::shared_timed_mutex>(pImpl->lidar_mutex);
+//   } else {
+//     readLock.unlock();
+//   }
+// }
+
+
+
+RobotMiddleware::ColorCloudDataGuard RobotMiddleware::lockColorCloudData() {
+  if (!pImpl) return {};
   try {
-    std::scoped_lock lock(pImpl->lidar_mutex);
-    return pImpl->cloudPoints;
-  } catch (const std::system_error &ex) {
-    std::cout << "\033[1;33mWARNING\033[0m getColorCloudData mutex error: "
-              << ex.what() << "\n";
-  } catch (const std::exception &ex) {
-    std::cout << "\033[1;33mWARNING\033[0m getColorCloudData std::exception: "
-              << ex.what() << "\n";
+    return ColorCloudDataGuard(pImpl->lidar_mutex, pImpl->cloudPoints, pImpl->cloudVersion);
   } catch (...) {
-    std::cout << "\033[1;33mWARNING\033[0m Failed to get cloud data\n";
-  }
-  return empty;
-}
-void RobotMiddleware::lockUlockGetColorCloudData(bool lock) {
-  static thread_local std::shared_lock<std::shared_timed_mutex> readLock;
-  if (lock) {
-    readLock = std::shared_lock<std::shared_timed_mutex>(pImpl->lidar_mutex);
-  } else {
-    readLock.unlock();
+    std::cout << "\033[1;33mWARNING\033[0m Failed to get color cloud data\n";
+    return {};
   }
 }
 
@@ -88,13 +101,13 @@ bool RobotMiddleware::getRobotState(float (&left)[8], float (&right)[8]) {
   try {
     {
       std::scoped_lock lock(pImpl->arm_mutex);
-      std::cout << "getRobotState: ";
+      // std::cout << "getRobotState: ";
       for (int i = 0; i < 8; ++i) {
         left[i] = pImpl->left_arm[i];
         right[i] = pImpl->right_arm[i];
-        std::cout << left[i] << " " << right[i] << " ";
+        // std::cout << left[i] << " " << right[i] << " ";
       }
-      std::cout << "\n";
+      // std::cout << "\n";
     }
     return true;
   } catch (const std::system_error &ex) {
@@ -112,11 +125,13 @@ bool RobotMiddleware::getRobotState(float (&left)[8], float (&right)[8]) {
 }
 
 bool RobotMiddleware::getRobotPose(RobotMiddleware::Pose &robot) {
-  if (!pImpl or !pImpl->poseChanged)
+  if (!pImpl)
     return false;
   try {
     {
       std::scoped_lock lock(pImpl->robot_mutex);
+      if (!pImpl->poseChanged)
+        return false;
       robot = pImpl->robot_pose;
       pImpl->poseChanged = false;
     }
@@ -182,4 +197,21 @@ bool RobotMiddleware::stopBase(){
         return false;
     }
 }
+
+bool RobotMiddleware::resetOdometer(){
+  if (!pImpl)
+    return false;  
+  try {
+    pImpl->resetOdometer();
+    return true;
+    } catch (const std::exception &ex) {
+        std::cout << "\033[1;33mWARNING\033[0m resetOdometer std::exception: "
+                << ex.what() << "\n";
+        return false;
+    } catch (...) {
+        std::cout << "\033[1;33mWARNING\033[0m Failed to reset odometer\n";
+        return false;
+    }
+}
+
 

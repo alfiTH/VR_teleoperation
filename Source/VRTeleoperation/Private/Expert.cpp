@@ -1,5 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-#include "Robot.h"
+#include "Expert.h"
 
 const float TOLERANCE_FLOAT = 0.01f;
 
@@ -27,7 +27,7 @@ inline void exportFPSQueueToCSV(const std::deque<float>& FPSQueue,
 }
 
 // Sets default values
-ARobot::ARobot()
+AExpert::AExpert()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -35,7 +35,7 @@ ARobot::ARobot()
 }
 
 // Called when the game starts or when spawned
-void ARobot::BeginPlay()
+void AExpert::BeginPlay()
 {
 	Super::BeginPlay();
 	if (GetWorld() && GetWorld()->IsGameWorld())
@@ -58,21 +58,25 @@ void ARobot::BeginPlay()
 
 		if (!CachedPC.IsValid())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ARobot::BeginPlay -> Pawn dont has PlayerController"));
+			UE_LOG(LogTemp, Warning, TEXT("AExpert::BeginPlay -> Pawn dont has PlayerController"));
 		}
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AP3Bot::StaticClass(), FoundActors);
+		if (FoundActors.Num() > 0)
+			P3Bot = Cast<AP3Bot>(FoundActors[0]);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Display, TEXT("Editor mode"));
 	}
 }
-void ARobot::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void AExpert::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 	// exportFPSQueueToCSV(FPSQueue, "/home/robolab/fps_data.csv", "FPS");
 }
 
-void ARobot::SetupPoseComponent()
+void AExpert::SetupPoseComponent()
 {
     // Camera (HMD)
     VRCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("VRCamera"));
@@ -92,7 +96,7 @@ void ARobot::SetupPoseComponent()
 
 }
 
-void ARobot::TriggerHapticFeedback(
+void AExpert::TriggerHapticFeedback(
 	EControllerHand Hand,
 	float Intensity /* = 1.0f */,
 	float Frequency /* = 0.5f */)
@@ -133,126 +137,139 @@ void ARobot::TriggerHapticFeedback(
 }
 
 #pragma region Inputs
-void ARobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AExpert::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 		// You can bind to any of the trigger events here by changing the "ETriggerEvent" enum value
-		Input->BindAction(IA_Hand_Grasp_Left, ETriggerEvent::Triggered, this, &ARobot::GraspLeft);
-		Input->BindAction(IA_Hand_Grasp_Left, ETriggerEvent::Completed, this, &ARobot::GraspReleaseLeft);
-		Input->BindAction(IA_Hand_Grasp_Right, ETriggerEvent::Triggered, this, &ARobot::GraspRight);
-		Input->BindAction(IA_Hand_Grasp_Right, ETriggerEvent::Completed, this, &ARobot::GraspReleaseRight);
-		Input->BindAction(IA_Hand_IndexCurl_Left, ETriggerEvent::Triggered, this, &ARobot::TriggerLeft);
-		Input->BindAction(IA_Hand_IndexCurl_Left, ETriggerEvent::Completed, this, &ARobot::TriggerReleaseLeft);
-		Input->BindAction(IA_Hand_IndexCurl_Right, ETriggerEvent::Triggered, this, &ARobot::TriggerRight);
-		Input->BindAction(IA_Hand_IndexCurl_Right, ETriggerEvent::Completed, this, &ARobot::TriggerReleaseRight);
-		Input->BindAction(IA_Hand_A, ETriggerEvent::Started, this, &ARobot::PushA);
-		Input->BindAction(IA_Hand_A, ETriggerEvent::Completed, this, &ARobot::ReleaseA);
-		Input->BindAction(IA_Hand_B, ETriggerEvent::Started, this, &ARobot::PushB);
-		Input->BindAction(IA_Hand_B, ETriggerEvent::Completed, this, &ARobot::ReleaseB);
-		Input->BindAction(IA_Hand_X, ETriggerEvent::Started, this, &ARobot::PushX);
-		Input->BindAction(IA_Hand_X, ETriggerEvent::Completed, this, &ARobot::ReleaseX);
-		Input->BindAction(IA_Hand_Y, ETriggerEvent::Started, this, &ARobot::PushY);
-		Input->BindAction(IA_Hand_Y, ETriggerEvent::Completed, this, &ARobot::ReleaseY);
-		Input->BindAction(IA_Hand_Thumbstick_Left, ETriggerEvent::Triggered, this, &ARobot::ThumbStickLeft);
-		Input->BindAction(IA_Hand_Thumbstick_Left, ETriggerEvent::Completed, this, &ARobot::ThumbStickReleaseLeft);
-		Input->BindAction(IA_Hand_Thumbstick_Right, ETriggerEvent::Triggered, this, &ARobot::ThumbStickRight);
-		Input->BindAction(IA_Hand_Thumbstick_Right, ETriggerEvent::Completed, this, &ARobot::ThumbStickReleaseRight);
-		Input->BindAction(IA_Hand_Thumbstick_Press_Left, ETriggerEvent::Started, this, &ARobot::PushThumbStickLeft);
-		Input->BindAction(IA_Hand_Thumbstick_Press_Left, ETriggerEvent::Completed, this, &ARobot::ReleaseThumbStickLeft);
-		Input->BindAction(IA_Hand_Thumbstick_Press_Right, ETriggerEvent::Started, this, &ARobot::PushThumbStickRight);
-		Input->BindAction(IA_Hand_Thumbstick_Press_Right, ETriggerEvent::Completed, this, &ARobot::ReleaseThumbStickRight);
+		Input->BindAction(IA_Hand_Grasp_Left, ETriggerEvent::Triggered, this, &AExpert::GraspLeft);
+		Input->BindAction(IA_Hand_Grasp_Left, ETriggerEvent::Completed, this, &AExpert::GraspReleaseLeft);
+		Input->BindAction(IA_Hand_Grasp_Right, ETriggerEvent::Triggered, this, &AExpert::GraspRight);
+		Input->BindAction(IA_Hand_Grasp_Right, ETriggerEvent::Completed, this, &AExpert::GraspReleaseRight);
+		Input->BindAction(IA_Hand_IndexCurl_Left, ETriggerEvent::Triggered, this, &AExpert::TriggerLeft);
+		Input->BindAction(IA_Hand_IndexCurl_Left, ETriggerEvent::Completed, this, &AExpert::TriggerReleaseLeft);
+		Input->BindAction(IA_Hand_IndexCurl_Right, ETriggerEvent::Triggered, this, &AExpert::TriggerRight);
+		Input->BindAction(IA_Hand_IndexCurl_Right, ETriggerEvent::Completed, this, &AExpert::TriggerReleaseRight);
+		Input->BindAction(IA_Hand_A, ETriggerEvent::Started, this, &AExpert::PushA);
+		Input->BindAction(IA_Hand_A, ETriggerEvent::Completed, this, &AExpert::ReleaseA);
+		Input->BindAction(IA_Hand_B, ETriggerEvent::Started, this, &AExpert::PushB);
+		Input->BindAction(IA_Hand_B, ETriggerEvent::Completed, this, &AExpert::ReleaseB);
+		Input->BindAction(IA_Hand_X, ETriggerEvent::Started, this, &AExpert::PushX);
+		Input->BindAction(IA_Hand_X, ETriggerEvent::Completed, this, &AExpert::ReleaseX);
+		Input->BindAction(IA_Hand_Y, ETriggerEvent::Started, this, &AExpert::PushY);
+		Input->BindAction(IA_Hand_Y, ETriggerEvent::Completed, this, &AExpert::ReleaseY);
+		Input->BindAction(IA_Hand_Thumbstick_Left, ETriggerEvent::Triggered, this, &AExpert::ThumbStickLeft);
+		Input->BindAction(IA_Hand_Thumbstick_Left, ETriggerEvent::Completed, this, &AExpert::ThumbStickReleaseLeft);
+		Input->BindAction(IA_Hand_Thumbstick_Right, ETriggerEvent::Triggered, this, &AExpert::ThumbStickRight);
+		Input->BindAction(IA_Hand_Thumbstick_Right, ETriggerEvent::Completed, this, &AExpert::ThumbStickReleaseRight);
+		Input->BindAction(IA_Hand_Thumbstick_Press_Left, ETriggerEvent::Started, this, &AExpert::PushThumbStickLeft);
+		Input->BindAction(IA_Hand_Thumbstick_Press_Left, ETriggerEvent::Completed, this, &AExpert::ReleaseThumbStickLeft);
+		Input->BindAction(IA_Hand_Thumbstick_Press_Right, ETriggerEvent::Started, this, &AExpert::PushThumbStickRight);
+		Input->BindAction(IA_Hand_Thumbstick_Press_Right, ETriggerEvent::Completed, this, &AExpert::ReleaseThumbStickRight);
 
 }
 #pragma region Triggers
-void ARobot::GraspLeft(const FInputActionValue& Value){
+void AExpert::GraspLeft(const FInputActionValue& Value){
 	left.grab = Value.Get<float>();
 };
-void ARobot::GraspReleaseLeft(const FInputActionValue& Value){
+void AExpert::GraspReleaseLeft(const FInputActionValue& Value){
 	left.grab = 0;
 };
-void ARobot::GraspRight(const FInputActionValue& Value){
+void AExpert::GraspRight(const FInputActionValue& Value){
 	right.grab =  Value.Get<float>();
 };
-void ARobot::GraspReleaseRight(const FInputActionValue& Value){
+void AExpert::GraspReleaseRight(const FInputActionValue& Value){
 	right.grab = 0;
 };
-void ARobot::TriggerLeft(const FInputActionValue& Value){
+void AExpert::TriggerLeft(const FInputActionValue& Value){
 	left.trigger = Value.Get<float>();
 };
-void ARobot::TriggerReleaseLeft(const FInputActionValue& Value){
+void AExpert::TriggerReleaseLeft(const FInputActionValue& Value){
 	left.trigger = 0;
 };
-void ARobot::TriggerRight(const FInputActionValue& Value){
+void AExpert::TriggerRight(const FInputActionValue& Value){
 	right.trigger = Value.Get<float>();
 };
-void ARobot::TriggerReleaseRight(const FInputActionValue& Value){
+void AExpert::TriggerReleaseRight(const FInputActionValue& Value){
 	right.trigger = 0;
 };
 #pragma endregion
 #pragma region Button
-void ARobot::PushA(const FInputActionValue& Value){
+void AExpert::PushA(const FInputActionValue& Value){
 	right.aButton= true;
 };
-void ARobot::ReleaseA(const FInputActionValue& Value){
+void AExpert::ReleaseA(const FInputActionValue& Value){
 	right.aButton= false;
 };
-void ARobot::PushB(const FInputActionValue& Value){
+void AExpert::PushB(const FInputActionValue& Value){
 	right.bButton= true;
 };
-void ARobot::ReleaseB(const FInputActionValue& Value){
+void AExpert::ReleaseB(const FInputActionValue& Value){
 	right.bButton= false;
 };
-void ARobot::PushX(const FInputActionValue& Value){
+void AExpert::PushX(const FInputActionValue& Value){
 	left.aButton= true;
 };
-void ARobot::ReleaseX(const FInputActionValue& Value){
+void AExpert::ReleaseX(const FInputActionValue& Value){
 	left.aButton= false;
 };
-void ARobot::PushY(const FInputActionValue& Value){
+void AExpert::PushY(const FInputActionValue& Value){
 	left.bButton= true;
 };
-void ARobot::ReleaseY(const FInputActionValue& Value){
+void AExpert::ReleaseY(const FInputActionValue& Value){
 	left.bButton= false;
 };
 #pragma endregion
 #pragma region ThumbStick
-void ARobot::ThumbStickLeft(const FInputActionValue& Value)
+void AExpert::ThumbStickLeft(const FInputActionValue& Value)
 {
     FVector2D StickValue = Value.Get<FVector2D>();
 	left.x = StickValue.X;
 	left.y = StickValue.Y;
 }
-void ARobot::ThumbStickReleaseLeft(const FInputActionValue& Value)
+void AExpert::ThumbStickReleaseLeft(const FInputActionValue& Value)
 {
 	left.x = 0;
     left.y = 0;
 }
-void ARobot::ThumbStickRight(const FInputActionValue& Value)
+void AExpert::ThumbStickRight(const FInputActionValue& Value)
 {
     FVector2D StickValue = Value.Get<FVector2D>();
 	right.x = StickValue.X;
 	right.y = StickValue.Y;
 }
-void ARobot::ThumbStickReleaseRight(const FInputActionValue& Value)
+void AExpert::ThumbStickReleaseRight(const FInputActionValue& Value)
 {
 	right.x = 0;
 	right.y = 0;
 }
-void ARobot::PushThumbStickLeft(const FInputActionValue& Value){
+void AExpert::PushThumbStickLeft(const FInputActionValue& Value){
 	left.thumbstickButton = true;
+
+	if (!P3Bot) return;
+
+	// HMD offset from pawn root (XY only — keep floor height)
+	// FVector CameraOffset = VRCamera->GetComponentLocation() - GetActorLocation();
+	// CameraOffset.Z = 0.0f;
+
+	// FVector BotLocation = P3Bot->GetActorLocation();
+	// FVector NewLocation = FVector(BotLocation.X - CameraOffset.X,
+	//                               BotLocation.Y - CameraOffset.Y,
+	//                               GetActorLocation().Z);
+	// SetActorLocation(NewLocation);
+	// SetActorRotation(P3Bot->GetActorRotation());
 };
-void ARobot::ReleaseThumbStickLeft(const FInputActionValue& Value){
+void AExpert::ReleaseThumbStickLeft(const FInputActionValue& Value){
 	left.thumbstickButton = false;
 };
-void ARobot::PushThumbStickRight(const FInputActionValue& Value){
+void AExpert::PushThumbStickRight(const FInputActionValue& Value){
 	right.thumbstickButton = true;
 	followRobot = !followRobot;
 	middleware.stopBase();
 
 };
-void ARobot::ReleaseThumbStickRight(const FInputActionValue& Value){
+void AExpert::ReleaseThumbStickRight(const FInputActionValue& Value){
 	right.thumbstickButton = false;
 };
 #pragma endregion
@@ -260,7 +277,7 @@ void ARobot::ReleaseThumbStickRight(const FInputActionValue& Value){
 
 
 // Called every frame
-void ARobot::Tick(float DeltaTime)
+void AExpert::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
     if (!GEngine or !GetWorld() or !GetWorld()->IsGameWorld())
@@ -275,6 +292,30 @@ void ARobot::Tick(float DeltaTime)
 	FVector RightPos = RightController->GetComponentLocation();
 	FQuat RightQuat = RightController->GetComponentQuat();
 
+	LeftPos = !followRobot && left.bButton ? HMDPos + (LeftPos - HMDPos) * 1.9f : LeftPos;
+	RightPos = !followRobot && right.bButton ? HMDPos + (RightPos - HMDPos) * 1.9f : RightPos;
+
+	LeftGriper->SetWorldRotation(LeftQuat);
+	LeftGriper->SetWorldLocation(LeftPos);
+
+	RightGriper->SetWorldRotation(RightQuat);
+	RightGriper->SetWorldLocation(RightPos);
+
+	if (P3Bot)
+	{
+		FTransform BotTransform = P3Bot->GetActorTransform();
+		FQuat BotQuat = P3Bot->GetActorQuat();
+
+		HMDPos = BotTransform.InverseTransformPosition(HMDPos);
+		HMDQuat = BotQuat.Inverse()*HMDQuat;
+
+		LeftPos = BotTransform.InverseTransformPosition(LeftPos);
+		LeftQuat = BotQuat.Inverse()*LeftQuat;
+
+		RightPos = BotTransform.InverseTransformPosition(RightPos);
+		RightQuat = BotQuat.Inverse()*RightQuat;
+	}
+
 	middleware.sendData(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W},
 		RobotMiddleware::Pose{LeftPos.X, LeftPos.Y, LeftPos.Z, LeftQuat.X, LeftQuat.Y, LeftQuat.Z, LeftQuat.W}, left,
 		RobotMiddleware::Pose{RightPos.X, RightPos.Y, RightPos.Z, RightQuat.X, RightQuat.Y, RightQuat.Z, RightQuat.W}, right
@@ -284,7 +325,18 @@ void ARobot::Tick(float DeltaTime)
 		middleware.setBasePose(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W});	
 	}
 	else{
-		middleware.setSpeedBase(left.x*500, left.y*500, -right.x*1.5);
+		if (left.x == 0 and left.y == 0 and right.x == 0 )
+		{
+			if(stopRobot == false)
+				middleware.stopBase();
+			stopRobot = true;
+		}
+		else
+		{
+			stopRobot = false;
+		}
+		if (!stopRobot)
+			middleware.setSpeedBase(left.x*500, left.y*500, -right.x*1.5);
 	}
 
 	RobotMiddleware::Haptic leftHaptic, rightHaptic;
@@ -295,11 +347,7 @@ void ARobot::Tick(float DeltaTime)
 	}
 
 
-	LeftGriper->SetWorldRotation(LeftQuat);
-	LeftGriper->SetWorldLocation(LeftPos);
 
-	RightGriper->SetWorldRotation(RightQuat);
-	RightGriper->SetWorldLocation(RightPos);
 
 	// if (FPSQueue.size() == maxSize) {
 	// 	FPSQueue.pop_front();

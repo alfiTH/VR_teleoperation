@@ -19,23 +19,24 @@
 
 #include "Engine/Engine.h"
 #include "RobotMiddleware.h"
+#include "P3Bot.h"
 #include <atomic>
 #include <iostream>
 #include <deque>
 #include <fstream>
 
 #include "DrawDebugHelpers.h"
-#include "Robot.generated.h"
+#include "Expert.generated.h"
 
 
 UCLASS()
-class VRTELEOPERATION_API ARobot : public APawn
+class VRTELEOPERATION_API AExpert : public APawn
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
-	ARobot();
+	AExpert();
 
 protected:
 	// Called when the game starts or when spawned
@@ -146,6 +147,10 @@ private:
 	std::deque<float> FPSQueue;
 	const size_t maxSize = 2000;
 	std::atomic<bool> followRobot = false;
+	std::atomic<bool> stopRobot = false;
+
+	AP3Bot* P3Bot = nullptr;
+
 public:
 
 };

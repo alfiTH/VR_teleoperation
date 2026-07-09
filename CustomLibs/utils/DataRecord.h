@@ -96,9 +96,9 @@ public:
 
 
     // /// Añade un registro con ColorCloudData
-    // bool addData(const std::uint32_t timestamp,
-    //              const std::uint32_t delay,
-    //              const RobotMiddleware::ColorCloudData& cloud);
+    bool addData(const std::uint32_t timestamp,
+                 const std::uint32_t delay,
+                 const RobotMiddleware::ColorCloudData& cloud);
                  
     bool addData(const std::uint32_t timestamp,
                  const std::uint32_t delay,

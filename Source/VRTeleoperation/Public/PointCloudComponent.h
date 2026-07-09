@@ -50,4 +50,13 @@ public:
 
 private:
 	RobotMiddleware& middleware = RobotMiddleware::getInstance();
+	// Versión de la nube ya consumida (RobotMiddleware::ColorCloudDataGuard::getVersion()).
+	// No comparar por puntero (cloud.X.data()): el allocator puede devolver la misma
+	// dirección que se acaba de liberar para el siguiente frame de tamaño similar.
+	uint64 lastCloudVersion = 0;
+
+	// Total de partículas instanciadas en el sistema Niagara (capacidad fija, p.ej. 1M).
+	int32 PointCapacity = 0;
+	// NumPoints válido del frame anterior, para solo relocar la diferencia a (0,0,0).
+	int32 PrevNumPoints = 0;
 };
