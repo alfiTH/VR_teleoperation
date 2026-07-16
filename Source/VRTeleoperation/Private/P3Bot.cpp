@@ -27,7 +27,7 @@ void AP3Bot::Tick(float DeltaTime)
 	{
 		lastPose = pose;
 		hasPose = true;
-		UE_LOG(LogTemp, Log, TEXT("Robot Pose -> Pos: (%f, %f, %f)"), pose.x, pose.y, pose.z);
+		// UE_LOG(LogTemp, Log, TEXT("Robot Pose -> Pos: (%f, %f, %f)"), pose.x, pose.y, pose.z);
 	}
 
 	if (hasPose)

@@ -35,6 +35,7 @@ void UPointCloudComponent::BeginPlay()
 			FNiagaraVariableBase Var(FNiagaraTypeDefinition::GetIntDef(), FName("User.NumPoints"));
 			NumPoints = Params.GetParameterValue<int32>(Var);
 			PointCapacity = NumPoints;
+			UE_LOG(LogTemp, Warning, TEXT("Niagara::PointCapacity: %d"), PointCapacity);
 
 			// SetNumZeroed (no SetNumUninitialized): así todo el array arranca ya en (0,0,0),
 			// que es el invariante que TickComponent mantiene después solo tocando el delta.

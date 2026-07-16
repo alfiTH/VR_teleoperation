@@ -34,7 +34,7 @@ bool RobotMiddleware::sendData(
               << ex.what() << "\n";
     return false;
   } catch (...) {
-    std::cout << "\033[1;33mWARNING\033[0m Failed to get robot state\n";
+    std::cout << "\033[1;33mWARNING\033[0m Failed to send data\n";
     return false;
   }
 }

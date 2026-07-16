@@ -68,7 +68,7 @@ struct RobotMiddleware::Impl {
       #ifdef P3BOT
         if (auto lidar3d_opt = require<RoboCompLidar3D::Lidar3DPrx,
                                       RoboCompLidar3D::Lidar3DPrxPtr>(
-                ic, "lidar3d:tcp -h " + IP_ROBOT + " -p 12001", "Lidar3DProxy"))
+                ic, "lidar3d:tcp -h " + IP_ROBOT + " -p 11990", "Lidar3DProxy"))//12001
           lidar3d_proxy = *lidar3d_opt;
         else {
           running = false;
@@ -88,7 +88,7 @@ struct RobotMiddleware::Impl {
       #ifdef P3BOT
         if (auto arm_left_opt = require<RoboCompKinovaArm::KinovaArmPrx,
                                       RoboCompKinovaArm::KinovaArmPrxPtr>(
-                ic, "kinovaarm1:tcp -h " + IP_ROBOT + " -p 10006",
+                ic, "kinovaarm:tcp -h " + IP_ROBOT + " -p 10006",
                 "KinovaArmProxy"))
           arm_left_proxy = *arm_left_opt;
         else {
@@ -469,6 +469,7 @@ struct RobotMiddleware::Impl {
     #ifdef P3BOT
       using namespace std::chrono;
       const auto period = 20ms;
+      const auto timeout = period;
       std::future<RoboCompGenericBase::TBaseState> state_future;
 
       while (running) {
@@ -487,12 +488,12 @@ struct RobotMiddleware::Impl {
 
         // Comprobar si la llamada pendiente ya tiene resultado (sin bloquear)
         if (state_future.valid() &&
-            state_future.wait_for(0ms) == std::future_status::ready) {
+            state_future.wait_for(timeout) == std::future_status::ready) {
           try {
             auto state = state_future.get();
             {
               std::unique_lock<std::mutex> lock(robot_mutex);
-              robot_pose = angle2DToQuaternion(static_cast<float>(state.alpha), static_cast<float>(state.z)*100, static_cast<float>(state.x)*100, 0.0);
+              robot_pose = angle2DToQuaternion(-static_cast<float>(state.alpha), static_cast<float>(state.z)/10, static_cast<float>(state.x)/10, 0.0);
               poseChanged = true;
             }
           } catch (const Ice::ConnectionRefusedException &ex) {

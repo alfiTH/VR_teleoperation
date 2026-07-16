@@ -263,7 +263,9 @@ TEST_F(MiddlewareLifecycleTest, SendDataReturns) {
 // 4. Prueba de nube de puntos vacía
 TEST_F(MiddlewareLifecycleTest, GetColorCloudDataReturns) {
   sleep(1);
-  const auto &cloud = RobotMiddleware::getInstance().getColorCloudData();
+  const auto guard = RobotMiddleware::getInstance().lockColorCloudData();
+  EXPECT_TRUE(guard.valid());
+	const RobotMiddleware::ColorCloudData& cloud = guard.get();
   EXPECT_FALSE(cloud.X.empty());
   EXPECT_FALSE(cloud.Y.empty());
   EXPECT_FALSE(cloud.Z.empty());

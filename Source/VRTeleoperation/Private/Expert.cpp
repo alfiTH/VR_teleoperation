@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "Expert.h"
+#include <iostream>
 
 const float TOLERANCE_FLOAT = 0.01f;
 
@@ -62,6 +63,7 @@ void AExpert::BeginPlay()
 		}
 		TArray<AActor*> FoundActors;
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AP3Bot::StaticClass(), FoundActors);
+		UE_LOG(LogTemp, Warning, TEXT("FoundActors.Num(): %d"), FoundActors.Num());
 		if (FoundActors.Num() > 0)
 			P3Bot = Cast<AP3Bot>(FoundActors[0]);
 	}
@@ -246,19 +248,6 @@ void AExpert::ThumbStickReleaseRight(const FInputActionValue& Value)
 }
 void AExpert::PushThumbStickLeft(const FInputActionValue& Value){
 	left.thumbstickButton = true;
-
-	if (!P3Bot) return;
-
-	// HMD offset from pawn root (XY only — keep floor height)
-	// FVector CameraOffset = VRCamera->GetComponentLocation() - GetActorLocation();
-	// CameraOffset.Z = 0.0f;
-
-	// FVector BotLocation = P3Bot->GetActorLocation();
-	// FVector NewLocation = FVector(BotLocation.X - CameraOffset.X,
-	//                               BotLocation.Y - CameraOffset.Y,
-	//                               GetActorLocation().Z);
-	// SetActorLocation(NewLocation);
-	// SetActorRotation(P3Bot->GetActorRotation());
 };
 void AExpert::ReleaseThumbStickLeft(const FInputActionValue& Value){
 	left.thumbstickButton = false;
@@ -267,7 +256,6 @@ void AExpert::PushThumbStickRight(const FInputActionValue& Value){
 	right.thumbstickButton = true;
 	followRobot = !followRobot;
 	middleware.stopBase();
-
 };
 void AExpert::ReleaseThumbStickRight(const FInputActionValue& Value){
 	right.thumbstickButton = false;
@@ -292,8 +280,8 @@ void AExpert::Tick(float DeltaTime)
 	FVector RightPos = RightController->GetComponentLocation();
 	FQuat RightQuat = RightController->GetComponentQuat();
 
-	LeftPos = !followRobot && left.bButton ? HMDPos + (LeftPos - HMDPos) * 1.9f : LeftPos;
-	RightPos = !followRobot && right.bButton ? HMDPos + (RightPos - HMDPos) * 1.9f : RightPos;
+	LeftPos = left.bButton ? HMDPos + (LeftPos - HMDPos) * 1.9f : LeftPos;
+	RightPos = right.bButton ? HMDPos + (RightPos - HMDPos) * 1.9f : RightPos;
 
 	LeftGriper->SetWorldRotation(LeftQuat);
 	LeftGriper->SetWorldLocation(LeftPos);
@@ -314,6 +302,7 @@ void AExpert::Tick(float DeltaTime)
 
 		RightPos = BotTransform.InverseTransformPosition(RightPos);
 		RightQuat = BotQuat.Inverse()*RightQuat;
+		// UE_LOG(LogTemp, Warning, TEXT("HMDPos -> (%f, %f, %f), LeftPos -> (%f, %f, %f), RightPos -> (%f, %f, %f)"), HMDPos.X, HMDPos.Y, HMDPos.Z, LeftPos.X, LeftPos.Y, LeftPos.Z, RightPos.X, RightPos.Y, RightPos.Z);
 	}
 
 	middleware.sendData(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W},
@@ -325,6 +314,10 @@ void AExpert::Tick(float DeltaTime)
 		middleware.setBasePose(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W});	
 	}
 	else{
+		if (left.thumbstickButton)
+		{
+			middleware.resetOdometer();
+		}
 		if (left.x == 0 and left.y == 0 and right.x == 0 )
 		{
 			if(stopRobot == false)
