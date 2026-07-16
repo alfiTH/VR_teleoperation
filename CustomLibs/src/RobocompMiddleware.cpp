@@ -386,7 +386,7 @@ struct RobotMiddleware::Impl {
 
   void updateRobotState() {
     using namespace std::chrono;
-    const auto period = 50ms;
+    const auto period = 5ms;
     const auto timeout = period;
     const double rad_to_deg = 180.0 / M_PI;
     RoboCompKinovaArm::TJoints left_joints, right_joints;
@@ -405,36 +405,45 @@ struct RobotMiddleware::Impl {
       right_joints.joints[i].angle = 0.0;
     }
 
+    #ifdef P3BOT
+      std::future<RoboCompKinovaArm::TJoints> left_future;
+    #endif
+    std::future<RoboCompKinovaArm::TJoints> right_future;
+
     while (running) {
       auto start = steady_clock::now();
       try {
-        // Llamadas asíncronas no bloqueantes
+        // Lanzar nueva llamada solo si no hay una pendiente
         #ifdef P3BOT
-          auto left_future = arm_left_proxy->getJointsStateAsync();
-        #endif
-        auto right_future = arm_right_proxy->getJointsStateAsync();
-
-        #ifdef P3BOT
-          if (left_future.wait_for(timeout) == std::future_status::ready) {
-            left_joints = left_future.get();
+          if (!left_future.valid()) {
+            left_future = arm_left_proxy->getJointsStateAsync();
           }
         #endif
-        if (right_future.wait_for(timeout) == std::future_status::ready) {
-          right_joints = right_future.get();
+        if (!right_future.valid()) {
+          right_future = arm_right_proxy->getJointsStateAsync();
         }
-        // std::cout << "arms: ";
-        {
+
+        bool updated = false;
+
+        #ifdef P3BOT
+          if (left_future.valid() && left_future.wait_for(timeout) == std::future_status::ready) {
+            left_joints = left_future.get();
+            updated = true;
+          }
+        #endif
+        if (right_future.valid() && right_future.wait_for(timeout) == std::future_status::ready) {
+          right_joints = right_future.get();
+          updated = true;
+        }
+
+        if (updated) {
           std::scoped_lock lock(arm_mutex);
           for (int i = 0; i < right_joints.joints.size(); ++i) {
             #ifdef P3BOT
               left_arm[i] = left_joints.joints[i].angle * rad_to_deg;
-              // std::cout << left_arm[i] << " ";
             #endif
             right_arm[i] = right_joints.joints[i].angle * rad_to_deg;
-            // std::cout << right_arm[i] << " ";
-
           }
-          // std::cout << "\n";
         }
       } catch (const Ice::ConnectionRefusedException &ex) {
         std::cerr << "\033[31mERROR\033[0m Robot state connection refused: "
@@ -468,7 +477,7 @@ struct RobotMiddleware::Impl {
   void updateRobotPose() {
     #ifdef P3BOT
       using namespace std::chrono;
-      const auto period = 20ms;
+      const auto period = 15ms;
       const auto timeout = period;
       std::future<RoboCompGenericBase::TBaseState> state_future;
 

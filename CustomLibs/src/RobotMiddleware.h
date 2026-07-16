@@ -6,7 +6,7 @@
 #include <string>
 
 
-const std::string IP_ROBOT = "192.168.3.158";
+const std::string IP_ROBOT = "192.168.3.161";
 
 class RobotMiddleware {
 public:

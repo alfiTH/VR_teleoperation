@@ -138,6 +138,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Input")
 	UInputAction* IA_Hand_Thumbstick_Press_Right;
 
+	// Radio máximo (en cm, unidades de Unreal) entre la persona y el P3Bot para permitir el followRobot
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Safety")
+	float MaxFollowDistance = 100.0f;
 
 private:
 	RobotMiddleware& middleware = RobotMiddleware::getInstance();
@@ -148,6 +151,10 @@ private:
 	const size_t maxSize = 2000;
 	std::atomic<bool> followRobot = false;
 	std::atomic<bool> stopRobot = false;
+	bool bOutOfFollowRangeWarned = false;
+
+	std::atomic<bool> continuousOdometerReset = false;
+	float LastThumbstickLeftPressTime = -1.0f;
 
 	AP3Bot* P3Bot = nullptr;
 

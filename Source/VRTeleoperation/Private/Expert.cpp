@@ -3,6 +3,7 @@
 #include <iostream>
 
 const float TOLERANCE_FLOAT = 0.01f;
+const float THUMBSTICK_DOUBLE_TAP_TIME = 0.4f;
 
 inline void exportFPSQueueToCSV(const std::deque<float>& FPSQueue, 
 						 const std::string& filename = "fps_data.csv",
@@ -248,6 +249,17 @@ void AExpert::ThumbStickReleaseRight(const FInputActionValue& Value)
 }
 void AExpert::PushThumbStickLeft(const FInputActionValue& Value){
 	left.thumbstickButton = true;
+
+	const float Now = GetWorld()->GetTimeSeconds();
+	if (LastThumbstickLeftPressTime >= 0.0f && (Now - LastThumbstickLeftPressTime) <= THUMBSTICK_DOUBLE_TAP_TIME)
+	{
+		continuousOdometerReset = !continuousOdometerReset;
+		LastThumbstickLeftPressTime = -1.0f;
+	}
+	else
+	{
+		LastThumbstickLeftPressTime = Now;
+	}
 };
 void AExpert::ReleaseThumbStickLeft(const FInputActionValue& Value){
 	left.thumbstickButton = false;
@@ -310,11 +322,25 @@ void AExpert::Tick(float DeltaTime)
 		RobotMiddleware::Pose{RightPos.X, RightPos.Y, RightPos.Z, RightQuat.X, RightQuat.Y, RightQuat.Z, RightQuat.W}, right
 	);
 
-	if (followRobot){
-		middleware.setBasePose(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W});	
+	if (!continuousOdometerReset && followRobot){
+		const float PlanarDistance = FVector::Dist2D(HMDPos, FVector::ZeroVector);
+		if (PlanarDistance <= MaxFollowDistance)
+		{
+			bOutOfFollowRangeWarned = false;
+			middleware.setBasePose(RobotMiddleware::Pose{HMDPos.X, HMDPos.Y, HMDPos.Z, HMDQuat.X, HMDQuat.Y, HMDQuat.Z, HMDQuat.W});
+		}
+		else
+		{
+			middleware.stopBase();
+			if (!bOutOfFollowRangeWarned)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("followRobot deshabilitado: distancia radial (%.1f) supera MaxFollowDistance (%.1f)"), PlanarDistance, MaxFollowDistance);
+				bOutOfFollowRangeWarned = true;
+			}
+		}
 	}
 	else{
-		if (left.thumbstickButton)
+		if (continuousOdometerReset || left.thumbstickButton)
 		{
 			middleware.resetOdometer();
 		}
@@ -329,7 +355,7 @@ void AExpert::Tick(float DeltaTime)
 			stopRobot = false;
 		}
 		if (!stopRobot)
-			middleware.setSpeedBase(left.x*500, left.y*500, -right.x*1.5);
+			middleware.setSpeedBase(left.x*800, left.y*800, -right.x*1.5);
 	}
 
 	RobotMiddleware::Haptic leftHaptic, rightHaptic;
