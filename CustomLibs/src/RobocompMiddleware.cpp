@@ -21,6 +21,8 @@
 #include <numeric>
 #include <deque>
 #include <shared_mutex>
+#include <cstring>
+#include <algorithm>
 
 
 #include "RobocompMiddleware.tpp"
@@ -68,7 +70,7 @@ struct RobotMiddleware::Impl {
       #ifdef P3BOT
         if (auto lidar3d_opt = require<RoboCompLidar3D::Lidar3DPrx,
                                       RoboCompLidar3D::Lidar3DPrxPtr>(
-                ic, "lidar3d:tcp -h " + IP_ROBOT + " -p 11990", "Lidar3DProxy"))//12001
+                ic, "lidar3d:tcp -h " + IP_ROBOT + " -p 12001", "Lidar3DProxy"))
           lidar3d_proxy = *lidar3d_opt;
         else {
           running = false;
@@ -211,8 +213,8 @@ struct RobotMiddleware::Impl {
 //ALL CALLS TO ICE MUST BE IN A TRY-CATCH BLOCK
   void updateLidarData() {
     using namespace std::chrono;
-    const auto period = 50ms;
-    const auto timeout = period * 5;
+    const auto period = 33ms;
+    const auto timeout = period * 20;
     std::deque<long long> zed_timestamps, lidar3d_timestamps;
     size_t max_size = 100;
     auto add_time = [max_size](std::deque<long long> &buffer, long long value) {
@@ -437,13 +439,32 @@ struct RobotMiddleware::Impl {
         }
 
         if (updated) {
-          std::scoped_lock lock(arm_mutex);
-          for (int i = 0; i < right_joints.joints.size(); ++i) {
-            #ifdef P3BOT
-              left_arm[i] = left_joints.joints[i].angle * rad_to_deg;
-            #endif
-            right_arm[i] = right_joints.joints[i].angle * rad_to_deg;
+          JointData joints{};
+          {
+            std::scoped_lock lock(arm_mutex);
+            for (int i = 0; i < right_joints.joints.size(); ++i) {
+              #ifdef P3BOT
+                left_arm[i] = left_joints.joints[i].angle * rad_to_deg;
+              #endif
+              right_arm[i] = right_joints.joints[i].angle * rad_to_deg;
+            }
+            std::memcpy(joints.left, left_arm, sizeof(left_arm));
+            std::memcpy(joints.right, right_arm, sizeof(right_arm));
           }
+          long long oldest_ts = right_joints.timestamp;
+          #ifdef P3BOT
+            if (left_joints.timestamp > 0)
+              oldest_ts = (oldest_ts > 0) ? std::min(oldest_ts, left_joints.timestamp)
+                                           : left_joints.timestamp;
+          #endif
+          std::uint32_t delay = 0;
+          if (oldest_ts > 0) {
+            const auto now_epoch_ms =
+                duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+            delay = static_cast<std::uint32_t>(now_epoch_ms - oldest_ts);
+          }
+          DataRecord::getInstance().addData(
+              DataRecord::getInstance().elapsedMs(), delay, joints);
         }
       } catch (const Ice::ConnectionRefusedException &ex) {
         std::cerr << "\033[31mERROR\033[0m Robot state connection refused: "
@@ -500,11 +521,17 @@ struct RobotMiddleware::Impl {
             state_future.wait_for(timeout) == std::future_status::ready) {
           try {
             auto state = state_future.get();
+            RobotMiddleware::Pose pose{};
             {
               std::unique_lock<std::mutex> lock(robot_mutex);
               robot_pose = angle2DToQuaternion(-static_cast<float>(state.alpha), static_cast<float>(state.z)/10, static_cast<float>(state.x)/10, 0.0);
               poseChanged = true;
+              pose = robot_pose;
             }
+            const auto delay = duration_cast<milliseconds>(steady_clock::now() - start).count();
+            DataRecord::getInstance().addData(
+                DataRecord::getInstance().elapsedMs(),
+                static_cast<std::uint32_t>(delay), pose);
           } catch (const Ice::ConnectionRefusedException &ex) {
             std::cerr << "\033[31mERROR\033[0m Robot pose connection refused: " << ex.what() << "\n";
           } catch (const Ice::ConnectionLostException &ex) {
@@ -548,6 +575,9 @@ struct RobotMiddleware::Impl {
         left = iceToHaptic(haptics.left);
         right = iceToHaptic(haptics.right);
         hapticChanged = true;
+        DataRecord::getInstance().addData(
+            DataRecord::getInstance().elapsedMs(), 0u,
+            HapticData{left, right});
       }
       return hapticChanged;
     } catch (const std::exception &ex) {
@@ -569,6 +599,12 @@ struct RobotMiddleware::Impl {
     const RobotMiddleware::Controller &leftController,
     const RobotMiddleware::Pose &right,
     const RobotMiddleware::Controller &rightController) {
+    {
+      auto &recorder = DataRecord::getInstance();
+      const auto ts = recorder.elapsedMs();
+      recorder.addData(ts, 0u, VRData{head, left, right});
+      recorder.addData(ts, 0u, ControllerData{leftController, rightController});
+    }
     try {
       RoboCompVRController::Controller retLeft = toIceController(leftController);
       retLeft.pose = toIcePose(left);
@@ -604,6 +640,9 @@ struct RobotMiddleware::Impl {
   }
   
   bool setBasePose(const RobotMiddleware::Pose &target){
+    DataRecord::getInstance().addData(
+        DataRecord::getInstance().elapsedMs(), 0u,
+        BasePoseCmd{target});
     #ifdef P3BOT
        try {
           navigator_proxy->gotoPoseAsync(RoboCompNavigator::TPose(-target.y*10, target.x*10, getYawFromQuaternion(target.qrx, target.qry, target.qrz, target.qrw))); 
@@ -634,6 +673,9 @@ struct RobotMiddleware::Impl {
   }
 
   bool setSpeedBase(float x, float y, float yaw){
+    DataRecord::getInstance().addData(
+        DataRecord::getInstance().elapsedMs(), 0u,
+        BaseSpeedCmd{x, y, yaw});
     #ifdef P3BOT
        try {
           // std::cerr << "\033[32mINFO\033[0m " << "Set robot speed: " << x << " " << y << " " << yaw << "\n";
@@ -666,6 +708,9 @@ struct RobotMiddleware::Impl {
   }
 
   bool stopBase(){
+    DataRecord::getInstance().addData(
+        DataRecord::getInstance().elapsedMs(), 0u,
+        BaseSpeedCmd{0.f, 0.f, 0.f});
     #ifdef P3BOT
        try {
           navigator_proxy->stopAsync();

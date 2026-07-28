@@ -339,8 +339,9 @@ protected:
 
 TEST_F(DataRecordTest, TypesData) {
   DataRecord& dr = DataRecord::getInstance();
+  dr.startRecording();
 
-  VRData vr{{1.0f, 2.0f, 3.0f, 0.0f, 0.0f, 0.707f, 0.707f}, 
+  VRData vr{{1.0f, 2.0f, 3.0f, 0.0f, 0.0f, 0.707f, 0.707f},
                       {1.0f, 2.0f, 3.0f, 0.0f, 0.0f, 0.707f, 0.707f},
                       {1.0f, 2.0f, 3.0f, 0.0f, 0.0f, 0.707f, 0.707f}};
   dr.addData(100u, 0u, vr);
@@ -372,6 +373,7 @@ TEST_F(DataRecordTest, AddAndSaveLoadRoundTrip) {
     std::remove(tmpfile.c_str());
 
     DataRecord& dr = DataRecord::getInstance();
+    dr.startRecording();
     // Add a Pose record (VRPose)
     RobotMiddleware::Pose pose{1.0f, 2.0f, 3.0f, 0.0f, 0.0f, 0.707f, 0.707f};
     dr.addData(1000u, 10u, pose);
@@ -393,13 +395,13 @@ TEST_F(DataRecordTest, AddAndSaveLoadRoundTrip) {
     std::vector<std::byte> expected;
     {
         // Manually construct expected buffer using same logic as DataRecord::append
-        RecordHeader hdr1{1000u, 10u, RecordType::VRPose, static_cast<uint16_t>(sizeof(RobotMiddleware::Pose))};
+        RecordHeader hdr1{1000u, 10u, RecordType::VRPose, static_cast<uint32_t>(sizeof(RobotMiddleware::Pose))};
         const std::byte* pHdr1 = reinterpret_cast<const std::byte*>(&hdr1);
         expected.insert(expected.end(), pHdr1, pHdr1 + sizeof(hdr1));
         const std::byte* pPos = reinterpret_cast<const std::byte*>(&pose);
         expected.insert(expected.end(), pPos, pPos + sizeof(pose));
 
-        RecordHeader hdr2{2000u, 20u, RecordType::VRHaptic, static_cast<uint16_t>(sizeof(RobotMiddleware::Haptic))};
+        RecordHeader hdr2{2000u, 20u, RecordType::VRHaptic, static_cast<uint32_t>(sizeof(RobotMiddleware::Haptic))};
         const std::byte* pHdr2 = reinterpret_cast<const std::byte*>(&hdr2);
         expected.insert(expected.end(), pHdr2, pHdr2 + sizeof(hdr2));
         const std::byte* pHit = reinterpret_cast<const std::byte*>(&haptic);

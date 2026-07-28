@@ -6,7 +6,7 @@
 #include <string>
 
 
-const std::string IP_ROBOT = "192.168.3.161";
+const std::string IP_ROBOT = "192.168.3.11";
 
 class RobotMiddleware {
 public:
@@ -98,6 +98,12 @@ struct Controller {
   bool setBasePose(const RobotMiddleware::Pose &target);
   bool stopBase();
   bool resetOdometer();
+
+  // ── Grabación de demostraciones (DataRecord) ──────────────────────
+  bool startRecording();
+  bool stopRecording();
+  bool saveRecording(const std::string &filename);
+  bool isRecording();
 
 private:
   RobotMiddleware();

@@ -2,6 +2,7 @@
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
+#include <DataRecord.h>
 
 
 #ifdef ROBOCOMP
@@ -200,7 +201,7 @@ bool RobotMiddleware::stopBase(){
 
 bool RobotMiddleware::resetOdometer(){
   if (!pImpl)
-    return false;  
+    return false;
   try {
     pImpl->resetOdometer();
     return true;
@@ -214,4 +215,19 @@ bool RobotMiddleware::resetOdometer(){
     }
 }
 
+bool RobotMiddleware::startRecording() {
+  return DataRecord::getInstance().startRecording();
+}
+
+bool RobotMiddleware::stopRecording() {
+  return DataRecord::getInstance().stopRecording();
+}
+
+bool RobotMiddleware::saveRecording(const std::string &filename) {
+  return DataRecord::getInstance().saveData(filename);
+}
+
+bool RobotMiddleware::isRecording() {
+  return DataRecord::getInstance().isRecording();
+}
 

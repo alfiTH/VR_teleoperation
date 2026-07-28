@@ -137,7 +137,7 @@ void UPointCloudComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		// desde el frame anterior (invariante). Si este frame tiene MENOS puntos válidos
 		// que el anterior, solo hay que relocar a (0,0,0) la diferencia; si tiene más o
 		// igual, no hace falta tocar nada más: ya estaban a cero y se acaban de sobrescribir.
-		if (NumPoints < PrevNumPoints && std::abs(PrevNumPoints - NumPoints) > 10000)
+		if (NumPoints < PrevNumPoints && std::abs(PrevNumPoints - NumPoints) > 1000)
 		{
 			const int32 ClearCount = PrevNumPoints - NumPoints;
 			FMemory::Memzero(ParticlePositions.GetData() + NumPoints, ClearCount * sizeof(FVector));
